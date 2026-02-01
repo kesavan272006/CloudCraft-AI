@@ -25,7 +25,7 @@ export const sidebarData: SidebarData = {
     {
       name: 'CloudCraft AI',
       logo: Sparkles,
-      plan: 'AI for Bharat 2025',
+      plan: 'AI for Bharat 2026',
     },
   ],
   navGroups: [

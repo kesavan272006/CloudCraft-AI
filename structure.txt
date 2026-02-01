@@ -1,0 +1,51 @@
+backend/
+├── config/
+│   ├── __init__.py
+│   ├── settings.py                # env vars + model selection logic
+│   └── logging_config.py
+├── src/
+│   ├── __init__.py
+│   ├── main.py
+│   ├── api/
+│   │   ├── __init__.py
+│   │   ├── v1/
+│   │   │   ├── __init__.py
+│   │   │   ├── endpoints/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── forge.py          # main agentic endpoint
+│   │   │   │   ├── brand.py          # RAG upload + audit
+│   │   │   │   ├── vision.py         # image/video analysis
+│   │   │   │   ├── campaign.py       # planning / calendar
+│   │   │   │   └── pulse.py          # trends + predictions
+│   │   └── dependencies.py
+│   ├── core/
+│   │   ├── __init__.py
+│   │   ├── llm_factory.py           ← NEW: central place to get LLM (Llama or Gemini)
+│   │   └── config.py
+│   ├── agents/
+│   │   ├── __init__.py
+│   │   ├── base_agent.py
+│   │   ├── supervisor.py            ← The Brain Agent (coordinates)
+│   │   ├── researcher_agent.py
+│   │   ├── copywriter_agent.py
+│   │   ├── designer_agent.py        ← uses Llama-3.2-Vision when needed
+│   │   └── compliance_agent.py
+│   ├── rag/
+│   │   ├── __init__.py
+│   │   ├── vector_store.py          # Chroma init + embedding model
+│   │   ├── document_processor.py
+│   │   └── retriever.py
+│   ├── vision/
+│   │   ├── __init__.py
+│   │   └── analyzer.py              # Llama-3.2-11B-Vision or Gemini Vision
+│   ├── utils/
+│   │   ├── __init__.py
+│   │   ├── logger.py
+│   │   └── helpers.py
+│   └── models/
+│       ├── __init__.py
+│       └── schemas.py               # Pydantic for API requests/responses
+├── .env
+├── .env.example
+├── requirements.txt
+└── README.md
