@@ -19,8 +19,8 @@ export function SignIn() {
         <CardHeader>
           <CardTitle className='text-lg tracking-tight'>Sign in</CardTitle>
           <CardDescription>
-            Enter your email and password below to <br />
-            log into your account
+            Log in to your CloudCraft AI account to <br />
+            start crafting content.
           </CardDescription>
         </CardHeader>
         <CardContent>

@@ -10,16 +10,14 @@ import {
   Settings,
   HelpCircle,
 } from 'lucide-react'
-
-// Note: If red lines persist on the 'export', change this to: 
-// export const sidebarData: any = {
 import { type SidebarData } from '../types'
 
 export const sidebarData: SidebarData = {
+  // We leave this empty or with placeholders; the component will override this
   user: {
-    name: 'Kesavan G',
-    email: 'kesavan@example.com',
-    avatar: '/avatars/shadcn.jpg',
+    name: '',
+    email: '',
+    avatar: '',
   },
   teams: [
     {
@@ -34,7 +32,7 @@ export const sidebarData: SidebarData = {
       items: [
         {
           title: 'Dashboard',
-          url: '/',
+          url: '/dashboard',
           icon: LayoutDashboard,
         },
         {
@@ -81,8 +79,6 @@ export const sidebarData: SidebarData = {
           title: 'Settings',
           url: '/settings',
           icon: Settings,
-          // If 'items' causes red lines here, your template's SidebarData
-          // does not support nested dropdowns. 
           items: [
             {
               title: 'Profile',

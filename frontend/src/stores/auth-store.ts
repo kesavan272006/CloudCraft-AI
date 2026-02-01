@@ -1,11 +1,11 @@
 import { create } from 'zustand'
-import { getCookie, setCookie, removeCookie } from '@/lib/cookies'
-
-const ACCESS_TOKEN = 'thisisjustarandomstring'
+import { persist, createJSONStorage } from 'zustand/middleware'
 
 interface AuthUser {
   accountNo: string
   email: string
+  name?: string
+  avatar?: string
   role: string[]
   exp: number
 }
@@ -13,41 +13,43 @@ interface AuthUser {
 interface AuthState {
   auth: {
     user: AuthUser | null
-    setUser: (user: AuthUser | null) => void
     accessToken: string
+    setUser: (user: AuthUser | null) => void
     setAccessToken: (accessToken: string) => void
-    resetAccessToken: () => void
     reset: () => void
   }
 }
 
-export const useAuthStore = create<AuthState>()((set) => {
-  const cookieState = getCookie(ACCESS_TOKEN)
-  const initToken = cookieState ? JSON.parse(cookieState) : ''
-  return {
-    auth: {
-      user: null,
-      setUser: (user) =>
-        set((state) => ({ ...state, auth: { ...state.auth, user } })),
-      accessToken: initToken,
-      setAccessToken: (accessToken) =>
-        set((state) => {
-          setCookie(ACCESS_TOKEN, JSON.stringify(accessToken))
-          return { ...state, auth: { ...state.auth, accessToken } }
-        }),
-      resetAccessToken: () =>
-        set((state) => {
-          removeCookie(ACCESS_TOKEN)
-          return { ...state, auth: { ...state.auth, accessToken: '' } }
-        }),
-      reset: () =>
-        set((state) => {
-          removeCookie(ACCESS_TOKEN)
-          return {
-            ...state,
-            auth: { ...state.auth, user: null, accessToken: '' },
-          }
-        }),
-    },
-  }
-})
+// Persist ONLY the serializable data (user + accessToken). Keep functions out of
+// the persisted payload so they remain available after hydration.
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      auth: {
+        user: null,
+        accessToken: '',
+        setUser: (user) =>
+          set((state) => ({ auth: { ...state.auth, user } })),
+        setAccessToken: (accessToken) =>
+          set((state) => ({ auth: { ...state.auth, accessToken } })),
+        reset: () =>
+          set(() => ({
+            auth: {
+              user: null,
+              accessToken: '',
+              setUser: () => {},
+              setAccessToken: () => {},
+              reset: () => {},
+            },
+          })),
+      },
+    }),
+    {
+      name: 'cloudcraft-auth-storage', // Key in LocalStorage
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        auth: { user: state.auth.user, accessToken: state.auth.accessToken },
+      }),
+    }
+  )
+)

@@ -1,36 +1,14 @@
 import { useState } from 'react'
-import { z } from 'zod'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Link, useNavigate } from '@tanstack/react-router'
-import { Loader2, LogIn } from 'lucide-react'
+import { useNavigate } from '@tanstack/react-router'
+import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { IconFacebook, IconGithub } from '@/assets/brand-icons'
+import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
+import { auth as firebaseAuth } from '@/lib/firebase'
 import { useAuthStore } from '@/stores/auth-store'
-import { sleep, cn } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { PasswordInput } from '@/components/password-input'
 
-const formSchema = z.object({
-  email: z.email({
-    error: (iss) => (iss.input === '' ? 'Please enter your email' : undefined),
-  }),
-  password: z
-    .string()
-    .min(1, 'Please enter your password')
-    .min(7, 'Password must be at least 7 characters long'),
-})
-
-interface UserAuthFormProps extends React.HTMLAttributes<HTMLFormElement> {
+interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {
   redirectTo?: string
 }
 
@@ -41,110 +19,86 @@ export function UserAuthForm({
 }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
-  const { auth } = useAuthStore()
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
-  })
-
-  function onSubmit(data: z.infer<typeof formSchema>) {
+  const handleGoogleSignIn = async () => {
     setIsLoading(true)
+    const provider = new GoogleAuthProvider()
+    provider.setCustomParameters({ prompt: 'select_account' })
 
-    toast.promise(sleep(2000), {
-      loading: 'Signing in...',
-      success: () => {
-        setIsLoading(false)
+    try {
+      const result = await signInWithPopup(firebaseAuth, provider)
+      const firebaseUser = result.user
 
-        // Mock successful authentication with expiry computed at success time
-        const mockUser = {
-          accountNo: 'ACC001',
-          email: data.email,
-          role: ['user'],
-          exp: Date.now() + 24 * 60 * 60 * 1000, // 24 hours from now
+      // 1. Prepare user data
+      const userData = {
+        accountNo: firebaseUser.uid,
+        email: firebaseUser.email || '',
+        name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
+        avatar: firebaseUser.photoURL || '',
+        role: ['user'],
+        exp: Date.now() + 24 * 60 * 60 * 1000, 
+      }
+
+      const token = await firebaseUser.getIdToken()
+
+      // 2. THE FIX: Directly update the state without calling "setUser"
+      // This uses the built-in setState which CANNOT be "not a function"
+      useAuthStore.setState((state) => ({
+        ...state,
+        auth: {
+          ...state.auth,
+          user: userData,
+          accessToken: token,
         }
+      }))
 
-        // Set user and access token
-        auth.setUser(mockUser)
-        auth.setAccessToken('mock-access-token')
-
-        // Redirect to the stored location or default to dashboard
-        const targetPath = redirectTo || '/'
-        navigate({ to: targetPath, replace: true })
-
-        return `Welcome back, ${data.email}!`
-      },
-      error: 'Error',
-    })
+      toast.success(`Welcome back, ${userData.name}!`)
+      
+      // 3. Navigate to dashboard
+      const targetPath = redirectTo || '/dashboard'
+      navigate({ to: targetPath, replace: true })
+      
+    } catch (error: any) {
+      console.error("Auth Error:", error)
+      if (error?.code === 'auth/popup-closed-by-user') {
+        toast.error('Sign-in cancelled')
+      } else {
+        toast.error(error.message || 'Failed to sign in with Google')
+      }
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className={cn('grid gap-3', className)}
-        {...props}
+    <div className={cn('grid gap-6', className)} {...props}>
+      <Button 
+        variant='outline' 
+        type='button' 
+        disabled={isLoading} 
+        onClick={handleGoogleSignIn}
+        className="w-full py-6 text-lg border-2 hover:bg-accent hover:text-accent-foreground transition-all"
       >
-        <FormField
-          control={form.control}
-          name='email'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder='name@example.com' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='password'
-          render={({ field }) => (
-            <FormItem className='relative'>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <PasswordInput placeholder='********' {...field} />
-              </FormControl>
-              <FormMessage />
-              <Link
-                to='/forgot-password'
-                className='absolute end-0 -top-0.5 text-sm font-medium text-muted-foreground hover:opacity-75'
-              >
-                Forgot password?
-              </Link>
-            </FormItem>
-          )}
-        />
-        <Button className='mt-2' disabled={isLoading}>
-          {isLoading ? <Loader2 className='animate-spin' /> : <LogIn />}
-          Sign in
-        </Button>
+        {isLoading ? (
+          <Loader2 className='mr-2 h-5 w-5 animate-spin' />
+        ) : (
+          <svg className="mr-2 h-5 w-5" viewBox="0 0 488 512">
+            <path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path>
+          </svg>
+        )}
+        Continue with Google
+      </Button>
 
-        <div className='relative my-2'>
-          <div className='absolute inset-0 flex items-center'>
-            <span className='w-full border-t' />
-          </div>
-          <div className='relative flex justify-center text-xs uppercase'>
-            <span className='bg-background px-2 text-muted-foreground'>
-              Or continue with
-            </span>
-          </div>
+      <div className='relative'>
+        <div className='absolute inset-0 flex items-center'>
+          <span className='w-full border-t' />
         </div>
-
-        <div className='grid grid-cols-2 gap-2'>
-          <Button variant='outline' type='button' disabled={isLoading}>
-            <IconGithub className='h-4 w-4' /> GitHub
-          </Button>
-          <Button variant='outline' type='button' disabled={isLoading}>
-            <IconFacebook className='h-4 w-4' /> Facebook
-          </Button>
+        <div className='relative flex justify-center text-xs uppercase'>
+          <span className='bg-background px-2 text-muted-foreground text-[10px]'>
+            CloudCraft AI Hackathon Secure Access
+          </span>
         </div>
-      </form>
-    </Form>
+      </div>
+    </div>
   )
 }

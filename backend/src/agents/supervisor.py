@@ -55,7 +55,15 @@ REASON: Research complete, now write.
 
 NEXT: FINISH
 REASON: All done, content ready.
-
+You are ONLY allowed to reply with EXACTLY these two lines and NOTHING ELSE:
+NEXT: Researcher
+or NEXT: Copywriter
+or NEXT: Designer
+or NEXT: Compliance
+or NEXT: FINISH
+REASON: [one short sentence max 10 words]
+NO other text allowed. NO explanations. NO content. NO repeating messages.
+Violating this destroys the system.
 User prompt: {task}
     """),
     MessagesPlaceholder(variable_name="messages"),
@@ -83,7 +91,10 @@ def supervisor_router(state: AgentState) -> Literal["researcher", "copywriter", 
     # Fallback for first step
     if len(state["messages"]) <= 2:
         return "researcher"
-
+    # Force final compliance if we have enough steps (prevents early end)
+    if len(state["messages"]) >= 6:  # after ~3 agents
+        logger.info("Forcing final compliance check")
+        return "compliance"
     logger.warning(f"Router failed to parse: {last[:100]}... → ending")
     return "__end__"
 
@@ -96,8 +107,8 @@ class SupervisorAgent(BaseAgent):
         super().__init__(**kwargs)
         self.llm = LLMFactory.get_llm(
             provider="gemini",
-            temperature=0.1,
-            max_tokens=80
+            temperature=0.0,
+            max_tokens=300
         )
 
     async def decide_next(self, state: AgentState) -> AgentState:
@@ -205,7 +216,11 @@ async def run_forge_workflow(
             logger.info(f"Node '{node_name}' updated state")
 
     return {
-        "final_content": current_state.get("final_output", "No final output generated."),
+        "final_content": (
+            current_state.get("final_output") or
+            current_state["messages"][-1].content if current_state["messages"] else
+            "Workflow completed. No final content generated due to early termination."
+        ),
         "thoughts": current_state.get("thought_history", []),
         "status": "success" if current_state.get("final_output") else "partial"
     }
