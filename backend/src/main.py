@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.api.v1.endpoints import forge
+from src.api.v1.endpoints import forge, vision
 
 app = FastAPI(
     title="CloudCraft AI Backend",
@@ -18,8 +18,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include the forge endpoint
+# Include routers
 app.include_router(forge.router, prefix="/api/v1")
+app.include_router(vision.router, prefix="/api/v1")
 
 @app.get("/health")
 async def health_check():
