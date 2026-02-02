@@ -134,28 +134,28 @@ def build_forge_graph():
     async def run_researcher(state: AgentState) -> AgentState:
         result = await researcher.async_run(state["messages"][0].content)
         state["thought_history"].append({"agent": "Researcher", "thought": result.thought, "output": result.output})
-        state["messages"].append(AIMessage(content=f"Researcher: {result.output}"))
+        state["messages"].append(HumanMessage(content=f"Researcher: {result.output}"))
         return state
 
     async def run_copywriter(state: AgentState) -> AgentState:
         context = "\n".join([m.content for m in state["messages"] if "Researcher" in m.content])
         result = await copywriter.async_run(state["messages"][0].content, context=context)
         state["thought_history"].append({"agent": "Copywriter", "thought": result.thought, "output": result.output})
-        state["messages"].append(AIMessage(content=f"Copywriter: {result.output}"))
+        state["messages"].append(HumanMessage(content=f"Copywriter: {result.output}"))
         return state
 
     async def run_designer(state: AgentState) -> AgentState:
         context = "\n".join([m.content for m in state["messages"] if "Researcher" in m.content or "Copywriter" in m.content])
         result = await designer.async_run(state["messages"][0].content, context=context)
         state["thought_history"].append({"agent": "Designer", "thought": result.thought, "output": result.output})
-        state["messages"].append(AIMessage(content=f"Designer: {result.output}"))
+        state["messages"].append(HumanMessage(content=f"Designer: {result.output}"))
         return state
 
     async def run_compliance(state: AgentState) -> AgentState:
         content = "\n".join([m.content for m in state["messages"] if "Researcher" in m.content or "Copywriter" in m.content or "Designer" in m.content])
         result = await compliance.async_run(state["messages"][0].content, content=content)
         state["thought_history"].append({"agent": "Compliance", "thought": result.thought, "output": result.output})
-        state["messages"].append(AIMessage(content=f"Compliance: {result.output}"))
+        state["messages"].append(HumanMessage(content=f"Compliance: {result.output}"))
         state["final_output"] = result.output
         return state
 
