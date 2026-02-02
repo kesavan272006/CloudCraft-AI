@@ -6,6 +6,8 @@ from langchain_core.language_models import BaseLanguageModel
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_huggingface import HuggingFaceEndpoint
 from langchain_aws import ChatBedrock
+from langchain_community.tools.tavily_search import TavilySearchResults
+from langchain.tools import Tool
 
 from ..utils.logger import get_logger
 
@@ -17,7 +19,7 @@ logger = get_logger(__name__)
 # Configuration – change these values if needed
 # ────────────────────────────────────────────────
 
-# Default priority order: Bedrock > Gemini > HuggingFace
+# Default priority: Bedrock (Claude) > Gemini > HuggingFace
 DEFAULT_MODEL_PROVIDER: Literal["bedrock", "gemini", "huggingface"] = "bedrock"
 
 # Hugging Face model (free inference API)
@@ -28,11 +30,14 @@ HF_TOKEN = os.getenv("HUGGINGFACEHUB_API_TOKEN")
 GEMINI_MODEL = "gemini-1.5-flash"  # or "gemini-1.5-pro" if you have access
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
 
-# AWS Bedrock (Claude-3-Sonnet is excellent)
+# AWS Bedrock (Claude-3-Sonnet / 3.5-Sonnet is excellent)
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
-BEDROCK_MODEL_ID = os.getenv("BEDROCK_MODEL_ID", "anthropic.claude-3-sonnet-20240229-v1:0")
+BEDROCK_MODEL_ID = os.getenv("BEDROCK_MODEL_ID", "anthropic.claude-3-sonnet-20240229-v1:0")  # or claude-3-5-sonnet-20241022-v2:0
+
+# Tavily API for web search (sign up at tavily.com for free key)
+TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 
 # Shared parameters
 DEFAULT_TEMPERATURE = 0.7
@@ -41,9 +46,18 @@ DEFAULT_MAX_TOKENS = 1024
 # ────────────────────────────────────────────────
 
 
+# Shared Tavily tool (available to all agents)
+tavily_search = TavilySearchResults(max_results=5) if TAVILY_API_KEY else None
+
+if not TAVILY_API_KEY:
+    logger.warning("TAVILY_API_KEY not found in .env — web search disabled")
+else:
+    logger.info("Tavily web search enabled")
+
+
 class LLMFactory:
     """
-    Central factory to get LLM instances.
+    Central factory to get LLM instances + shared tools.
     Priority: Bedrock (Claude) > Gemini > HuggingFace
     """
 
@@ -103,7 +117,7 @@ class LLMFactory:
                     huggingfacehub_api_token=HF_TOKEN,
                     temperature=temperature,
                     max_new_tokens=max_tokens,
-                    task="conversational",  # Required for Llama-3.2-Instruct
+                    task="conversational",
                     repetition_penalty=1.2,
                     huggingfacehub_repo_type="model",
                     top_p=0.9,
@@ -113,9 +127,9 @@ class LLMFactory:
                 raise ValueError(f"Unknown provider: {provider}")
 
         except Exception as e:
-            logger.error(f"Failed to initialize {provider} LLM: {str(e)}")
+            logger.error(f"Failed to initialize {provider} LLM: {str(e)}", exc_info=True)
 
-            # Smart fallback chain: Bedrock → Gemini → HuggingFace
+            # Smart fallback chain
             fallback_order = ["bedrock", "gemini", "huggingface"]
             current_index = fallback_order.index(provider) if provider in fallback_order else 0
 
@@ -137,39 +151,15 @@ class LLMFactory:
         """Quick shortcut – uses highest priority provider (Bedrock)"""
         return LLMFactory.get_llm()
 
-
-# Quick test / debug
-if __name__ == "__main__":
-    import asyncio
-
-    async def test_llms():
-        llm_bedrock = LLMFactory.get_llm(provider="bedrock")
-        llm_gemini = LLMFactory.get_llm(provider="gemini")
-        llm_hf = LLMFactory.get_llm(provider="huggingface")
-
-        prompt = "Say hello in Malayalam and explain why Kerala is beautiful in one sentence."
-
-        print("Testing Bedrock (Claude-3-Sonnet):")
-        try:
-            response_bedrock = await llm_bedrock.ainvoke(prompt)
-            print(response_bedrock.content.strip())
-        except Exception as e:
-            print(f"Bedrock Error: {e}")
-        print("-" * 60)
-
-        print("Testing Gemini Flash:")
-        try:
-            response_gemini = await llm_gemini.ainvoke(prompt)
-            print(response_gemini.content.strip())
-        except Exception as e:
-            print(f"Gemini Error: {e}")
-        print("-" * 60)
-
-        print("Testing HuggingFace (Llama-3.2-3B):")
-        try:
-            response_hf = await llm_hf.ainvoke(prompt)
-            print(response_hf.content.strip())
-        except Exception as e:
-            print(f"HF Error: {e}")
-
-    asyncio.run(test_llms())
+    @staticmethod
+    def get_tools():
+        """Shared tools available to agents (Tavily web search)"""
+        if tavily_search:
+            return [
+                Tool(
+                    name="web_search",
+                    func=tavily_search.invoke,
+                    description="Search the web for current information, trends, news, or facts. Use for up-to-date queries."
+                )
+            ]
+        return []

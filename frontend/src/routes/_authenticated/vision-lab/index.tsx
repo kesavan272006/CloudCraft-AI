@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Image as ImageIcon, Upload, Eye, Sparkles, Wand2, Loader2, AlertCircle } from "lucide-react"
+import { Image as ImageIcon, Upload, Eye, Sparkles, Wand2, Loader2, AlertCircle, Clock, MessageSquare } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { createFileRoute } from '@tanstack/react-router'
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -18,6 +18,11 @@ interface VisionResult {
   dominant_colors: string[]
   caption_idea: string
   edit_suggestion: string
+  instagram_caption: string           // full ready-to-post caption
+  hashtags: string[]                  // 8–10 Instagram hashtags
+  post_timing: string                  // best time to post
+  reel_story_idea: string             // how to turn into Reel/Story
+  engagement_tips: string             // questions/polls/CTA
 }
 
 export default function VisionLabPage() {
@@ -37,8 +42,7 @@ export default function VisionLabPage() {
       setSelectedFile(file)
       setPreviewUrl(URL.createObjectURL(file))
       setError(null)
-      setResult(null) // Reset previous results
-      // Auto-analyze on select
+      setResult(null)
       analyzeImage(file)
     }
   }
@@ -80,11 +84,10 @@ export default function VisionLabPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Vision Lab</h1>
-            <p className="text-muted-foreground">Scene intelligence & visual content suggestions</p>
+            <p className="text-muted-foreground">Scene intelligence & Instagram-ready suggestions</p>
           </div>
         </div>
 
-        {/* Status Indicator */}
         {isLoading && (
           <Badge variant="outline" className="animate-pulse">
             <Loader2 className="mr-2 h-3 w-3 animate-spin" />
@@ -165,16 +168,16 @@ export default function VisionLabPage() {
           </CardContent>
         </Card>
 
-        {/* Right: Analysis & Suggestions */}
+        {/* Right: Analysis & Instagram Suggestions */}
         {result ? (
           <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Eye className="h-5 w-5 text-primary" />
-                Scene Intelligence Results
+                Scene Intelligence & Instagram Strategy
               </CardTitle>
               <CardDescription>
-                AI-detected elements, mood, and suggestions
+                AI-detected elements, mood, colors, and ready-to-post suggestions
               </CardDescription>
             </CardHeader>
 
@@ -196,7 +199,7 @@ export default function VisionLabPage() {
 
               {/* Mood & Colors */}
               <div className="grid gap-4 sm:grid-cols-2">
-                <div className="rounded-xl border bg-card p-5 shadow-sm">
+                <div className="rounded-lg border bg-muted/30 p-5">
                   <h4 className="mb-3 text-sm font-medium text-muted-foreground flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-primary" />
                     Mood Analysis
@@ -209,13 +212,13 @@ export default function VisionLabPage() {
                   </div>
                 </div>
 
-                <div className="rounded-xl border bg-card p-5 shadow-sm flex flex-col justify-between">
+                <div className="rounded-lg border bg-muted/30 p-5 flex flex-col justify-between">
                   <h4 className="mb-3 text-sm font-medium text-muted-foreground">Dominant Colors</h4>
                   <div className="flex gap-3 flex-wrap">
                     {result.dominant_colors.map((color, i) => (
                       <div
                         key={i}
-                        className="h-10 w-10 rounded-full ring-1 ring-border shadow-sm transition-transform hover:scale-110"
+                        className="h-10 w-10 rounded-full ring-1 ring-border"
                         style={{ backgroundColor: color }}
                         title={color}
                       />
@@ -224,25 +227,63 @@ export default function VisionLabPage() {
                 </div>
               </div>
 
-              {/* Suggestions */}
-              <div className="space-y-4">
-                <h4 className="font-medium">Suggested Actions & Captions</h4>
-                <div className="space-y-3">
-                  <div className="rounded-md border p-4 bg-muted/30">
-                    <p className="font-medium flex items-center gap-2">
-                      <Wand2 className="h-4 w-4 text-primary" />
-                      Caption Idea
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-2 italic">
-                      "{result.caption_idea}"
+              {/* Instagram-Specific Suggestions */}
+              <div className="space-y-5">
+                <h4 className="font-medium text-lg flex items-center gap-2">
+                  <Wand2 className="h-5 w-5 text-primary" />
+                  Instagram-Ready Suggestions
+                </h4>
+
+                {/* Suggested Caption */}
+                <div className="rounded-lg border bg-muted/30 p-5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <MessageSquare className="h-5 w-5 text-primary" />
+                    <h5 className="font-medium">Suggested Caption</h5>
+                  </div>
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                    {result.instagram_caption || result.caption_idea || "No caption generated yet"}
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {result.hashtags?.map((tag: string, i: number) => (
+                      <Badge key={i} variant="secondary" className="text-xs">
+                        {tag}
+                      </Badge>
+                    )) || <Badge variant="outline">No hashtags</Badge>}
+                  </div>
+                </div>
+
+                {/* Timing & Reel/Story */}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="rounded-lg border bg-muted/30 p-5">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Clock className="h-5 w-5 text-primary" />
+                      <h5 className="font-medium">Best Time to Post</h5>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {result.post_timing || "7–9 PM IST (peak Gen Z engagement)"}
                     </p>
                   </div>
-                  <div className="rounded-md border p-4 bg-muted/30">
-                    <p className="font-medium">Edit Suggestion</p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {result.edit_suggestion}
+
+                  <div className="rounded-lg border bg-muted/30 p-5">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Sparkles className="h-5 w-5 text-primary" />
+                      <h5 className="font-medium">Reel/Story Idea</h5>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {result.reel_story_idea || "Add trending audio + slow zoom on main subject"}
                     </p>
                   </div>
+                </div>
+
+                {/* Engagement */}
+                <div className="rounded-lg border bg-muted/30 p-5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <MessageSquare className="h-5 w-5 text-primary" />
+                    <h5 className="font-medium">Engagement Boosters</h5>
+                  </div>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {result.engagement_tips || "Ask a question in caption + add poll in Stories"}
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -252,7 +293,7 @@ export default function VisionLabPage() {
           !isLoading && (
             <div className="hidden lg:flex flex-col items-center justify-center p-12 text-muted-foreground border-2 border-dashed rounded-xl h-full min-h-[400px] bg-muted/10">
               <Sparkles className="h-12 w-12 mb-4 opacity-20" />
-              <p className="text-lg">Upload an image to reveal AI insights</p>
+              <p className="text-lg">Upload an image to reveal AI insights & Instagram strategy</p>
             </div>
           )
         )}

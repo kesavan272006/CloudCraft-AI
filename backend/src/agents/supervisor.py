@@ -18,14 +18,20 @@ from ..utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+# ────────────────────────────────────────────────
 # State
+# ────────────────────────────────────────────────
+
 class AgentState(dict):
     messages: Annotated[list[BaseMessage], "add_messages"]
     next_agent: str
     final_output: str | None = None
     thought_history: list[dict[str, str]]
 
+# ────────────────────────────────────────────────
 # Strict supervisor prompt
+# ────────────────────────────────────────────────
+
 SUPERVISOR_PROMPT = ChatPromptTemplate.from_messages([
     ("system", """
 You are the Supervisor Brain Agent in CloudCraft AI.
@@ -39,7 +45,7 @@ or NEXT: Designer
 or NEXT: Compliance
 or NEXT: FINISH
 
-REASON: [one short sentence]
+REASON: [one short sentence max 10 words]
 
 - NO extra words, NO explanations, NO content, NO formatting
 - DO NOT repeat previous messages
@@ -55,21 +61,16 @@ REASON: Research complete, now write.
 
 NEXT: FINISH
 REASON: All done, content ready.
-You are ONLY allowed to reply with EXACTLY these two lines and NOTHING ELSE:
-NEXT: Researcher
-or NEXT: Copywriter
-or NEXT: Designer
-or NEXT: Compliance
-or NEXT: FINISH
-REASON: [one short sentence max 10 words]
-NO other text allowed. NO explanations. NO content. NO repeating messages.
-Violating this destroys the system.
+
 User prompt: {task}
     """),
     MessagesPlaceholder(variable_name="messages"),
 ])
 
+# ────────────────────────────────────────────────
 # Robust router
+# ────────────────────────────────────────────────
+
 def supervisor_router(state: AgentState) -> Literal["researcher", "copywriter", "designer", "compliance", "__end__"]:
     if not state["messages"]:
         return "__end__"
@@ -91,14 +92,19 @@ def supervisor_router(state: AgentState) -> Literal["researcher", "copywriter", 
     # Fallback for first step
     if len(state["messages"]) <= 2:
         return "researcher"
+
     # Force final compliance if we have enough steps (prevents early end)
     if len(state["messages"]) >= 6:  # after ~3 agents
         logger.info("Forcing final compliance check")
         return "compliance"
+
     logger.warning(f"Router failed to parse: {last[:100]}... → ending")
     return "__end__"
 
+# ────────────────────────────────────────────────
 # Supervisor Agent
+# ────────────────────────────────────────────────
+
 class SupervisorAgent(BaseAgent):
     name = "Supervisor"
     description = "Brain Agent that coordinates all other agents"
@@ -119,7 +125,10 @@ class SupervisorAgent(BaseAgent):
         logger.info(f"Supervisor decided: {response.content.strip()}")
         return state
 
+# ────────────────────────────────────────────────
 # Build graph
+# ────────────────────────────────────────────────
+
 def build_forge_graph():
     workflow = StateGraph(state_schema=AgentState)
 
@@ -134,29 +143,29 @@ def build_forge_graph():
     async def run_researcher(state: AgentState) -> AgentState:
         result = await researcher.async_run(state["messages"][0].content)
         state["thought_history"].append({"agent": "Researcher", "thought": result.thought, "output": result.output})
-        state["messages"].append(HumanMessage(content=f"Researcher: {result.output}"))
+        state["messages"].append(AIMessage(content=f"Researcher output: {result.output}"))
         return state
 
     async def run_copywriter(state: AgentState) -> AgentState:
         context = "\n".join([m.content for m in state["messages"] if "Researcher" in m.content])
         result = await copywriter.async_run(state["messages"][0].content, context=context)
         state["thought_history"].append({"agent": "Copywriter", "thought": result.thought, "output": result.output})
-        state["messages"].append(HumanMessage(content=f"Copywriter: {result.output}"))
+        state["messages"].append(AIMessage(content=f"Copywriter output: {result.output}"))
         return state
 
     async def run_designer(state: AgentState) -> AgentState:
         context = "\n".join([m.content for m in state["messages"] if "Researcher" in m.content or "Copywriter" in m.content])
         result = await designer.async_run(state["messages"][0].content, context=context)
         state["thought_history"].append({"agent": "Designer", "thought": result.thought, "output": result.output})
-        state["messages"].append(HumanMessage(content=f"Designer: {result.output}"))
+        state["messages"].append(AIMessage(content=f"Designer output: {result.output}"))
         return state
 
     async def run_compliance(state: AgentState) -> AgentState:
         content = "\n".join([m.content for m in state["messages"] if "Researcher" in m.content or "Copywriter" in m.content or "Designer" in m.content])
         result = await compliance.async_run(state["messages"][0].content, content=content)
         state["thought_history"].append({"agent": "Compliance", "thought": result.thought, "output": result.output})
-        state["messages"].append(HumanMessage(content=f"Compliance: {result.output}"))
-        state["final_output"] = result.output
+        state["messages"].append(AIMessage(content=f"Compliance output: {result.output}"))
+        state["final_output"] = result.output or "Compliance completed - content reviewed."
         return state
 
     workflow.add_node("researcher", RunnableLambda(run_researcher))
@@ -190,7 +199,10 @@ def build_forge_graph():
 forge_graph = build_forge_graph()
 
 
+# ────────────────────────────────────────────────
 # Run full workflow
+# ────────────────────────────────────────────────
+
 async def run_forge_workflow(
     user_prompt: str,
     thread_id: str = "default_thread"
@@ -211,12 +223,14 @@ async def run_forge_workflow(
             current_state.update(update)
             logger.info(f"Node '{node_name}' updated state")
 
+    # Improved fallback: if no final_output, take last agent's output
+    final_content = (
+        current_state.get("final_output") or
+        (current_state["messages"][-1].content if current_state["messages"] else "Workflow completed.")
+    )
+
     return {
-        "final_content": (
-            current_state.get("final_output") or
-            current_state["messages"][-1].content if current_state["messages"] else
-            "Workflow completed. No final content generated due to early termination."
-        ),
+        "final_content": final_content,
         "thoughts": current_state.get("thought_history", []),
         "status": "success" if current_state.get("final_output") else "partial"
     }
