@@ -55,11 +55,7 @@ Content to check: {content}
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # Compliance needs high precision & rule-following → Gemini Flash (strict mode)
-        self.llm = LLMFactory.get_llm(
-            provider="gemini",
-            temperature=0.3,      # Low temp = more consistent & strict
-            max_tokens=800
-        )
+        self.llm = LLMFactory.get_default_llm()  # Bedrock
 
         # Reusable prompt template
         self.prompt = ChatPromptTemplate.from_messages([

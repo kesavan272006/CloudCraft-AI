@@ -105,11 +105,7 @@ class SupervisorAgent(BaseAgent):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.llm = LLMFactory.get_llm(
-            provider="gemini",
-            temperature=0.0,
-            max_tokens=300
-        )
+        self.llm = LLMFactory.get_default_llm()  # Bedrock
 
     async def decide_next(self, state: AgentState) -> AgentState:
         chain = SUPERVISOR_PROMPT | self.llm

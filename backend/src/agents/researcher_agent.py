@@ -39,7 +39,7 @@ Task: {task}
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # Researcher benefits from fast reasoning → Gemini Flash
-        self.llm = LLMFactory.get_llm(provider="gemini", temperature=0.5, max_tokens=800)
+        self.llm = LLMFactory.get_default_llm()  # Bedrock
 
         # Build prompt template once
         self.prompt = ChatPromptTemplate.from_messages([

@@ -57,12 +57,7 @@ Task: {task}
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # Copywriter benefits from creative flair → Llama-3.2-3B is stronger here
-        self.llm = LLMFactory.get_llm(
-            provider="gemini",
-            temperature=0.85,
-            max_tokens=1200
-        )
-
+        self.llm = LLMFactory.get_default_llm()  # Bedrock
         # Reusable prompt template
         self.prompt = ChatPromptTemplate.from_messages([
             ("system", self.role_prompt),

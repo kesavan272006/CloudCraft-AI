@@ -64,11 +64,7 @@ Task: {task}
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # Designer needs creative + visual thinking → Gemini Flash is excellent
-        self.llm = LLMFactory.get_llm(
-            provider="gemini",
-            temperature=0.9,      # Higher temp = more creative visuals
-            max_tokens=1500
-        )
+        self.llm = LLMFactory.get_default_llm()  # Bedrock
 
         # Reusable prompt template
         self.prompt = ChatPromptTemplate.from_messages([
