@@ -33,6 +33,7 @@ import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authen
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
 import { Route as AuthenticatedGenesisIndexRouteImport } from './routes/_authenticated/genesis/index'
 import { Route as AuthenticatedForgeIndexRouteImport } from './routes/_authenticated/forge/index'
+import { Route as AuthenticatedCompetitorPulseIndexRouteImport } from './routes/_authenticated/competitor-pulse/index'
 import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
 import { Route as AuthenticatedCampaignArchitectIndexRouteImport } from './routes/_authenticated/campaign-architect/index'
 import { Route as AuthenticatedBrand_brainIndexRouteImport } from './routes/_authenticated/brand_brain/index'
@@ -168,6 +169,12 @@ const AuthenticatedForgeIndexRoute = AuthenticatedForgeIndexRouteImport.update({
   path: '/forge/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCompetitorPulseIndexRoute =
+  AuthenticatedCompetitorPulseIndexRouteImport.update({
+    id: '/competitor-pulse/',
+    path: '/competitor-pulse/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedChatsIndexRoute = AuthenticatedChatsIndexRouteImport.update({
   id: '/chats/',
   path: '/chats/',
@@ -264,6 +271,7 @@ export interface FileRoutesByFullPath {
   '/brand_brain': typeof AuthenticatedBrand_brainIndexRoute
   '/campaign-architect': typeof AuthenticatedCampaignArchitectIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
+  '/competitor-pulse': typeof AuthenticatedCompetitorPulseIndexRoute
   '/forge': typeof AuthenticatedForgeIndexRoute
   '/genesis': typeof AuthenticatedGenesisIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
@@ -298,6 +306,7 @@ export interface FileRoutesByTo {
   '/brand_brain': typeof AuthenticatedBrand_brainIndexRoute
   '/campaign-architect': typeof AuthenticatedCampaignArchitectIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
+  '/competitor-pulse': typeof AuthenticatedCompetitorPulseIndexRoute
   '/forge': typeof AuthenticatedForgeIndexRoute
   '/genesis': typeof AuthenticatedGenesisIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
@@ -337,6 +346,7 @@ export interface FileRoutesById {
   '/_authenticated/brand_brain/': typeof AuthenticatedBrand_brainIndexRoute
   '/_authenticated/campaign-architect/': typeof AuthenticatedCampaignArchitectIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
+  '/_authenticated/competitor-pulse/': typeof AuthenticatedCompetitorPulseIndexRoute
   '/_authenticated/forge/': typeof AuthenticatedForgeIndexRoute
   '/_authenticated/genesis/': typeof AuthenticatedGenesisIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
@@ -374,6 +384,7 @@ export interface FileRouteTypes {
     | '/brand_brain'
     | '/campaign-architect'
     | '/chats'
+    | '/competitor-pulse'
     | '/forge'
     | '/genesis'
     | '/help-center'
@@ -408,6 +419,7 @@ export interface FileRouteTypes {
     | '/brand_brain'
     | '/campaign-architect'
     | '/chats'
+    | '/competitor-pulse'
     | '/forge'
     | '/genesis'
     | '/help-center'
@@ -446,6 +458,7 @@ export interface FileRouteTypes {
     | '/_authenticated/brand_brain/'
     | '/_authenticated/campaign-architect/'
     | '/_authenticated/chats/'
+    | '/_authenticated/competitor-pulse/'
     | '/_authenticated/forge/'
     | '/_authenticated/genesis/'
     | '/_authenticated/help-center/'
@@ -641,6 +654,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedForgeIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/competitor-pulse/': {
+      id: '/_authenticated/competitor-pulse/'
+      path: '/competitor-pulse'
+      fullPath: '/competitor-pulse'
+      preLoaderRoute: typeof AuthenticatedCompetitorPulseIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/chats/': {
       id: '/_authenticated/chats/'
       path: '/chats'
@@ -759,6 +779,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedBrand_brainIndexRoute: typeof AuthenticatedBrand_brainIndexRoute
   AuthenticatedCampaignArchitectIndexRoute: typeof AuthenticatedCampaignArchitectIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
+  AuthenticatedCompetitorPulseIndexRoute: typeof AuthenticatedCompetitorPulseIndexRoute
   AuthenticatedForgeIndexRoute: typeof AuthenticatedForgeIndexRoute
   AuthenticatedGenesisIndexRoute: typeof AuthenticatedGenesisIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
@@ -776,6 +797,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCampaignArchitectIndexRoute:
     AuthenticatedCampaignArchitectIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
+  AuthenticatedCompetitorPulseIndexRoute:
+    AuthenticatedCompetitorPulseIndexRoute,
   AuthenticatedForgeIndexRoute: AuthenticatedForgeIndexRoute,
   AuthenticatedGenesisIndexRoute: AuthenticatedGenesisIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,

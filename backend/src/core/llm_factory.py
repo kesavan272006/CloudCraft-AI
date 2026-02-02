@@ -129,7 +129,7 @@ class LLMFactory:
         except Exception as e:
             logger.error(f"Failed to initialize {provider} LLM: {str(e)}", exc_info=True)
 
-            # Smart fallback chain
+            # Smart fallback chain: Bedrock → Gemini → HuggingFace
             fallback_order = ["bedrock", "gemini", "huggingface"]
             current_index = fallback_order.index(provider) if provider in fallback_order else 0
 
@@ -153,13 +153,14 @@ class LLMFactory:
 
     @staticmethod
     def get_tools():
-        """Shared tools available to agents (Tavily web search)"""
+        """Shared tools available to all agents (Tavily web search + more later)"""
+        tools = []
         if tavily_search:
-            return [
+            tools.append(
                 Tool(
                     name="web_search",
                     func=tavily_search.invoke,
-                    description="Search the web for current information, trends, news, or facts. Use for up-to-date queries."
+                    description="Search the web for current information, trends, news, or facts. Use for up-to-date queries, viral content, or competitor analysis."
                 )
-            ]
-        return []
+            )
+        return tools
