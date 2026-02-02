@@ -31,6 +31,7 @@ import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authenticated/tasks/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
+import { Route as AuthenticatedGenesisIndexRouteImport } from './routes/_authenticated/genesis/index'
 import { Route as AuthenticatedForgeIndexRouteImport } from './routes/_authenticated/forge/index'
 import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
 import { Route as AuthenticatedCampaignArchitectIndexRouteImport } from './routes/_authenticated/campaign-architect/index'
@@ -156,6 +157,12 @@ const AuthenticatedHelpCenterIndexRoute =
     path: '/help-center/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedGenesisIndexRoute =
+  AuthenticatedGenesisIndexRouteImport.update({
+    id: '/genesis/',
+    path: '/genesis/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedForgeIndexRoute = AuthenticatedForgeIndexRouteImport.update({
   id: '/forge/',
   path: '/forge/',
@@ -258,6 +265,7 @@ export interface FileRoutesByFullPath {
   '/campaign-architect': typeof AuthenticatedCampaignArchitectIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/forge': typeof AuthenticatedForgeIndexRoute
+  '/genesis': typeof AuthenticatedGenesisIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
@@ -291,6 +299,7 @@ export interface FileRoutesByTo {
   '/campaign-architect': typeof AuthenticatedCampaignArchitectIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/forge': typeof AuthenticatedForgeIndexRoute
+  '/genesis': typeof AuthenticatedGenesisIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
@@ -329,6 +338,7 @@ export interface FileRoutesById {
   '/_authenticated/campaign-architect/': typeof AuthenticatedCampaignArchitectIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
   '/_authenticated/forge/': typeof AuthenticatedForgeIndexRoute
+  '/_authenticated/genesis/': typeof AuthenticatedGenesisIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
@@ -365,6 +375,7 @@ export interface FileRouteTypes {
     | '/campaign-architect'
     | '/chats'
     | '/forge'
+    | '/genesis'
     | '/help-center'
     | '/settings/'
     | '/tasks'
@@ -398,6 +409,7 @@ export interface FileRouteTypes {
     | '/campaign-architect'
     | '/chats'
     | '/forge'
+    | '/genesis'
     | '/help-center'
     | '/settings'
     | '/tasks'
@@ -435,6 +447,7 @@ export interface FileRouteTypes {
     | '/_authenticated/campaign-architect/'
     | '/_authenticated/chats/'
     | '/_authenticated/forge/'
+    | '/_authenticated/genesis/'
     | '/_authenticated/help-center/'
     | '/_authenticated/settings/'
     | '/_authenticated/tasks/'
@@ -614,6 +627,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHelpCenterIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/genesis/': {
+      id: '/_authenticated/genesis/'
+      path: '/genesis'
+      fullPath: '/genesis'
+      preLoaderRoute: typeof AuthenticatedGenesisIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/forge/': {
       id: '/_authenticated/forge/'
       path: '/forge'
@@ -740,6 +760,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCampaignArchitectIndexRoute: typeof AuthenticatedCampaignArchitectIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
   AuthenticatedForgeIndexRoute: typeof AuthenticatedForgeIndexRoute
+  AuthenticatedGenesisIndexRoute: typeof AuthenticatedGenesisIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
   AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
@@ -756,6 +777,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedCampaignArchitectIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
   AuthenticatedForgeIndexRoute: AuthenticatedForgeIndexRoute,
+  AuthenticatedGenesisIndexRoute: AuthenticatedGenesisIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
   AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
