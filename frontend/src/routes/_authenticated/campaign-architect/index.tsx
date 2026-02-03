@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Loader2, Plus, Rocket, Sparkles, Target, Users, ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
+import { GenesisCanvas } from '@/features/genesis/GenesisCanvas'
 
 export const Route = createFileRoute('/_authenticated/campaign-architect/')({
   component: CampaignArchitectPage,
@@ -17,6 +18,7 @@ export const Route = createFileRoute('/_authenticated/campaign-architect/')({
 function CampaignArchitectPage() {
   const { campaigns, activeCampaign, isFetching, isSaving, isGenerating, fetchCampaigns, createCampaign, setActiveCampaign, generateStrategy } = useCampaignStore()
   const [isCreating, setIsCreating] = useState(false)
+  const [showGenesis, setShowGenesis] = useState(false)
   const [formData, setFormData] = useState({ name: '', goal: '', duration: '', budget: '' })
 
   useEffect(() => {
@@ -39,13 +41,28 @@ function CampaignArchitectPage() {
   }
 
   if (activeCampaign) {
+    if (showGenesis) {
+      return (
+        <div className="relative h-[calc(100vh-6rem)] w-full overflow-hidden rounded-xl border">
+          <Button
+            variant="secondary"
+            className="absolute top-4 left-4 z-50 shadow-xl border bg-background/80 backdrop-blur"
+            onClick={() => setShowGenesis(false)}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard
+          </Button>
+          <GenesisCanvas initialInput={activeCampaign.goal} autoStart={true} />
+        </div>
+      )
+    }
+
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => setActiveCampaign(null)}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <div>
+          <div className="flex-1">
             <h2 className="text-3xl font-bold tracking-tight">{activeCampaign.name}</h2>
             <div className="flex items-center gap-2 text-muted-foreground">
               <Badge variant={activeCampaign.status === 'active' ? 'default' : 'secondary'}>
@@ -54,6 +71,11 @@ function CampaignArchitectPage() {
               <span>{activeCampaign.duration} • {activeCampaign.budget}</span>
             </div>
           </div>
+          {activeCampaign.strategy && (
+            <Button variant="outline" onClick={() => setShowGenesis(true)} className="gap-2">
+              <Sparkles className="h-4 w-4 text-purple-500" /> View Genesis Graph
+            </Button>
+          )}
         </div>
 
         {/* Strategy Section */}
@@ -131,10 +153,20 @@ function CampaignArchitectPage() {
             <p className="text-muted-foreground mb-6 max-w-sm">
               Let our AI Marketing Strategist analyze your goal and audience to build a winning plan.
             </p>
-            <Button onClick={handleGenerate} disabled={isGenerating} size="lg">
-              {isGenerating ? <Loader2 className="animate-spin mr-2" /> : <Sparkles className="mr-2 h-4 w-4" />}
-              Generate Strategy
-            </Button>
+            <div className="flex gap-4">
+              <Button onClick={handleGenerate} disabled={isGenerating} size="lg" variant="outline">
+                {isGenerating ? <Loader2 className="animate-spin mr-2" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                Generate Standard Strategy
+              </Button>
+              <Button
+                onClick={() => setShowGenesis(true)}
+                disabled={isGenerating}
+                size="lg"
+                className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white shadow-lg"
+              >
+                <Rocket className="mr-2 h-4 w-4" /> IGNITE GENESIS
+              </Button>
+            </div>
           </Card>
         )}
       </div>

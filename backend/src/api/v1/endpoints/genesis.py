@@ -5,7 +5,7 @@ from typing import Dict, Any, Optional
 
 from src.services.genesis_service import GenesisService
 
-router = APIRouter(prefix="/genesis", tags=["genesis"])
+router = APIRouter(tags=["genesis"])
 
 class StartGenesisRequest(BaseModel):
     input_source: str
