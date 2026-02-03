@@ -7,7 +7,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_huggingface import HuggingFaceEndpoint
 from langchain_aws import ChatBedrock
 from langchain_community.tools.tavily_search import TavilySearchResults
-from langchain.tools import Tool
+from langchain_core.tools import Tool
 
 from ..utils.logger import get_logger
 
