@@ -2,7 +2,9 @@
 import { Handle, Position } from 'reactflow';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Twitter, Linkedin, Mail, Instagram, Video, Loader2, Brain } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { Twitter, Linkedin, Mail, Instagram, Video, Loader2, Brain, Copy } from "lucide-react";
 
 const icons = {
     twitter_thread: <Twitter className="h-4 w-4 text-blue-400" />,
@@ -31,13 +33,25 @@ export const AssetNode = ({ data }: any) => {
                             <Loader2 className="h-3 w-3 animate-spin" /> Generating
                         </Badge>
                     ) : (
-                        <div className="flex gap-1">
+                        <div className="flex gap-1 items-center">
                             {data.dialect && (
                                 <Badge variant="outline" className="text-xs border-indigo-500 text-indigo-500">
                                     {data.dialect}
                                 </Badge>
                             )}
                             <Badge variant={isStrategy ? "default" : "secondary"}>Ready</Badge>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 ml-1"
+                                onClick={(e) => {
+                                    e.stopPropagation(); // Prevent drag interference
+                                    navigator.clipboard.writeText(data.content);
+                                    toast.success("Content copied to clipboard!");
+                                }}
+                            >
+                                <Copy className="h-3 w-3" />
+                            </Button>
                         </div>
                     )}
                 </CardHeader>

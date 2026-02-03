@@ -1,13 +1,11 @@
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import ReactFlow, {
     Background,
     Controls,
     MiniMap,
     useNodesState,
-    useEdgesState,
-    applyNodeChanges,
-    applyEdgeChanges
+    useEdgesState
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import axios from 'axios';
@@ -37,13 +35,31 @@ const nodeTypes = {
 
 const API_URL = "http://localhost:8000/api/v1/genesis"; // Hardcoded for hackathon speed
 
-export const GenesisCanvas = () => {
-    const { brand } = useBrandStore();
-    const [inputSource, setInputSource] = useState("");
+interface GenesisCanvasProps {
+    initialInput?: string;
+    autoStart?: boolean;
+}
+
+export const GenesisCanvas = ({ initialInput, autoStart }: GenesisCanvasProps) => {
+    const { brandName, brandDescription, brandVoice, targetAudience } = useBrandStore();
+    const [inputSource, setInputSource] = useState(initialInput || "");
     const [processId, setProcessId] = useState<string | null>(null);
     const [isTrending, setIsTrending] = useState(false);
+    const [isStarting, setIsStarting] = useState(false);
 
-    const hasBrandProfile = brand.brandName || brand.brandDescription;
+    // Auto-start effect
+    useEffect(() => {
+        if (autoStart && initialInput && !processId && !isStarting) {
+            handleStart();
+        }
+    }, [autoStart, initialInput]);
+
+    // Sync input prop
+    useEffect(() => {
+        if (initialInput) setInputSource(initialInput);
+    }, [initialInput]);
+
+    const hasBrandProfile = brandName || brandDescription;
 
     // React Flow State
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -55,7 +71,7 @@ export const GenesisCanvas = () => {
         queryFn: async () => {
             if (!processId) return null;
             const res = await axios.get(`${API_URL}/${processId}`);
-            return res.data;
+            return res.data as any;
         },
         enabled: !!processId,
         refetchInterval: (data) => data?.status === 'complete' ? false : 2000 // Poll every 2s until complete
@@ -81,22 +97,26 @@ export const GenesisCanvas = () => {
                 toast.success("Campaign Generation Complete!");
             }
         }
-    }, [graphData, setNodes, setEdges]);
+    }, [graphData, setNodes, setEdges, isTrending]);
 
     const handleStart = async () => {
-        if (!inputSource) return;
+        if (!inputSource || isStarting) return;
+        setIsStarting(true);
         try {
             // Inject brand context if available
             let enrichedInput = inputSource;
             if (hasBrandProfile) {
-                enrichedInput += `\n\n--- BRAND CONTEXT ---\nBrand: ${brand.brandName}\nDescription: ${brand.brandDescription}\nVoice: ${brand.brandVoice}\nTarget Audience: ${brand.targetAudience}`;
+                enrichedInput += `\n\n--- BRAND CONTEXT ---\nBrand: ${brandName}\nDescription: ${brandDescription}\nVoice: ${brandVoice}\nTarget Audience: ${targetAudience}`;
             }
 
             const res = await axios.post(`${API_URL}/start`, { input_source: enrichedInput });
             setProcessId(res.data.process_id);
-            toast.success(hasBrandProfile ? `Genesis Started for ${brand.brandName}` : "Genesis Engine Started");
-        } catch (e) {
-            toast.error("Failed to start Genesis");
+            toast.success(hasBrandProfile ? `Genesis Started for ${brandName}` : "Genesis Engine Started");
+        } catch (e: any) {
+            console.error(e);
+            toast.error(`Failed to start Genesis: ${e.response?.data?.detail || e.message}`);
+        } finally {
+            setIsStarting(false);
         }
     };
 
@@ -138,7 +158,7 @@ export const GenesisCanvas = () => {
             {hasBrandProfile && (
                 <div className="absolute top-2 left-1/2 -translate-x-1/2 z-20">
                     <Badge variant="outline" className="bg-primary/10 border-primary/30 text-primary px-3 py-1 flex items-center gap-1">
-                        <Zap className="h-3 w-3" /> Active Identity: {brand.brandName}
+                        <Zap className="h-3 w-3" /> Active Identity: {brandName}
                     </Badge>
                 </div>
             )}
@@ -154,8 +174,8 @@ export const GenesisCanvas = () => {
                         onChange={(e) => setInputSource(e.target.value)}
                     />
                 </div>
-                <Button size="lg" className="h-12 shadow-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700" onClick={handleStart}>
-                    <Zap className="mr-2 h-4 w-4" /> IGNITE GENESIS
+                <Button size="lg" className="h-12 shadow-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700" onClick={handleStart} disabled={isStarting || !inputSource}>
+                    {isStarting ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : <Zap className="mr-2 h-4 w-4" />} {isStarting ? "IGNITING..." : "IGNITE GENESIS"}
                 </Button>
 
                 {processId && (
@@ -184,39 +204,16 @@ export const GenesisCanvas = () => {
                     onEdgesChange={onEdgesChange}
                     nodeTypes={nodeTypes}
                     fitView
+                    minZoom={0.1}
+                    maxZoom={4}
                     className="bg-slate-50 dark:bg-zinc-950"
                 >
-                    <Background gap={20} color="#64748b" className="opacity-5" />
+                    <Background />
                     <Controls />
-                    <MiniMap className="dark:bg-zinc-900 border-zinc-800" />
                 </ReactFlow>
             </div>
 
-            {/* Floating Trend Dock */}
-            {processId && (
-                <div className="absolute bottom-8 right-8 z-10">
-                    <Card className="bg-background/80 backdrop-blur border-pink-500/30 overflow-hidden w-80 shadow-2xl">
-                        <div className="h-1 bg-gradient-to-r from-pink-500 to-rose-500" />
-                        <CardContent className="p-4">
-                            <h4 className="font-bold flex items-center gap-2 text-pink-600 mb-2">
-                                <TrendingUp className="h-4 w-4" /> Live Trends
-                            </h4>
-                            <p className="text-xs text-muted-foreground mb-4">
-                                Detected: "Barbie" is trending globally. Match this campaign?
-                            </p>
-                            <Button
-                                variant="default"
-                                size="sm"
-                                className="w-full bg-pink-600 hover:bg-pink-700 text-white"
-                                onClick={handleTrendJack}
-                                disabled={isTrending}
-                            >
-                                {isTrending ? <Loader2 className="animate-spin h-4 w-4" /> : "Inject Trend 'Barbie'"}
-                            </Button>
-                        </CardContent>
-                    </Card>
-                </div>
-            )}
+
         </div>
     );
 };

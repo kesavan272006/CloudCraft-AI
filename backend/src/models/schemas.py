@@ -59,6 +59,12 @@ class OracleResponse(BaseModel):
     analysis_report: str
     status: str = "success"
 
+class OracleHistoryItem(BaseModel):
+    id: str
+    timestamp: str
+    input_content: str
+    response: OracleResponse
+
 # --- CAMPAIGN ARCHITECT SCHEMAS ---
 class AudienceSegment(BaseModel):
     segment_name: str

@@ -82,8 +82,33 @@ class GenesisService:
                 """
             )
             
+            
             # Update Graph with Strategy Node
-            cls._add_node(process_id, "strategy", "strategy", "Campaign Strategy", strategy_result.output, "root")
+            # We strictly format the node content for display (Markdown), but keep using the raw JSON for logic
+            display_content = strategy_result.output
+            try:
+                # Attempt to parse and pretty print
+                import json
+                clean_json = strategy_result.output.replace("```json", "").replace("```", "").strip()
+                data = json.loads(clean_json)
+                
+                display_content = f"""**{data.get('tagline', 'Campaign Strategy')}**
+                
+**Core Concept:** {data.get('core_concept')}
+
+**Target Audience:**
+{chr(10).join([f"- {s['segment_name']}: {s['pain_point']}" for s in data.get('target_audience', [])])}
+
+**USPs:**
+{chr(10).join([f"- {u}" for u in data.get('usps', [])])}
+
+**Tone:** {data.get('tone')}
+**Visuals:** {data.get('visual_direction')}
+"""
+            except Exception as e:
+                logger.warning(f"Failed to format strategy display: {e}")
+
+            cls._add_node(process_id, "strategy", "strategy", "Campaign Strategy", display_content, "root")
             
             # Step B: Spawn Asset Nodes (The "Explosion")
             # In a real app, the Strategist would decide WHICH assets to create. 
@@ -123,10 +148,8 @@ class GenesisService:
         """
         Generates content for a specific asset node using the Strategy as context.
         """
-        # Simulate LLM latency for dramatic effect if needed, but we want speed.
-        # We reuse the Strategist for specific content generation or use a Copywriter.
-        # For simplicity, using Strategist/BaseAgent here.
-        agent = MarketingStrategistAgent() # reusing agent for content gen
+        from src.agents.content_creator_agent import ContentCreatorAgent
+        agent = ContentCreatorAgent() # dedicated agent for text
         
         response = await agent.async_run(
             task=f"{prompt}\n\nStrictly follow this strategy context:\n{strategy}"
@@ -214,15 +237,51 @@ class GenesisService:
     def _add_node(cls, process_id: str, node_id: str, type: str, label: str, content: str, parent_id: str):
         graph = cls._active_processes[process_id]
         
-        # Simple layout logic: Strategy is (250, 200). Assets fan out.
+        # Smart Layout Logic
         x, y = 0, 0
-        if type == "strategy":
-            x, y = 250, 150
+        
+        if type == "source":
+            # Root at center-left
+            x, y = 0, 200
+            
+        elif type == "strategy":
+            # Strategy to the right of Source
+            x, y = 400, 200
+            
         else:
-            # Random fan out from strategy
-            import random
-            x = 250 + random.randint(-400, 400)
-            y = 400 + random.randint(0, 200)
+            # Asset Nodes: Arrange in a vertical stack to the right of Strategy
+            # We calculate index based on existing asset nodes to position them
+            asset_nodes = [n for n in graph["nodes"] if n["type"] == "asset" or n["type"] == "asset-pending"]
+            index = len(asset_nodes)
+            
+            # Start x at 900
+            base_x = 900
+            # Start y at 0 and stack down with spacing
+            base_y = 0 
+            spacing_y = 500 # Height + Gap
+            
+            x = base_x
+            y = base_y + (index * spacing_y)
+            
+            # Use 'smart' stagger if needed, but grid is cleaner as requested
+            # "Index 0" -> y=0. "Index 1" -> y=500. etc. Center is y=200 roughly.
+            # Let's offset y so the middle asset is aligned with strategy (y=200)
+            # If 5 assets, indices 0,1,2,3,4.
+            # Total height = 5 * 500 = 2500. Mid point = 1250.
+            # We want center of stack to be 200.
+            # This is hard to do incrementally without knowing total count.
+            # A simple vertical stack starting from top is fine for now, or fan out.
+            
+            # Alternating top-bottom fan out?
+            # 0 -> 200
+            # 1 -> -100 (up)
+            # 2 -> 500 (down)
+            # 3 -> -400
+            # 4 -> 800
+            
+            if index == 0: y = 200
+            elif index % 2 == 1: y = 200 - ( (index + 1) // 2 * 400 )
+            else: y = 200 + ( index // 2 * 400 )
 
         new_node = {
             "id": node_id,
