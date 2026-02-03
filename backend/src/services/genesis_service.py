@@ -1,10 +1,16 @@
 
+
 import asyncio
 import uuid
 import random
 from typing import Dict, List, Any
-from src.agents.marketing_strategist_agent import MarketingStrategistAgent
+from datetime import datetime, timedelta
+import json
+import re
+from src.core.llm_factory import LLMFactory
 from src.utils.logger import get_logger
+from src.services.brand_service import BrandService
+from src.agents.marketing_strategist_agent import MarketingStrategistAgent
 
 logger = get_logger(__name__)
 
@@ -62,8 +68,16 @@ class GenesisService:
         try:
             # Step A: Strategy Analysis
             strategist = MarketingStrategistAgent()
+            
+            # Get Brand Context
+            brand_context = await BrandService.get_brand_context()
+            
             strategy_result = await strategist.async_run(
-                task=f"Analyze this input and create a campaign strategy: {input_source}"
+                task=f"""
+                {brand_context}
+                
+                Analyze this input and create a campaign strategy: {input_source}
+                """
             )
             
             # Update Graph with Strategy Node

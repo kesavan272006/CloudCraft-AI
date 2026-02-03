@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from src.models.schemas import OracleRequest, OracleResponse, MetricScore, TimePoint
 from src.core.llm_factory import LLMFactory
+from src.services.brand_service import BrandService
 import json
 import re
 
@@ -19,9 +20,14 @@ async def predict_performance(request: OracleRequest):
             search_query = f"current viral social media trends and engagement patterns February 2026"
             context = search_tool.func(search_query)
 
-        # 2. Prompt Claude to act as a Data Scientist
+        # 2. Get Brand Context
+        brand_context = await BrandService.get_brand_context()
+
+        # 3. Prompt Claude/Bedrock to act as a Data Scientist
         prompt = f"""
         You are the 'Performance Oracle' AI. Analyze the following content draft against current market trends.
+        
+        {brand_context}
         
         Current Trends Context:
         {context}

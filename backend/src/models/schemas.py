@@ -12,6 +12,14 @@ class ForgeResponse(BaseModel):
     thoughts: List[AgentThought]
     status: str
 
+# --- BRAND BRAIN SCHEMAS ---
+class BrandProfile(BaseModel):
+    brandName: str
+    brandDescription: str
+    brandVoice: str
+    targetAudience: str
+    lastUpdated: Optional[str] = None
+
 # --- COMPETITOR PULSE SCHEMAS ---
 class CompetitorRequest(BaseModel):
     query: str  # The handle or niche

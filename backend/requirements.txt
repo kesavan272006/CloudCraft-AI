@@ -13,3 +13,6 @@ sentence-transformers
 pypdf
 pillow
 python-multipart
+langchain-huggingface
+langchain-openai
+tavily-python

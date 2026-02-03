@@ -1,5 +1,6 @@
 from src.core.llm_factory import LLMFactory
 from src.utils.logger import get_logger
+from src.services.brand_service import BrandService
 
 logger = get_logger(__name__)
 
@@ -17,9 +18,15 @@ class CompetitorService:
         search_query = f"latest viral instagram posts and reels content by {query} 2025 2026"
         search_results = search_tool.func(search_query)
 
-        # 2. Analyze with LLM
+        # 2. Get Brand Context
+        brand_context = await BrandService.get_brand_context()
+
+        # 3. Analyze with LLM
         prompt = f"""
         You are an elite Social Media Strategist. 
+        
+        {brand_context}
+        
         Analyze these search results for the competitor/niche: '{query}'
         
         Search Results:
@@ -27,11 +34,11 @@ class CompetitorService:
         
         Task:
         1. Summarize their current content strategy.
-        2. Provide ONE viral-ready suggestion for our brand based on their success.
+        2. Provide ONE viral-ready suggestion tailored for OUR BRAND based on their success.
         
         Return the response in this EXACT format:
         SUMMARY: [Brief summary]
-        SUGGESTED CAPTION: [Caption text]
+        SUGGESTED CAPTION: [Caption text in our brand voice]
         HASHTAGS: [#tag1, #tag2]
         VISUAL IDEA: [Description of the reel/post visual]
         BEST TIME: [e.g. 7 PM IST]

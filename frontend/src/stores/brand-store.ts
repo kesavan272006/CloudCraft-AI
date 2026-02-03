@@ -8,16 +8,16 @@ interface BrandProfile {
     targetAudience: string
 }
 
-interface BrandState {
-    brand: BrandProfile & {
-        setBrandName: (name: string) => void
-        setBrandDescription: (desc: string) => void
-        setBrandVoice: (voice: string) => void
-        setTargetAudience: (audience: string) => void
-        setBrandProfile: (profile: Partial<BrandProfile>) => void
-        reset: () => void
-        hasProfile: () => boolean
-    }
+interface BrandState extends BrandProfile {
+    isLoading: boolean
+    error: string | null
+
+    // Actions
+    setBrandProfile: (profile: Partial<BrandProfile>) => void
+    fetchBrandProfile: () => Promise<void>
+    saveBrandProfile: (profile: BrandProfile) => Promise<void>
+    reset: () => void
+    hasProfile: () => boolean
 }
 
 const defaultProfile: BrandProfile = {
@@ -30,47 +30,63 @@ const defaultProfile: BrandProfile = {
 export const useBrandStore = create<BrandState>()(
     persist(
         (set, get) => ({
-            brand: {
-                ...defaultProfile,
-                setBrandName: (brandName) =>
-                    set((state) => ({ brand: { ...state.brand, brandName } })),
-                setBrandDescription: (brandDescription) =>
-                    set((state) => ({ brand: { ...state.brand, brandDescription } })),
-                setBrandVoice: (brandVoice) =>
-                    set((state) => ({ brand: { ...state.brand, brandVoice } })),
-                setTargetAudience: (targetAudience) =>
-                    set((state) => ({ brand: { ...state.brand, targetAudience } })),
-                setBrandProfile: (profile) =>
-                    set((state) => ({ brand: { ...state.brand, ...profile } })),
-                reset: () =>
-                    set(() => ({
-                        brand: {
-                            ...defaultProfile,
-                            setBrandName: get().brand.setBrandName,
-                            setBrandDescription: get().brand.setBrandDescription,
-                            setBrandVoice: get().brand.setBrandVoice,
-                            setTargetAudience: get().brand.setTargetAudience,
-                            setBrandProfile: get().brand.setBrandProfile,
-                            reset: get().brand.reset,
-                            hasProfile: get().brand.hasProfile
-                        }
-                    })),
-                hasProfile: () => {
-                    const state = get()
-                    return !!(state.brand.brandName || state.brand.brandDescription)
+            ...defaultProfile,
+            isLoading: false,
+            error: null,
+
+            setBrandProfile: (profile) =>
+                set((state) => ({ ...state, ...profile })),
+
+            fetchBrandProfile: async () => {
+                set({ isLoading: true, error: null })
+                try {
+                    const response = await fetch('http://localhost:8000/api/v1/brand')
+                    if (response.ok) {
+                        const data: BrandProfile = await response.json()
+                        set({ ...data, isLoading: false })
+                    } else {
+                        // If 404, just stop loading
+                        set({ isLoading: false })
+                    }
+                } catch (err: any) {
+                    set({ isLoading: false, error: err.message })
                 }
+            },
+
+            saveBrandProfile: async (profile: BrandProfile) => {
+                set({ isLoading: true, error: null })
+                try {
+                    const response = await fetch('http://localhost:8000/api/v1/brand', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(profile)
+                    })
+
+                    if (!response.ok) throw new Error("Failed to save brand profile")
+
+                    const savedData = await response.json()
+                    set({ ...savedData, isLoading: false })
+                } catch (err: any) {
+                    set({ isLoading: false, error: err.message })
+                    throw err
+                }
+            },
+
+            reset: () => set({ ...defaultProfile }),
+
+            hasProfile: () => {
+                const state = get()
+                return !!(state.brandName || state.brandDescription)
             }
         }),
         {
             name: 'cloudcraft-brand-storage',
             storage: createJSONStorage(() => localStorage),
             partialize: (state) => ({
-                brand: {
-                    brandName: state.brand.brandName,
-                    brandDescription: state.brand.brandDescription,
-                    brandVoice: state.brand.brandVoice,
-                    targetAudience: state.brand.targetAudience
-                }
+                brandName: state.brandName,
+                brandDescription: state.brandDescription,
+                brandVoice: state.brandVoice,
+                targetAudience: state.targetAudience
             })
         }
     )

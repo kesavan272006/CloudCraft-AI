@@ -2,6 +2,7 @@ import json
 import re
 from src.core.llm_factory import LLMFactory
 from src.utils.logger import get_logger
+from src.services.brand_service import BrandService
 
 logger = get_logger(__name__)
 
@@ -15,21 +16,27 @@ class LocalScoutService:
         if not search_tool:
             return {"error": "Search tool unavailable"}
 
-        # 1. Search for local data
+        # 1. Get Brand Context
+        brand_context = await BrandService.get_brand_context()
+
+        # 2. Search for local data
         search_query = f"latest viral trends events food spots news {city} Kerala February 2026 reddit"
         raw_search_data = search_tool.func(search_query)
 
-        # 2. Synthesis into JSON
-        # We instruct Nemotron to strictly follow a JSON format
+        # 3. Synthesis into JSON
+        # We instruct Nemotron to strictly follow a JSON format and consider Brand Audience
         final_analysis_prompt = f"""
         You are an NVIDIA-powered Local Scout Agent.
         Location: {city}, Kerala.
+        
+        {brand_context}
         
         RAW RESEARCH DATA:
         {raw_search_data}
         
         Task: 
-        Summarize this data into a structured JSON object for a dashboard.
+        Summarize this data into a structured JSON object.
+        IMPORTANT: Filter trends that match our Target Audience defined above.
         
         STRICT JSON FORMAT:
         {{
@@ -39,7 +46,7 @@ class LocalScoutService:
                 {{"title": "Hook 2", "description": "Details"}},
                 {{"title": "Hook 3", "description": "Details"}}
             ],
-            "strategic_recommendation": "One specific post idea",
+            "strategic_recommendation": "One specific post idea for OUR BRAND",
             "sentiment_score": 85,
             "trending_hashtags": ["#tag1", "#tag2"]
         }}
