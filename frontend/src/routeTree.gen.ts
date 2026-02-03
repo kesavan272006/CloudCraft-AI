@@ -31,6 +31,7 @@ import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authenticated/tasks/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
 import { Route as AuthenticatedPerformanceOracleIndexRouteImport } from './routes/_authenticated/performance-oracle/index'
+import { Route as AuthenticatedLocalScoutIndexRouteImport } from './routes/_authenticated/local-scout/index'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
 import { Route as AuthenticatedGenesisIndexRouteImport } from './routes/_authenticated/genesis/index'
 import { Route as AuthenticatedForgeIndexRouteImport } from './routes/_authenticated/forge/index'
@@ -159,6 +160,12 @@ const AuthenticatedPerformanceOracleIndexRoute =
     path: '/performance-oracle/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedLocalScoutIndexRoute =
+  AuthenticatedLocalScoutIndexRouteImport.update({
+    id: '/local-scout/',
+    path: '/local-scout/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedHelpCenterIndexRoute =
   AuthenticatedHelpCenterIndexRouteImport.update({
     id: '/help-center/',
@@ -274,19 +281,20 @@ export interface FileRoutesByFullPath {
   '/clerk/sign-in': typeof ClerkauthSignInRoute
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
-  '/apps/': typeof AuthenticatedAppsIndexRoute
-  '/brand_brain/': typeof AuthenticatedBrand_brainIndexRoute
-  '/campaign-architect/': typeof AuthenticatedCampaignArchitectIndexRoute
-  '/chats/': typeof AuthenticatedChatsIndexRoute
-  '/competitor-pulse/': typeof AuthenticatedCompetitorPulseIndexRoute
-  '/forge/': typeof AuthenticatedForgeIndexRoute
-  '/genesis/': typeof AuthenticatedGenesisIndexRoute
-  '/help-center/': typeof AuthenticatedHelpCenterIndexRoute
-  '/performance-oracle/': typeof AuthenticatedPerformanceOracleIndexRoute
+  '/apps': typeof AuthenticatedAppsIndexRoute
+  '/brand_brain': typeof AuthenticatedBrand_brainIndexRoute
+  '/campaign-architect': typeof AuthenticatedCampaignArchitectIndexRoute
+  '/chats': typeof AuthenticatedChatsIndexRoute
+  '/competitor-pulse': typeof AuthenticatedCompetitorPulseIndexRoute
+  '/forge': typeof AuthenticatedForgeIndexRoute
+  '/genesis': typeof AuthenticatedGenesisIndexRoute
+  '/help-center': typeof AuthenticatedHelpCenterIndexRoute
+  '/local-scout': typeof AuthenticatedLocalScoutIndexRoute
+  '/performance-oracle': typeof AuthenticatedPerformanceOracleIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
-  '/tasks/': typeof AuthenticatedTasksIndexRoute
-  '/users/': typeof AuthenticatedUsersIndexRoute
-  '/vision-lab/': typeof AuthenticatedVisionLabIndexRoute
+  '/tasks': typeof AuthenticatedTasksIndexRoute
+  '/users': typeof AuthenticatedUsersIndexRoute
+  '/vision-lab': typeof AuthenticatedVisionLabIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -318,6 +326,7 @@ export interface FileRoutesByTo {
   '/forge': typeof AuthenticatedForgeIndexRoute
   '/genesis': typeof AuthenticatedGenesisIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
+  '/local-scout': typeof AuthenticatedLocalScoutIndexRoute
   '/performance-oracle': typeof AuthenticatedPerformanceOracleIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
@@ -359,6 +368,7 @@ export interface FileRoutesById {
   '/_authenticated/forge/': typeof AuthenticatedForgeIndexRoute
   '/_authenticated/genesis/': typeof AuthenticatedGenesisIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
+  '/_authenticated/local-scout/': typeof AuthenticatedLocalScoutIndexRoute
   '/_authenticated/performance-oracle/': typeof AuthenticatedPerformanceOracleIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
@@ -390,19 +400,20 @@ export interface FileRouteTypes {
     | '/clerk/sign-in'
     | '/clerk/sign-up'
     | '/clerk/user-management'
-    | '/apps/'
-    | '/brand_brain/'
-    | '/campaign-architect/'
-    | '/chats/'
-    | '/competitor-pulse/'
-    | '/forge/'
-    | '/genesis/'
-    | '/help-center/'
-    | '/performance-oracle/'
+    | '/apps'
+    | '/brand_brain'
+    | '/campaign-architect'
+    | '/chats'
+    | '/competitor-pulse'
+    | '/forge'
+    | '/genesis'
+    | '/help-center'
+    | '/local-scout'
+    | '/performance-oracle'
     | '/settings/'
-    | '/tasks/'
-    | '/users/'
-    | '/vision-lab/'
+    | '/tasks'
+    | '/users'
+    | '/vision-lab'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -434,6 +445,7 @@ export interface FileRouteTypes {
     | '/forge'
     | '/genesis'
     | '/help-center'
+    | '/local-scout'
     | '/performance-oracle'
     | '/settings'
     | '/tasks'
@@ -474,6 +486,7 @@ export interface FileRouteTypes {
     | '/_authenticated/forge/'
     | '/_authenticated/genesis/'
     | '/_authenticated/help-center/'
+    | '/_authenticated/local-scout/'
     | '/_authenticated/performance-oracle/'
     | '/_authenticated/settings/'
     | '/_authenticated/tasks/'
@@ -509,7 +522,7 @@ declare module '@tanstack/react-router' {
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
-      fullPath: '/'
+      fullPath: ''
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -621,21 +634,21 @@ declare module '@tanstack/react-router' {
     '/_authenticated/vision-lab/': {
       id: '/_authenticated/vision-lab/'
       path: '/vision-lab'
-      fullPath: '/vision-lab/'
+      fullPath: '/vision-lab'
       preLoaderRoute: typeof AuthenticatedVisionLabIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/users/': {
       id: '/_authenticated/users/'
       path: '/users'
-      fullPath: '/users/'
+      fullPath: '/users'
       preLoaderRoute: typeof AuthenticatedUsersIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/tasks/': {
       id: '/_authenticated/tasks/'
       path: '/tasks'
-      fullPath: '/tasks/'
+      fullPath: '/tasks'
       preLoaderRoute: typeof AuthenticatedTasksIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
@@ -649,63 +662,70 @@ declare module '@tanstack/react-router' {
     '/_authenticated/performance-oracle/': {
       id: '/_authenticated/performance-oracle/'
       path: '/performance-oracle'
-      fullPath: '/performance-oracle/'
+      fullPath: '/performance-oracle'
       preLoaderRoute: typeof AuthenticatedPerformanceOracleIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/local-scout/': {
+      id: '/_authenticated/local-scout/'
+      path: '/local-scout'
+      fullPath: '/local-scout'
+      preLoaderRoute: typeof AuthenticatedLocalScoutIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/help-center/': {
       id: '/_authenticated/help-center/'
       path: '/help-center'
-      fullPath: '/help-center/'
+      fullPath: '/help-center'
       preLoaderRoute: typeof AuthenticatedHelpCenterIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/genesis/': {
       id: '/_authenticated/genesis/'
       path: '/genesis'
-      fullPath: '/genesis/'
+      fullPath: '/genesis'
       preLoaderRoute: typeof AuthenticatedGenesisIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/forge/': {
       id: '/_authenticated/forge/'
       path: '/forge'
-      fullPath: '/forge/'
+      fullPath: '/forge'
       preLoaderRoute: typeof AuthenticatedForgeIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/competitor-pulse/': {
       id: '/_authenticated/competitor-pulse/'
       path: '/competitor-pulse'
-      fullPath: '/competitor-pulse/'
+      fullPath: '/competitor-pulse'
       preLoaderRoute: typeof AuthenticatedCompetitorPulseIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/chats/': {
       id: '/_authenticated/chats/'
       path: '/chats'
-      fullPath: '/chats/'
+      fullPath: '/chats'
       preLoaderRoute: typeof AuthenticatedChatsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/campaign-architect/': {
       id: '/_authenticated/campaign-architect/'
       path: '/campaign-architect'
-      fullPath: '/campaign-architect/'
+      fullPath: '/campaign-architect'
       preLoaderRoute: typeof AuthenticatedCampaignArchitectIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/brand_brain/': {
       id: '/_authenticated/brand_brain/'
       path: '/brand_brain'
-      fullPath: '/brand_brain/'
+      fullPath: '/brand_brain'
       preLoaderRoute: typeof AuthenticatedBrand_brainIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/apps/': {
       id: '/_authenticated/apps/'
       path: '/apps'
-      fullPath: '/apps/'
+      fullPath: '/apps'
       preLoaderRoute: typeof AuthenticatedAppsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
@@ -803,6 +823,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedForgeIndexRoute: typeof AuthenticatedForgeIndexRoute
   AuthenticatedGenesisIndexRoute: typeof AuthenticatedGenesisIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
+  AuthenticatedLocalScoutIndexRoute: typeof AuthenticatedLocalScoutIndexRoute
   AuthenticatedPerformanceOracleIndexRoute: typeof AuthenticatedPerformanceOracleIndexRoute
   AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
@@ -823,6 +844,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedForgeIndexRoute: AuthenticatedForgeIndexRoute,
   AuthenticatedGenesisIndexRoute: AuthenticatedGenesisIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
+  AuthenticatedLocalScoutIndexRoute: AuthenticatedLocalScoutIndexRoute,
   AuthenticatedPerformanceOracleIndexRoute:
     AuthenticatedPerformanceOracleIndexRoute,
   AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,

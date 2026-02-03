@@ -10,6 +10,7 @@ import {
   Settings,
   HelpCircle,
   BrainCircuit,
+  Radio,
 } from 'lucide-react'
 import { type SidebarData } from '../types'
 
@@ -55,6 +56,11 @@ export const sidebarData: SidebarData = {
           title: 'Performance Oracle',
           url: '/performance-oracle',
           icon: BrainCircuit
+        },
+        {
+          title: 'Local Scout',
+          url: '/local-scout',
+          icon: Radio,
         },
       ],
     },
