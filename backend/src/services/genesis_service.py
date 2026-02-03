@@ -70,7 +70,9 @@ class GenesisService:
             strategist = MarketingStrategistAgent()
             
             # Get Brand Context
-            brand_context = await BrandService.get_brand_context()
+            # Get Brand Context
+            from fastapi.concurrency import run_in_threadpool
+            brand_context = await run_in_threadpool(BrandService.get_brand_context)
             
             strategy_result = await strategist.async_run(
                 task=f"""

@@ -58,3 +58,31 @@ class OracleResponse(BaseModel):
     forecast_data: List[TimePoint]
     analysis_report: str
     status: str = "success"
+
+# --- CAMPAIGN ARCHITECT SCHEMAS ---
+class AudienceSegment(BaseModel):
+    segment_name: str
+    pain_point: str
+
+class CampaignStrategy(BaseModel):
+    core_concept: str
+    target_audience: List[AudienceSegment]
+    usps: List[str]
+    tone: str
+    tagline: str
+    visual_direction: str
+
+class CampaignBase(BaseModel):
+    name: str
+    goal: str
+    duration: str
+    budget: str
+
+class CampaignCreate(CampaignBase):
+    pass
+
+class Campaign(CampaignBase):
+    id: str
+    status: str  # draft, active, completed
+    strategy: Optional[CampaignStrategy] = None
+    created_at: str

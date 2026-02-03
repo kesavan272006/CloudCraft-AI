@@ -21,7 +21,9 @@ async def predict_performance(request: OracleRequest):
             context = search_tool.func(search_query)
 
         # 2. Get Brand Context
-        brand_context = await BrandService.get_brand_context()
+        # 2. Get Brand Context
+        from fastapi.concurrency import run_in_threadpool
+        brand_context = await run_in_threadpool(BrandService.get_brand_context)
 
         # 3. Prompt Claude/Bedrock to act as a Data Scientist
         prompt = f"""

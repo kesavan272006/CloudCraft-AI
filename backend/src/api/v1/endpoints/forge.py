@@ -9,11 +9,13 @@ router = APIRouter()
 class ForgeRequest(BaseModel):
     prompt: str
 
+from fastapi.concurrency import run_in_threadpool
+
 @router.post("/forge", response_model=ForgeResponse)
 async def forge_content(request: ForgeRequest):
     try:
         # 1. Get Brand Context
-        brand_context = await BrandService.get_brand_context()
+        brand_context = await run_in_threadpool(BrandService.get_brand_context)
         
         # 2. Enrich the prompt with brand identity
         enriched_prompt = f"""

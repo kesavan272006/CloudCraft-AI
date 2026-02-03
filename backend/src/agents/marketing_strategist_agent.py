@@ -23,28 +23,19 @@ class MarketingStrategistAgent(BaseAgent):
 
     Your analysis must be sharp, modern, and actionable.
 
-    Your Output Format must be structured exactly like this:
-
-    Thought: [Your reasoning process]
-    Output:
-    ## 🎯 Core Concept
-    [One sentence hook]
-
-    ## 👥 Target Audience
-    1. [Audience Segment 1] - [Pain Point]
-    2. [Audience Segment 2] - [Desire]
-
-    ## 🔑 Unique Selling Points (USPs)
-    - [USP 1]
-    - [USP 2]
-    - [USP 3]
-
-    ## 📣 Key Messages / Tone of Voice
-    - Tone: [e.g., Witty, Professional, Urgent]
-    - Tagline: "[Catchy Tagline]"
-
-    ## 🎨 Visual Direction
-    [Brief description of the visual vibe]
+    Your Output Format must be a STRICT VALID JSON object. Do not include markdown formatting (```json).
+    Structure:
+    {
+        "core_concept": "One sentence hook",
+        "target_audience": [
+            {"segment_name": "Segment 1", "pain_point": "Pain Point 1"},
+            {"segment_name": "Segment 2", "pain_point": "Pain Point 2"}
+        ],
+        "usps": ["USP 1", "USP 2", "USP 3"],
+        "tone": "e.g., Witty, Professional",
+        "tagline": "Catchy Tagline",
+        "visual_direction": "Brief description of visual vibe"
+    }
     """
 
     def __init__(self, **kwargs):

@@ -31,14 +31,19 @@ class BrandService:
         except ClientError as e:
             if e.response["Error"]["Code"] == "ResourceNotFoundException":
                 logger.info(f"Table {cls.TABLE_NAME} not found. Creating it...")
-                table = dynamodb.create_table(
-                    TableName=cls.TABLE_NAME,
-                    KeySchema=[{"AttributeName": "pk", "KeyType": "HASH"}],
-                    AttributeDefinitions=[{"AttributeName": "pk", "AttributeType": "S"}],
-                    BillingMode="PAY_PER_REQUEST",
-                )
-                table.wait_until_exists()
-                logger.info(f"Table {cls.TABLE_NAME} created successfully.")
+                try:
+                    table = dynamodb.create_table(
+                        TableName=cls.TABLE_NAME,
+                        KeySchema=[{"AttributeName": "pk", "KeyType": "HASH"}],
+                        AttributeDefinitions=[{"AttributeName": "pk", "AttributeType": "S"}],
+                        BillingMode="PAY_PER_REQUEST",
+                    )
+                    logger.info(f"Table {cls.TABLE_NAME} creation initiated.")
+                except ClientError as e2:
+                    if e2.response["Error"]["Code"] == "ResourceInUseException":
+                         logger.info(f"Table {cls.TABLE_NAME} is already being created.")
+                    else:
+                         raise e2
             else:
                 logger.error(f"Failed to connect to DynamoDB: {e}")
                 raise e
@@ -70,7 +75,7 @@ class BrandService:
             return None
 
     @classmethod
-    async def save_brand_profile(cls, profile: BrandProfile):
+    def save_brand_profile(cls, profile: BrandProfile):
         """Save brand profile to DynamoDB with File Fallback"""
         item = profile.dict()
         item["pk"] = "BRAND_IDENTITY"  # Singleton pattern for now
@@ -87,7 +92,7 @@ class BrandService:
             return item
 
     @classmethod
-    async def load_brand_profile(cls) -> BrandProfile:
+    def load_brand_profile(cls) -> BrandProfile:
         """Load brand profile from DynamoDB with File Fallback"""
         try:
             table = cls._get_table()
@@ -105,9 +110,9 @@ class BrandService:
         return None
 
     @classmethod
-    async def get_brand_context(cls) -> str:
+    def get_brand_context(cls) -> str:
         """Format brand profile as context string for AI agents"""
-        profile = await cls.load_brand_profile()
+        profile = cls.load_brand_profile()
         if not profile:
             return ""
             

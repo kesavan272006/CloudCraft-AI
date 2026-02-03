@@ -9,7 +9,7 @@ except ImportError:
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.api.v1.endpoints import forge, vision, genesis, competitor, oracle, scout, brand
+from src.api.v1.endpoints import forge, vision, genesis, competitor, oracle, scout, brand, campaign
 
 app = FastAPI(
     title="CloudCraft AI Backend",
@@ -27,13 +27,14 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(forge.router, prefix="/api/v1")
-app.include_router(vision.router, prefix="/api/v1")
-app.include_router(genesis.router, prefix="/api/v1")
-app.include_router(brand.router, prefix="/api/v1/brand", tags=["Brand Brain"])
+app.include_router(forge.router, prefix="/api/v1", tags=["Forge"])
+app.include_router(vision.router, prefix="/api/v1/vision", tags=["Vision Lab"])
+app.include_router(genesis.router, prefix="/api/v1/genesis", tags=["Genesis Engine"])
 app.include_router(competitor.router, prefix="/api/v1/competitor", tags=["Competitor Pulse"])
 app.include_router(oracle.router, prefix="/api/v1/oracle", tags=["Performance Oracle"])
 app.include_router(scout.router, prefix="/api/v1/scout", tags=["Local Scout"])
+app.include_router(brand.router, prefix="/api/v1/brand", tags=["Brand Brain"])
+app.include_router(campaign.router, prefix="/api/v1/campaigns", tags=["Campaign Architect"])
 
 @app.get("/health")
 async def health_check():
