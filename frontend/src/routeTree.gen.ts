@@ -30,6 +30,7 @@ import { Route as AuthenticatedVisionLabIndexRouteImport } from './routes/_authe
 import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authenticated/users/index'
 import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authenticated/tasks/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
+import { Route as AuthenticatedPerformanceOracleIndexRouteImport } from './routes/_authenticated/performance-oracle/index'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
 import { Route as AuthenticatedGenesisIndexRouteImport } from './routes/_authenticated/genesis/index'
 import { Route as AuthenticatedForgeIndexRouteImport } from './routes/_authenticated/forge/index'
@@ -151,6 +152,12 @@ const AuthenticatedSettingsIndexRoute =
     id: '/',
     path: '/',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
+  } as any)
+const AuthenticatedPerformanceOracleIndexRoute =
+  AuthenticatedPerformanceOracleIndexRouteImport.update({
+    id: '/performance-oracle/',
+    path: '/performance-oracle/',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedHelpCenterIndexRoute =
   AuthenticatedHelpCenterIndexRouteImport.update({
@@ -275,6 +282,7 @@ export interface FileRoutesByFullPath {
   '/forge': typeof AuthenticatedForgeIndexRoute
   '/genesis': typeof AuthenticatedGenesisIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
+  '/performance-oracle': typeof AuthenticatedPerformanceOracleIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
@@ -310,6 +318,7 @@ export interface FileRoutesByTo {
   '/forge': typeof AuthenticatedForgeIndexRoute
   '/genesis': typeof AuthenticatedGenesisIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
+  '/performance-oracle': typeof AuthenticatedPerformanceOracleIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
@@ -350,6 +359,7 @@ export interface FileRoutesById {
   '/_authenticated/forge/': typeof AuthenticatedForgeIndexRoute
   '/_authenticated/genesis/': typeof AuthenticatedGenesisIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
+  '/_authenticated/performance-oracle/': typeof AuthenticatedPerformanceOracleIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
@@ -388,6 +398,7 @@ export interface FileRouteTypes {
     | '/forge'
     | '/genesis'
     | '/help-center'
+    | '/performance-oracle'
     | '/settings/'
     | '/tasks'
     | '/users'
@@ -423,6 +434,7 @@ export interface FileRouteTypes {
     | '/forge'
     | '/genesis'
     | '/help-center'
+    | '/performance-oracle'
     | '/settings'
     | '/tasks'
     | '/users'
@@ -462,6 +474,7 @@ export interface FileRouteTypes {
     | '/_authenticated/forge/'
     | '/_authenticated/genesis/'
     | '/_authenticated/help-center/'
+    | '/_authenticated/performance-oracle/'
     | '/_authenticated/settings/'
     | '/_authenticated/tasks/'
     | '/_authenticated/users/'
@@ -633,6 +646,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsIndexRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
+    '/_authenticated/performance-oracle/': {
+      id: '/_authenticated/performance-oracle/'
+      path: '/performance-oracle'
+      fullPath: '/performance-oracle'
+      preLoaderRoute: typeof AuthenticatedPerformanceOracleIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/help-center/': {
       id: '/_authenticated/help-center/'
       path: '/help-center'
@@ -783,6 +803,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedForgeIndexRoute: typeof AuthenticatedForgeIndexRoute
   AuthenticatedGenesisIndexRoute: typeof AuthenticatedGenesisIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
+  AuthenticatedPerformanceOracleIndexRoute: typeof AuthenticatedPerformanceOracleIndexRoute
   AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
   AuthenticatedVisionLabIndexRoute: typeof AuthenticatedVisionLabIndexRoute
@@ -802,6 +823,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedForgeIndexRoute: AuthenticatedForgeIndexRoute,
   AuthenticatedGenesisIndexRoute: AuthenticatedGenesisIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
+  AuthenticatedPerformanceOracleIndexRoute:
+    AuthenticatedPerformanceOracleIndexRoute,
   AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
   AuthenticatedVisionLabIndexRoute: AuthenticatedVisionLabIndexRoute,

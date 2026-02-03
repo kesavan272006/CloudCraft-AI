@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.api.v1.endpoints import forge, vision, genesis, competitor
+from src.api.v1.endpoints import forge, vision, genesis, competitor, oracle
 
 app = FastAPI(
     title="CloudCraft AI Backend",
@@ -23,6 +23,7 @@ app.include_router(forge.router, prefix="/api/v1")
 app.include_router(vision.router, prefix="/api/v1")
 app.include_router(genesis.router, prefix="/api/v1")
 app.include_router(competitor.router, prefix="/api/v1/competitor", tags=["Competitor Pulse"])
+app.include_router(oracle.router, prefix="/api/v1/oracle", tags=["Performance Oracle"])
 
 @app.get("/health")
 async def health_check():

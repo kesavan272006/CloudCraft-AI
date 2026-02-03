@@ -9,6 +9,7 @@ import {
   Sparkles,
   Settings,
   HelpCircle,
+  BrainCircuit,
 } from 'lucide-react'
 import { type SidebarData } from '../types'
 
@@ -49,6 +50,11 @@ export const sidebarData: SidebarData = {
           title: 'Vision Lab',
           url: '/vision-lab',
           icon: ImageIcon,
+        },
+        {
+          title: 'Performance Oracle',
+          url: '/performance-oracle',
+          icon: BrainCircuit
         },
       ],
     },
