@@ -24,18 +24,28 @@ class BrandProfile(BaseModel):
 class CompetitorRequest(BaseModel):
     query: str  # The handle or niche
 
-class CompetitorSuggestion(BaseModel):
+class WinningPatterns(BaseModel):
+    hooks: List[str]
+    visuals: str
+    engagement_triggers: str
+
+class CounterPlay(BaseModel):
+    the_pivot: str
+    suggested_content_idea: str
+    target_metric: str
+
+class SuggestedAsset(BaseModel):
+    type: str # Reel, Carousel, etc.
     caption: str
+    visual_description: str
     hashtags: List[str]
-    visual_idea: str
-    best_time_to_post: str
-    why_it_works: str
-    compliance_note: str
 
 class CompetitorPulseResponse(BaseModel):
     competitor_handle: str
     summary: str
-    suggestions: CompetitorSuggestion
+    winning_patterns: WinningPatterns
+    counter_play: CounterPlay
+    suggested_assets: List[SuggestedAsset]
     status: str = "success"
 
 # --- PERFORMANCE ORACLE SCHEMAS (NEW) ---

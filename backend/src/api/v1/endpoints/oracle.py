@@ -13,8 +13,8 @@ async def predict_performance(request: OracleRequest):
     from src.services.oracle_service import OracleService
 
     try:
-        # Run blocking service method in threadpool
-        response = await run_in_threadpool(OracleService.predict_performance, request.content)
+        # Service is now async, so we await it directly
+        response = await OracleService.predict_performance(request.content)
         return response
 
     except Exception as e:

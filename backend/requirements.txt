@@ -16,3 +16,7 @@ python-multipart
 langchain-huggingface
 langchain-openai
 tavily-python
+requests
+httpx
+jinja2
+python-slugify

@@ -5,14 +5,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
-import { 
-  Radar, 
-  Search, 
-  TrendingUp, 
-  Clock, 
-  Lightbulb, 
-  ShieldCheck, 
-  Loader2, 
+import {
+  Radar,
+  Search,
+  TrendingUp,
+  Clock,
+  Lightbulb,
+  ShieldCheck,
+  Loader2,
   Instagram,
   Zap,
   Check,
@@ -37,7 +37,7 @@ export default function CompetitorPulsePage() {
 
   const handleSearch = async () => {
     if (!query.trim()) return
-    
+
     setLoading(true)
     setError(null)
     setResult(null)
@@ -50,7 +50,7 @@ export default function CompetitorPulsePage() {
       })
 
       if (!response.ok) throw new Error("Failed to fetch competitor pulse")
-      
+
       const data = await response.json()
       setResult(data)
     } catch (err: any) {
@@ -83,8 +83,8 @@ export default function CompetitorPulsePage() {
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input 
-                placeholder="Enter handle (e.g. @keralafoodie) or niche..." 
+              <Input
+                placeholder="Enter handle (e.g. @keralafoodie) or niche..."
                 className="pl-10 h-12 bg-background"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -119,71 +119,119 @@ export default function CompetitorPulsePage() {
 
       {/* Results View */}
       {result && (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          
-          <Card className="md:col-span-2 lg:col-span-3 border-primary/20 bg-primary/5">
-            <CardHeader className="p-4 md:p-6">
+        <div className="grid gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+
+          {/* Summary Hero */}
+          <Card className="border-primary/20 bg-primary/5 overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-10">
+              <Instagram className="h-24 w-24" />
+            </div>
+            <CardHeader className="p-4 md:p-6 pb-2">
               <div className="flex items-center gap-2">
-                <Instagram className="h-5 w-5 text-primary" />
-                <CardTitle className="text-sm md:text-base">Strategy Summary: {result.competitor_handle}</CardTitle>
+                <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">Competitor Audit</Badge>
+                <CardTitle className="text-sm md:text-xl font-black">{result.competitor_handle}</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="p-4 md:p-6 pt-0">
-              <p className="text-sm md:text-lg leading-relaxed italic font-medium">
-                "{result.summary}"
+              <p className="text-sm md:text-xl leading-relaxed font-medium text-foreground/80">
+                {result.summary}
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-border shadow-sm">
-            <CardHeader className="p-4">
-              <CardTitle className="flex items-center justify-between text-sm md:text-base text-primary">
-                <div className="flex items-center gap-2"><Lightbulb className="h-4 w-4" /> Suggestion</div>
-                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleCopy(result.suggestions.caption)}>
-                  {copied ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
-                </Button>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 pt-0 space-y-4">
-              <div className="bg-muted/30 p-3 rounded-lg border text-xs md:text-sm leading-relaxed">
-                {result.suggestions.caption}
-              </div>
-              <div className="flex flex-wrap gap-1">
-                {result.suggestions.hashtags.map((tag: string) => (
-                  <Badge key={tag} variant="secondary" className="text-[9px]">#{tag}</Badge>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {/* Winning Patterns */}
+            <Card className="border-border shadow-md hover:shadow-lg transition-shadow bg-card/50">
+              <CardHeader className="p-4 bg-primary/5 border-b">
+                <CardTitle className="flex items-center gap-2 text-sm md:text-base text-primary uppercase tracking-wider font-black">
+                  <TrendingUp className="h-4 w-4" /> Winning Patterns
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 space-y-4">
+                <div>
+                  <h4 className="text-[10px] uppercase font-bold text-muted-foreground mb-2 flex items-center gap-1">
+                    <Zap className="h-3 w-3 text-yellow-500" /> Top Hooks
+                  </h4>
+                  <div className="space-y-2">
+                    {result.winning_patterns.hooks.map((hook: string, i: number) => (
+                      <div key={i} className="text-xs p-2 rounded bg-muted/50 border border-border/50 italic">
+                        "{hook}"
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <Separator />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Visual Style</h4>
+                    <p className="text-xs text-foreground/70">{result.winning_patterns.visuals}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Psychology</h4>
+                    <p className="text-xs text-foreground/70">{result.winning_patterns.engagement_triggers}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Strategic Counter-Play */}
+            <Card className="border-primary/30 shadow-md hover:shadow-lg transition-all bg-primary/[0.02] scale-[1.02] ring-1 ring-primary/20">
+              <CardHeader className="p-4 bg-primary/10 border-b">
+                <CardTitle className="flex items-center gap-2 text-sm md:text-base text-primary uppercase tracking-wider font-black">
+                  <Radar className="h-4 w-4" /> The Counter-Play
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 space-y-4">
+                <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+                  <h4 className="text-[10px] uppercase font-bold text-primary mb-1">The Pivot (Our Edge)</h4>
+                  <p className="text-sm font-semibold">{result.counter_play.the_pivot}</p>
+                </div>
+                <div>
+                  <h4 className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Suggested Content Idea</h4>
+                  <p className="text-xs leading-relaxed">{result.counter_play.suggested_content_idea}</p>
+                </div>
+                <div className="flex items-center justify-between p-2 rounded border bg-background">
+                  <span className="text-[10px] font-bold uppercase text-muted-foreground">Focus Metric</span>
+                  <Badge variant="secondary" className="font-black text-primary uppercase">{result.counter_play.target_metric}</Badge>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Suggested Assets */}
+            <Card className="border-border shadow-md hover:shadow-lg transition-shadow bg-card/50">
+              <CardHeader className="p-4 bg-muted/50 border-b">
+                <CardTitle className="flex items-center gap-2 text-sm md:text-base text-foreground uppercase tracking-wider font-black">
+                  <Lightbulb className="h-4 w-4 text-yellow-500" /> Asset Drafts
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 overflow-y-auto max-h-[400px] space-y-6">
+                {result.suggested_assets.map((asset: any, i: number) => (
+                  <div key={i} className="space-y-3 p-3 rounded-lg border bg-background/50 relative group">
+                    <div className="flex items-center justify-between">
+                      <Badge className="bg-primary/20 text-primary border-none text-[10px] uppercase font-bold">{asset.type}</Badge>
+                      <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleCopy(asset.caption)}>
+                        <Copy className="h-3 w-3" />
+                      </Button>
+                    </div>
+                    <div>
+                      <h4 className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Caption</h4>
+                      <p className="text-xs italic leading-relaxed">"{asset.caption}"</p>
+                    </div>
+                    <div>
+                      <h4 className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Visual Concept</h4>
+                      <p className="text-[11px] text-foreground/70">{asset.visual_description}</p>
+                    </div>
+                    <div className="flex flex-wrap gap-1 pt-1 text-[9px]">
+                      {asset.hashtags.map((tag: string) => (
+                        <span key={tag} className="text-primary font-medium">#{tag.replace('#', '')}</span>
+                      ))}
+                    </div>
+                    {i < result.suggested_assets.length - 1 && <Separator className="mt-4" />}
+                  </div>
                 ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-border shadow-sm">
-            <CardHeader className="p-4">
-              <CardTitle className="flex items-center gap-2 text-sm md:text-base text-primary">
-                <TrendingUp className="h-4 w-4" /> Visual & Time
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 pt-0 space-y-4 text-xs md:text-sm">
-              <p className="leading-relaxed"><span className="font-bold">Visual Idea:</span> {result.suggestions.visual_idea}</p>
-              <div className="flex items-center justify-between p-3 rounded-lg bg-primary/5 border border-primary/10 font-bold">
-                <span className="flex items-center gap-2"><Clock className="h-4 w-4" /> Best Time</span>
-                <span className="text-primary">{result.suggestions.best_time_to_post}</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-border shadow-sm">
-            <CardHeader className="p-4">
-              <CardTitle className="flex items-center gap-2 text-sm md:text-base text-primary">
-                <ShieldCheck className="h-4 w-4" /> Strategy Logic
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 pt-0 space-y-4 text-xs md:text-sm">
-              <p><span className="font-bold">Why it works:</span> {result.suggestions.why_it_works}</p>
-              <Badge className="w-full justify-center py-1 text-[9px] uppercase font-black" variant="outline">
-                {result.suggestions.compliance_note}
-              </Badge>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       )}
 

@@ -17,7 +17,7 @@ class LocalScoutService:
             return {"error": "Search tool unavailable"}
 
         # 1. Get Brand Context
-        brand_context = await BrandService.get_brand_context()
+        brand_context = BrandService.get_brand_context()
 
         # 2. Search for local data
         search_query = f"latest viral trends events food spots news {city} Kerala February 2026 reddit"

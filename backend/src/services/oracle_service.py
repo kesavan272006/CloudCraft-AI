@@ -22,28 +22,32 @@ class OracleService:
     """
 
     @classmethod
-    def predict_performance(cls, content: str) -> OracleResponse:
+    async def predict_performance(cls, content: str) -> OracleResponse:
         """
-        Synchronous method to be run in threadpool.
+        Async method for prediction.
         """
+        from fastapi.concurrency import run_in_threadpool
+        
         try:
             # 1. Setup LLM & Tools
             llm = LLMFactory.get_default_llm()
             tools = LLMFactory.get_tools()
             search_tool = next((t for t in tools if t.name == "web_search"), None)
 
-            # 2. Web Search (Blocking)
+            # 2. Web Search (Blocking - Wrap in threadpool)
             context = ""
             if search_tool:
                 try:
                     search_query = "current viral social media trends and engagement patterns 2026"
-                    context = search_tool.func(search_query)
+                    # Run sync search in threadpool
+                    # Note: search_tool.func might be partial, ensure it's callable
+                    context = await run_in_threadpool(search_tool.func, search_query)
                 except Exception as e:
                     logger.warning(f"Oracle search failed: {e}")
                     context = "Assume standard high-engagement patterns."
 
-            # 3. Brand Context
-            brand_context = BrandService.get_brand_context()
+            # 3. Brand Context (Blocking - Wrap in threadpool)
+            brand_context = await run_in_threadpool(BrandService.get_brand_context)
 
             # 4. Prompt
             prompt = f"""
@@ -82,8 +86,8 @@ class OracleService:
             }}
             """
 
-            # 5. Invoke LLM (Blocking)
-            response = llm.invoke(prompt)
+            # 5. Invoke LLM (Async)
+            response = await llm.ainvoke(prompt)
             
             # 6. Parse JSON
             output_text = response.content
@@ -102,8 +106,8 @@ class OracleService:
                 status="success"
             )
 
-            # 7. Persist
-            cls._save_history(content, result)
+            # 7. Persist (Blocking - Wrap)
+            await run_in_threadpool(cls._save_history, content, result)
 
             return result
 

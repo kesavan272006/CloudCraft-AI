@@ -4,26 +4,42 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
-import { 
-  BarChart3, Sparkles, Loader2, TrendingUp, BrainCircuit, 
+import {
+  BarChart3, Sparkles, Loader2, TrendingUp, BrainCircuit,
   Target, AlertCircle, PieChart as PieIcon, BarChart as BarIcon,
   MessageSquareQuote
 } from "lucide-react"
-import { 
+import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer,
   AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid,
   PieChart, Pie, Cell, BarChart, Bar, LabelList, Label
 } from 'recharts'
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-
-// Vibrant Palette for Hackathon Impact
-const VIBRANT_COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+import { Badge } from "@/components/ui/badge"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { Clock, History } from "lucide-react"
 
 export default function PerformanceOraclePage() {
   const [content, setContent] = useState('')
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
+  const [history, setHistory] = useState<any[]>([])
+  const [historyLoading, setHistoryLoading] = useState(false)
+
+  const fetchHistory = async () => {
+    setHistoryLoading(true)
+    try {
+      const res = await fetch('http://localhost:8000/api/v1/oracle/history')
+      if (res.ok) {
+        const data = await res.json()
+        setHistory(data)
+      }
+    } catch (e) {
+      console.error("Failed to fetch history", e)
+    } finally {
+      setHistoryLoading(false)
+    }
+  }
 
   const handlePredict = async () => {
     if (!content.trim()) return
@@ -38,7 +54,7 @@ export default function PerformanceOraclePage() {
       })
       if (!response.ok) throw new Error("Oracle connection failed")
       const data = await response.json()
-      
+
       const enrichedData = {
         ...data,
         sentiment: [
@@ -65,14 +81,64 @@ export default function PerformanceOraclePage() {
   return (
     <div className="flex-1 space-y-4 p-4 md:space-y-6 md:p-10 bg-background text-foreground overflow-x-hidden">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <div className="rounded-xl bg-primary/10 p-2 md:p-3">
-          <BrainCircuit className="h-6 w-6 md:h-8 md:w-8 text-primary" />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="rounded-xl bg-primary/10 p-2 md:p-3">
+            <BrainCircuit className="h-6 w-6 md:h-8 md:w-8 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold tracking-tight md:text-3xl uppercase italic">Performance Oracle</h1>
+            <p className="text-muted-foreground text-[10px] md:text-sm font-medium tracking-widest uppercase">Predictive Viral Intelligence</p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-xl font-bold tracking-tight md:text-3xl uppercase italic">Performance Oracle</h1>
-          <p className="text-muted-foreground text-[10px] md:text-sm font-medium tracking-widest uppercase">Predictive Viral Intelligence</p>
-        </div>
+
+        {/* History Trigger */}
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="outline" className="gap-2 border-primary/20" onClick={fetchHistory}>
+              <History className="h-4 w-4" /> History
+            </Button>
+          </SheetTrigger>
+          <SheetContent className="overflow-y-auto">
+            <SheetHeader>
+              <SheetTitle className="uppercase font-black flex items-center gap-2">
+                <Clock className="h-5 w-5 text-primary" /> Prediction History
+              </SheetTitle>
+              <CardDescription>Revisit past viral forecasts.</CardDescription>
+            </SheetHeader>
+            <div className="mt-6 space-y-3">
+              {historyLoading ? (
+                <div className="flex justify-center p-4"><Loader2 className="animate-spin h-6 w-6 text-primary" /></div>
+              ) : history.length === 0 ? (
+                <p className="text-sm text-center text-muted-foreground p-4">No history yet.</p>
+              ) : (
+                history.map((item: any) => (
+                  <Card
+                    key={item.id}
+                    className="cursor-pointer hover:bg-accent/50 transition-colors border-primary/10 group"
+                    onClick={() => {
+                      setContent(item.input_content);
+                      setResult(item.response);
+                      // Close sheet implicitly by user action or manual control (uncontrolled for now is fine)
+                    }}
+                  >
+                    <CardContent className="p-3">
+                      <div className="flex justify-between items-start mb-2">
+                        <Badge variant="outline" className="text-[10px] border-primary/20 text-primary">
+                          {new Date(item.timestamp).toLocaleDateString()}
+                        </Badge>
+                        <p className="text-[10px] font-bold text-emerald-500">{item.response.viral_score}% Viral</p>
+                      </div>
+                      <p className="text-xs font-medium line-clamp-2 text-muted-foreground group-hover:text-foreground transition-colors">
+                        {item.input_content}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
 
       <Separator />
@@ -85,7 +151,7 @@ export default function PerformanceOraclePage() {
               <CardTitle className="text-sm font-black uppercase">Draft Input</CardTitle>
             </CardHeader>
             <CardContent className="p-4 pt-0 space-y-4">
-              <Textarea 
+              <Textarea
                 placeholder="Paste your script here for the Oracle to scan..."
                 className="h-[200px] md:h-[450px] bg-background border-primary/10 text-sm overflow-y-auto resize-none font-medium leading-relaxed"
                 value={content}
@@ -104,7 +170,7 @@ export default function PerformanceOraclePage() {
         <div className="lg:col-span-8 space-y-4">
           {result ? (
             <div className="space-y-6 animate-in fade-in slide-in-from-right-10 duration-700">
-              
+
               {/* AI VERDICT - PROMINENT PLACE */}
               <Card className="border-l-4 border-l-primary bg-primary/5 shadow-sm">
                 <CardHeader className="p-4 pb-2">
@@ -144,9 +210,9 @@ export default function PerformanceOraclePage() {
                     <ResponsiveContainer width="100%" height="100%">
                       <RadarChart data={result.radar_data} outerRadius="70%">
                         <PolarGrid />
-                        <PolarAngleAxis dataKey="subject" tick={{fontSize: 10, fontWeight: 'bold', fill: '#888'}} />
+                        <PolarAngleAxis dataKey="subject" tick={{ fontSize: 10, fontWeight: 'bold', fill: '#888' }} />
                         <Radar dataKey="score" stroke="#6366f1" fill="#6366f1" fillOpacity={0.6}>
-                           <LabelList dataKey="score" position="top" style={{fontSize: '10px', fontWeight: 'bold', fill: '#6366f1'}} />
+                          <LabelList dataKey="score" position="top" style={{ fontSize: '10px', fontWeight: 'bold', fill: '#6366f1' }} />
                         </Radar>
                       </RadarChart>
                     </ResponsiveContainer>
@@ -158,8 +224,8 @@ export default function PerformanceOraclePage() {
                   <div className="h-[250px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
-                        <Pie data={result.sentiment} innerRadius={50} outerRadius={70} paddingAngle={8} dataKey="value" label={({name, value}) => `${name}: ${value}%`}>
-                          {result.sentiment.map((entry: any, index: number) => (<Cell key={`cell-${index}`} fill={VIBRANT_COLORS[index % VIBRANT_COLORS.length]} />))}
+                        <Pie data={result.sentiment || []} innerRadius={50} outerRadius={70} paddingAngle={8} dataKey="value" label={({ name, value }) => `${name}: ${value}%`}>
+                          {(result.sentiment || []).map((entry: any, index: number) => (<Cell key={`cell-${index}`} fill={VIBRANT_COLORS[index % VIBRANT_COLORS.length]} />))}
                         </Pie>
                         <Tooltip />
                       </PieChart>
@@ -176,11 +242,11 @@ export default function PerformanceOraclePage() {
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={result.forecast_data}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                        <XAxis dataKey="time" tick={{fontSize: 10, fontWeight: 'bold'}} />
+                        <XAxis dataKey="time" tick={{ fontSize: 10, fontWeight: 'bold' }} />
                         <YAxis hide />
                         <Tooltip />
                         <Area type="monotone" dataKey="engagement" stroke="#6366f1" fill="#6366f1" fillOpacity={0.3}>
-                          <LabelList dataKey="engagement" position="top" style={{fontSize: '9px', fill: '#6366f1', fontWeight: 'bold'}} />
+                          <LabelList dataKey="engagement" position="top" style={{ fontSize: '9px', fill: '#6366f1', fontWeight: 'bold' }} />
                         </Area>
                       </AreaChart>
                     </ResponsiveContainer>
@@ -191,14 +257,14 @@ export default function PerformanceOraclePage() {
                   <p className="text-[10px] font-black mb-4 flex items-center gap-2 uppercase text-muted-foreground"><BarIcon className="h-3 w-3 text-primary" /> Platform Reach Index</p>
                   <div className="h-[250px]">
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={result.platform_reach} layout="vertical">
+                      <BarChart data={result.platform_reach || []} layout="vertical">
                         <XAxis type="number" hide />
-                        <YAxis dataKey="name" type="category" tick={{fontSize: 10, fontWeight: 'bold'}} axisLine={false} />
+                        <YAxis dataKey="name" type="category" tick={{ fontSize: 10, fontWeight: 'bold' }} axisLine={false} />
                         <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={25}>
-                          {result.platform_reach.map((entry: any, index: number) => (
+                          {(result.platform_reach || []).map((entry: any, index: number) => (
                             <Cell key={`cell-${index}`} fill={VIBRANT_COLORS[index % VIBRANT_COLORS.length]} />
                           ))}
-                          <LabelList dataKey="value" position="right" style={{fontSize: '10px', fontWeight: 'black', fill: '#888'}} />
+                          <LabelList dataKey="value" position="right" style={{ fontSize: '10px', fontWeight: 'black', fill: '#888' }} />
                         </Bar>
                       </BarChart>
                     </ResponsiveContainer>

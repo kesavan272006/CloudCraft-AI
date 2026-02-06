@@ -1,58 +1,40 @@
 from fastapi import APIRouter, HTTPException
-from src.models.schemas import CompetitorRequest, CompetitorPulseResponse, CompetitorSuggestion
+from src.models.schemas import CompetitorRequest, CompetitorPulseResponse
 from src.services.competitor_service import CompetitorService
-import re
+from src.utils.logger import get_logger
+import json
+
+logger = get_logger(__name__)
 
 router = APIRouter()
 
-def parse_llm_response(text: str) -> dict:
-    """Helper to extract structured data from the LLM's text output"""
-    data = {}
-    patterns = {
-        "summary": r"SUMMARY:\s*(.*)",
-        "caption": r"SUGGESTED CAPTION:\s*(.*)",
-        "hashtags": r"HASHTAGS:\s*\[(.*?)\]",
-        "visual_idea": r"VISUAL IDEA:\s*(.*)",
-        "best_time": r"BEST TIME:\s*(.*)",
-        "why_it_works": r"WHY IT WORKS:\s*(.*)",
-        "compliance": r"COMPLIANCE:\s*(.*)",
-    }
-    
-    for key, pattern in patterns.items():
-        match = re.search(pattern, text, re.IGNORECASE | re.DOTALL)
-        if match:
-            val = match.group(1).strip()
-            if key == "hashtags":
-                data[key] = [tag.strip().replace("#", "") for tag in val.split(",")]
-            else:
-                data[key] = val
-        else:
-            data[key] = "Not provided" if key != "hashtags" else []
-            
-    return data
-
 @router.post("/pulse", response_model=CompetitorPulseResponse)
 async def get_competitor_pulse(request: CompetitorRequest):
+    """
+    Endpoint for 'Competitor Pulse'.
+    Performs deep research on a niche/competitor and returns a strategic counter-play.
+    """
     try:
-        # 1. Call the service to get raw analysis from Claude + Tavily
-        raw_analysis = await CompetitorService.analyze_competitor(request.query)
+        # 1. Get structured analysis (JSON string) from Service
+        raw_json_str = await CompetitorService.analyze_competitor(request.query)
         
-        # 2. Parse the text into our dictionary format
-        parsed = parse_llm_response(raw_analysis)
+        # 2. Parse the JSON
+        analysis_data = json.loads(raw_json_str)
         
-        # 3. Return the structured response
+        # 3. Construct and return the response
+        # The keys in analysis_data must match our CompetitorPulseResponse schema
         return CompetitorPulseResponse(
             competitor_handle=request.query,
-            summary=parsed["summary"],
-            suggestions=CompetitorSuggestion(
-                caption=parsed["caption"],
-                hashtags=parsed["hashtags"],
-                visual_idea=parsed["visual_idea"],
-                best_time_to_post=parsed["best_time"],
-                why_it_works=parsed["why_it_works"],
-                compliance_note=parsed["compliance"]
-            ),
+            summary=analysis_data.get("competitor_summary", "Strategic audit completed."),
+            winning_patterns=analysis_data.get("winning_patterns", {}),
+            counter_play=analysis_data.get("strategic_counter_play", {}),
+            suggested_assets=analysis_data.get("suggested_assets", []),
             status="success"
         )
+        
+    except json.JSONDecodeError as je:
+        logger.error(f"Failed to parse Agent JSON: {je}")
+        raise HTTPException(status_code=500, detail="Intelligence report formatting error. Please try again.")
     except Exception as e:
+        logger.error(f"Competitor Pulse API Error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
