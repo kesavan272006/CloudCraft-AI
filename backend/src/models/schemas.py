@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any
 
 # --- FORGE SCHEMAS ---
 class AgentThought(BaseModel):
@@ -26,24 +26,34 @@ class CompetitorRequest(BaseModel):
 
 class WinningPatterns(BaseModel):
     hooks: List[str]
-    visuals: str
-    engagement_triggers: str
+    visual_secret: str
+    psychology: str
+
+class SWOTAnalysis(BaseModel):
+    strengths: List[str]
+    weaknesses: List[str]
+    opportunities: List[str]
+    threats: List[str]
 
 class CounterPlay(BaseModel):
     the_pivot: str
-    suggested_content_idea: str
-    target_metric: str
+    content_series_concept: Any # Can be str or dict
+    execution_difficulty: str
 
 class SuggestedAsset(BaseModel):
-    type: str # Reel, Carousel, etc.
-    caption: str
-    visual_description: str
-    hashtags: List[str]
+    type: str # Reel, Post, Thread
+    headline: str
+    script_outline: Any # Can be str or list of steps
+    visual_vibe: str
+    impact_prediction: str
 
 class CompetitorPulseResponse(BaseModel):
     competitor_handle: str
-    summary: str
+    threat_level: int
+    competitor_status: str
+    intelligence_brief: str
     winning_patterns: WinningPatterns
+    swot: SWOTAnalysis
     counter_play: CounterPlay
     suggested_assets: List[SuggestedAsset]
     status: str = "success"

@@ -25,8 +25,11 @@ async def get_competitor_pulse(request: CompetitorRequest):
         # The keys in analysis_data must match our CompetitorPulseResponse schema
         return CompetitorPulseResponse(
             competitor_handle=request.query,
-            summary=analysis_data.get("competitor_summary", "Strategic audit completed."),
+            threat_level=analysis_data.get("threat_level", 50),
+            competitor_status=analysis_data.get("competitor_status", "Neutral"),
+            intelligence_brief=analysis_data.get("intelligence_brief", "Strategic audit completed."),
             winning_patterns=analysis_data.get("winning_patterns", {}),
+            swot=analysis_data.get("swot", {}),
             counter_play=analysis_data.get("strategic_counter_play", {}),
             suggested_assets=analysis_data.get("suggested_assets", []),
             status="success"

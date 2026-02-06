@@ -119,118 +119,205 @@ export default function CompetitorPulsePage() {
 
       {/* Results View */}
       {result && (
-        <div className="grid gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
 
-          {/* Summary Hero */}
-          <Card className="border-primary/20 bg-primary/5 overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-10">
-              <Instagram className="h-24 w-24" />
-            </div>
-            <CardHeader className="p-4 md:p-6 pb-2">
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">Competitor Audit</Badge>
-                <CardTitle className="text-sm md:text-xl font-black">{result.competitor_handle}</CardTitle>
+          {/* Top Intelligence Bar */}
+          <div className="grid gap-4 md:grid-cols-3">
+            <Card className="md:col-span-2 border-primary/40 bg-primary/10 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                <ShieldCheck className="h-32 w-32" />
               </div>
-            </CardHeader>
-            <CardContent className="p-4 md:p-6 pt-0">
-              <p className="text-sm md:text-xl leading-relaxed font-medium text-foreground/80">
-                {result.summary}
-              </p>
-            </CardContent>
-          </Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <Badge variant="destructive" className="animate-pulse bg-red-600">LIVE INTEL</Badge>
+                  <CardTitle className="text-xl font-black tracking-tighter uppercase">Intelligence Brief: {result.competitor_handle}</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="text-lg font-bold leading-tight text-foreground/90 italic">
+                  "{result.intelligence_brief}"
+                </p>
+              </CardContent>
+            </Card>
 
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {/* Winning Patterns */}
-            <Card className="border-border shadow-md hover:shadow-lg transition-shadow bg-card/50">
-              <CardHeader className="p-4 bg-primary/5 border-b">
-                <CardTitle className="flex items-center gap-2 text-sm md:text-base text-primary uppercase tracking-wider font-black">
-                  <TrendingUp className="h-4 w-4" /> Winning Patterns
+            <Card className="border-border bg-card flex flex-col justify-center items-center p-6 text-center">
+              <h4 className="text-xs font-black uppercase text-muted-foreground mb-2">Threat Level</h4>
+              <div className="relative h-24 w-24">
+                <svg className="h-full w-full" viewBox="0 0 100 100">
+                  <circle
+                    cx="50" cy="50" r="45"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="10"
+                    className="text-muted/20"
+                  />
+                  <circle
+                    cx="50" cy="50" r="45"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="10"
+                    strokeDasharray="283"
+                    strokeDashoffset={283 - (283 * result.threat_level) / 100}
+                    className={result.threat_level > 70 ? "text-red-500" : "text-yellow-500"}
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-2xl font-black">{result.threat_level}%</span>
+                </div>
+              </div>
+              <Badge variant="outline" className="mt-4 border-red-500/50 text-red-500 bg-red-500/10">
+                {result.competitor_status}
+              </Badge>
+            </Card>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Battle Map: SWOT Analysis */}
+            <Card className="border-border bg-card shadow-xl overflow-hidden">
+              <CardHeader className="bg-muted/50 border-b py-3">
+                <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-2">
+                  <Radar className="h-4 w-4 text-primary" /> Tactical SWOT Map
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-4 space-y-4">
-                <div>
-                  <h4 className="text-[10px] uppercase font-bold text-muted-foreground mb-2 flex items-center gap-1">
-                    <Zap className="h-3 w-3 text-yellow-500" /> Top Hooks
-                  </h4>
-                  <div className="space-y-2">
-                    {result.winning_patterns.hooks.map((hook: string, i: number) => (
-                      <div key={i} className="text-xs p-2 rounded bg-muted/50 border border-border/50 italic">
-                        "{hook}"
-                      </div>
-                    ))}
+              <CardContent className="p-0">
+                <div className="grid grid-cols-2">
+                  <div className="p-4 border-r border-b bg-green-500/5">
+                    <h5 className="text-[10px] font-black uppercase text-green-600 mb-2">Strengths</h5>
+                    <ul className="space-y-1">
+                      {result.swot.strengths.map((s: string, i: number) => (
+                        <li key={i} className="text-[11px] font-medium flex items-start gap-1">
+                          <span className="text-green-500">+</span> {s}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                </div>
-                <Separator />
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Visual Style</h4>
-                    <p className="text-xs text-foreground/70">{result.winning_patterns.visuals}</p>
+                  <div className="p-4 border-b bg-red-500/5">
+                    <h5 className="text-[10px] font-black uppercase text-red-600 mb-2">Weaknesses</h5>
+                    <ul className="space-y-1">
+                      {result.swot.weaknesses.map((s: string, i: number) => (
+                        <li key={i} className="text-[11px] font-medium flex items-start gap-1">
+                          <span className="text-red-500">-</span> {s}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <div>
-                    <h4 className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Psychology</h4>
-                    <p className="text-xs text-foreground/70">{result.winning_patterns.engagement_triggers}</p>
+                  <div className="p-4 border-r bg-blue-500/5">
+                    <h5 className="text-[10px] font-black uppercase text-blue-600 mb-2">Opportunities</h5>
+                    <ul className="space-y-1">
+                      {result.swot.opportunities.map((s: string, i: number) => (
+                        <li key={i} className="text-[11px] font-medium flex items-start gap-1">
+                          <span className="text-blue-500">⚡</span> {s}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="p-4 bg-orange-500/5">
+                    <h5 className="text-[10px] font-black uppercase text-orange-600 mb-2">Threats</h5>
+                    <ul className="space-y-1">
+                      {result.swot.threats.map((s: string, i: number) => (
+                        <li key={i} className="text-[11px] font-medium flex items-start gap-1">
+                          <span className="text-orange-500">⚠️</span> {s}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Strategic Counter-Play */}
-            <Card className="border-primary/30 shadow-md hover:shadow-lg transition-all bg-primary/[0.02] scale-[1.02] ring-1 ring-primary/20">
-              <CardHeader className="p-4 bg-primary/10 border-b">
-                <CardTitle className="flex items-center gap-2 text-sm md:text-base text-primary uppercase tracking-wider font-black">
-                  <Radar className="h-4 w-4" /> The Counter-Play
+            <Card className="border-primary/40 bg-primary/5 shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16 blur-3xl" />
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-primary uppercase font-black tracking-tighter">
+                  <Zap className="h-5 w-5 fill-primary" /> The Counter-Play Pivot
                 </CardTitle>
+                <CardDescription className="text-xs font-bold uppercase tracking-widest text-muted-foreground">War Room Directives</CardDescription>
               </CardHeader>
-              <CardContent className="p-4 space-y-4">
-                <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
-                  <h4 className="text-[10px] uppercase font-bold text-primary mb-1">The Pivot (Our Edge)</h4>
-                  <p className="text-sm font-semibold">{result.counter_play.the_pivot}</p>
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <h4 className="text-xs font-black uppercase text-primary/70">Master Strategy</h4>
+                  <p className="text-xl font-black leading-tight tracking-tight">{result.counter_play.the_pivot}</p>
                 </div>
-                <div>
-                  <h4 className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Suggested Content Idea</h4>
-                  <p className="text-xs leading-relaxed">{result.counter_play.suggested_content_idea}</p>
+                <div className="p-4 rounded-xl bg-background border-2 border-primary/20 relative">
+                  <div className="absolute -top-3 left-4 bg-primary text-primary-foreground px-2 py-0.5 rounded text-[10px] font-black uppercase">Series Pitch</div>
+                  <div className="pt-2 text-sm font-bold">
+                    {typeof result.counter_play.content_series_concept === 'string' ? (
+                      result.counter_play.content_series_concept
+                    ) : (
+                      <div className="space-y-1">
+                        <span className="text-primary block">{result.counter_play.content_series_concept?.series_name || result.counter_play.content_series_concept?.name || 'Tactical Series'}</span>
+                        <span className="text-muted-foreground font-normal block text-xs">{result.counter_play.content_series_concept?.pitch || result.counter_play.content_series_concept?.description || JSON.stringify(result.counter_play.content_series_concept)}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center justify-between p-2 rounded border bg-background">
-                  <span className="text-[10px] font-bold uppercase text-muted-foreground">Focus Metric</span>
-                  <Badge variant="secondary" className="font-black text-primary uppercase">{result.counter_play.target_metric}</Badge>
+                <div className="flex items-center gap-4">
+                  <div className="flex-1 p-3 rounded-lg bg-muted/50 border flex flex-col items-center">
+                    <span className="text-[10px] font-black uppercase text-muted-foreground">Difficulty</span>
+                    <span className="text-sm font-black text-primary">{result.counter_play.execution_difficulty}</span>
+                  </div>
+                  <div className="flex-[2] p-3 rounded-lg bg-primary/10 border-2 border-primary/20 flex flex-col items-center justify-center">
+                    <span className="text-[10px] font-black uppercase text-primary">Status</span>
+                    <span className="text-xs font-black animate-pulse">STRATEGY READY</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
+          </div>
 
-            {/* Suggested Assets */}
-            <Card className="border-border shadow-md hover:shadow-lg transition-shadow bg-card/50">
-              <CardHeader className="p-4 bg-muted/50 border-b">
-                <CardTitle className="flex items-center gap-2 text-sm md:text-base text-foreground uppercase tracking-wider font-black">
-                  <Lightbulb className="h-4 w-4 text-yellow-500" /> Asset Drafts
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 overflow-y-auto max-h-[400px] space-y-6">
-                {result.suggested_assets.map((asset: any, i: number) => (
-                  <div key={i} className="space-y-3 p-3 rounded-lg border bg-background/50 relative group">
+          {/* Tactical Files: Asset Suggestions */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <hr className="flex-1 border-muted-foreground/20" />
+              <h3 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground">Tactical Assets</h3>
+              <hr className="flex-1 border-muted-foreground/20" />
+            </div>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {result.suggested_assets.map((asset: any, i: number) => (
+                <Card key={i} className="border-border hover:border-primary/50 transition-colors bg-card shadow-sm flex flex-col h-full group">
+                  <CardHeader className="p-4 space-y-1">
                     <div className="flex items-center justify-between">
-                      <Badge className="bg-primary/20 text-primary border-none text-[10px] uppercase font-bold">{asset.type}</Badge>
-                      <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleCopy(asset.caption)}>
+                      <Badge className="bg-primary/10 text-primary border-primary/20 text-[9px] font-black uppercase">{asset.type}</Badge>
+                      <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleCopy(asset.headline + "\n\n" + asset.script_outline)}>
                         <Copy className="h-3 w-3" />
                       </Button>
                     </div>
-                    <div>
-                      <h4 className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Caption</h4>
-                      <p className="text-xs italic leading-relaxed">"{asset.caption}"</p>
+                    <CardTitle className="text-base font-black leading-tight group-hover:text-primary transition-colors cursor-pointer">{asset.headline}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-4 pt-0 space-y-4 flex-1">
+                    <div className="space-y-2">
+                      <h5 className="text-[9px] font-black uppercase text-muted-foreground tracking-widest">Script Outline</h5>
+                      <div className="text-[11px] leading-relaxed text-foreground/80 whitespace-pre-wrap">
+                        {Array.isArray(asset.script_outline) ? (
+                          <ul className="list-disc pl-3 space-y-1">
+                            {asset.script_outline.map((step: string, j: number) => (
+                              <li key={j}>{step}</li>
+                            ))}
+                          </ul>
+                        ) : (
+                          asset.script_outline
+                        )}
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Visual Concept</h4>
-                      <p className="text-[11px] text-foreground/70">{asset.visual_description}</p>
+                    <div className="p-2 rounded bg-muted/30 text-[10px] italic border-l-2 border-primary">
+                      <span className="font-bold uppercase not-italic">Visual:</span> {asset.visual_vibe}
                     </div>
-                    <div className="flex flex-wrap gap-1 pt-1 text-[9px]">
-                      {asset.hashtags.map((tag: string) => (
-                        <span key={tag} className="text-primary font-medium">#{tag.replace('#', '')}</span>
-                      ))}
-                    </div>
-                    {i < result.suggested_assets.length - 1 && <Separator className="mt-4" />}
+                  </CardContent>
+                  <div className="p-4 pt-0">
+                    <Alert className="bg-primary/5 border-primary/20 py-2">
+                      <AlertTitle className="text-[10px] font-black uppercase flex items-center gap-1">
+                        <TrendingUp className="h-3 w-3" /> Projection
+                      </AlertTitle>
+                      <AlertDescription className="text-[10px] text-primary leading-tight font-medium">
+                        {asset.impact_prediction}
+                      </AlertDescription>
+                    </Alert>
                   </div>
-                ))}
-              </CardContent>
-            </Card>
+                </Card>
+              ))}
+            </div>
           </div>
         </div>
       )}
