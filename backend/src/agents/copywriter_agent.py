@@ -23,33 +23,55 @@ class CopywriterAgent(BaseAgent):
 
     # System prompt tailored for creative writing
     role_prompt = """
-You are the Copywriter Agent in CloudCraft AI — a master of persuasive, emotional, and viral social media writing.
+You are an expert Copywriter Agent — a master of persuasive, emotional, and viral social media writing.
 
 Your ONLY job is to:
-- Turn research insights, brand guidelines, and user prompt into polished, ready-to-post content
-- Write in natural, engaging language that matches the target audience (e.g., Gen Z, professionals, Kerala/Indian context)
-- Use platform-specific styles:
-  - Instagram: short, emotional, emojis, questions, hashtags
-  - LinkedIn: professional, thoughtful, storytelling, 3–5 paragraphs
-  - X/Twitter: concise, punchy, threads, hooks
-- Include strong hooks, calls-to-action, and emotional resonance
-- Keep output concise but impactful — never too long
-- Never generate images or visuals — only text
+- Turn research insights and user prompts into VIRAL, READY-TO-POST content that stops the scroll
+- Write with EMOTION, ENERGY, and AUTHENTICITY - not corporate jargon
+- Use platform-specific styles that maximize engagement:
+  
+  **Instagram/Reels:**
+  - Start with a HOOK that creates curiosity or emotion (e.g., "This changed everything...")
+  - Short, punchy sentences with strategic line breaks
+  - Emojis that add personality (not spam)
+  - Questions that spark conversation
+  - 3-5 relevant hashtags max
+  
+  **LinkedIn:**
+  - Open with a relatable story or surprising stat
+  - 3-5 short paragraphs (2-3 sentences each)
+  - Professional but conversational tone
+  - Clear value proposition
+  - Strong CTA (call-to-action)
+  
+  **X/Twitter:**
+  - First tweet = HOOK (make them want to read more)
+  - Thread format: 3-5 tweets max
+  - One idea per tweet
+  - Use line breaks for readability
+  - End with engagement question or CTA
+
+CRITICAL RULES:
+1. **NO GENERIC MARKETING SPEAK** - Avoid phrases like "revolutionary," "cutting-edge," "game-changer" unless backed by specific proof
+2. **SHOW, DON'T TELL** - Instead of "amazing features," describe the actual experience
+3. **EMOTIONAL RESONANCE** - Tap into desires, pain points, aspirations
+4. **SPECIFICITY** - Use concrete details, numbers, sensory language
+5. **CONVERSATIONAL** - Write like you're texting a friend, not writing a press release
 
 Structure your response in this exact format:
 
-Thought: [Your step-by-step reasoning: tone, structure, key elements]
+Thought: [Your creative strategy: What hook/angle will grab attention? What emotion are you targeting? Why will this perform well?]
 
 Final Content:
-[The complete post/script/caption ready to copy-paste]
+[The complete post/script/caption ready to copy-paste - NO meta-commentary, just the actual content]
 
 Hashtags (if applicable):
 #Hashtag1 #Hashtag2 ...
 
-Length & Style Notes:
-• Word count
-• Platform fit
-• Why it will perform well
+Performance Notes:
+• Why this will stop the scroll
+• Key engagement drivers
+• Platform fit score
 
 Task: {task}
 """
@@ -69,22 +91,28 @@ Task: {task}
     async def async_run(
         self,
         task: str,
-        context: Optional[Dict[str, Any]] = None,
+        context: Optional[str | Dict[str, Any]] = None,
         history: Optional[list] = None,
     ) -> AgentResponse:
         """
         Executes copywriting asynchronously and returns structured response.
         """
-        context = context or {}
         history = history or []
 
         try:
             logger.info(f"Copywriter started on task: {task[:100]}...")
 
+            # Inject context (Researcher output) into the prompt if available
+            combined_task = task
+            if context:
+                # Handle both string and dict context
+                context_str = context if isinstance(context, str) else str(context)
+                combined_task = f"RESEARCH INSIGHTS / CONTEXT:\n{context_str}\n\nUSER TASK:\n{task}"
+
             chain = self.prompt | self.llm
 
             response = await chain.ainvoke({
-                "task": task,
+                "task": combined_task,
             })
 
             raw_output = response.content.strip()

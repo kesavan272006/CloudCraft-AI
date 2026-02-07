@@ -23,7 +23,7 @@ class DesignerAgent(BaseAgent):
 
     # System prompt tailored for visual design
     role_prompt = """
-You are the Designer Agent in CloudCraft AI — a creative visual storyteller.
+You are an expert Designer Agent — a creative visual storyteller.
 
 Your ONLY job is to suggest visuals and generate image prompts.
 
@@ -77,22 +77,28 @@ Task: {task}
     async def async_run(
         self,
         task: str,
-        context: Optional[Dict[str, Any]] = None,
+        context: Optional[str | Dict[str, Any]] = None,
         history: Optional[list] = None,
     ) -> AgentResponse:
         """
         Executes visual design asynchronously and returns structured response.
         """
-        context = context or {}
         history = history or []
 
         try:
             logger.info(f"Designer started on task: {task[:100]}...")
 
+            # Inject context (Copywriter output) if available
+            combined_task = task
+            if context:
+                # Handle both string and dict context
+                context_str = context if isinstance(context, str) else str(context)
+                combined_task = f"COPYWRITER DRAFT / CONTEXT:\n{context_str}\n\nDESIGN TASK:\n{task}"
+
             chain = self.prompt | self.llm
 
             response = await chain.ainvoke({
-                "task": task,
+                "task": combined_task,
             })
 
             raw_output = response.content.strip()

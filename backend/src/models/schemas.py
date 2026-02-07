@@ -12,6 +12,21 @@ class ForgeResponse(BaseModel):
     thoughts: List[AgentThought]
     status: str
 
+# --- TRANSMUTE SCHEMAS ---
+class TransmuteRequest(BaseModel):
+    content: str
+    target_format: str # e.g., "Twitter Thread", "Instagram Reel Script", "LinkedIn Post"
+    target_language: str = "English" # e.g., "Hindi", "Tamil", "Hinglish"
+    tone_modifier: Optional[str] = None
+
+class TransmuteResponse(BaseModel):
+    transformed_content: str
+    format_notes: str
+    regional_nuance: str
+    suggested_tags: List[str]
+    estimated_reading_time: str
+    status: str = "success"
+
 # --- BRAND BRAIN SCHEMAS ---
 class BrandProfile(BaseModel):
     brandName: str

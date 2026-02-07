@@ -117,9 +117,14 @@ class BrandService:
             return ""
             
         return f"""
-        BRAND CONTEXT (Use this voice and identity):
+        BRAND IDENTITY & VOICE (For Style/Tone Only):
         - Brand Name: {profile.brandName}
-        - Description: {profile.brandDescription}
         - Voice/Tone: {profile.brandVoice}
         - Target Audience: {profile.targetAudience}
+        - Brand Description: {profile.brandDescription}
+        
+        CRITICAL INSTRUCTION:
+        This Brand Identity provided above is for TONE/STYLE reference only. 
+        If the User Request (Task) asks to write about a SPECIFIC PRODUCT or TOPIC (e.g., a coffee machine), you MUST write about that product, NOT about '{profile.brandName}'. 
+        Do not force the brand description into the content if it effectively changes the subject.
         """

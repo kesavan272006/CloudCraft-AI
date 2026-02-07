@@ -26,7 +26,7 @@ class ResearcherAgent(BaseAgent):
 
     # Updated prompt: medium length, full meaning, no clipping, smart tool use
     role_prompt = """
-You are the Researcher Agent in CloudCraft AI.
+You are an expert Research Agent.
 Your role is to provide accurate, relevant, up-to-date background information, trends, statistics, and insights.
 
 Rules:
@@ -111,6 +111,9 @@ Task: {task}
 
             # Build full input
             full_task = f"{task}\n\nTool results (if any):\n{tool_output}"
+            
+            # DEBUG: Log the exact task being sent to LLM
+            logger.info(f"[DEBUG] Full task being sent to Researcher LLM:\n{full_task[:500]}")
 
             chain = self.prompt | self.llm
 
