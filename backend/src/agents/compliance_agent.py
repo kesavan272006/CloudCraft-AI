@@ -24,46 +24,55 @@ class ComplianceAgent(BaseAgent):
 
     # System prompt tailored for strict compliance
     role_prompt = """
-You are the Compliance Agent in CloudCraft AI — a strict guardian of brand identity.
-
-Your ONLY job is to:
-- Review the final content (caption, script, visual suggestions) against brand guidelines
-- Check tone, voice, key messages, prohibited words/phrases, cultural fit (especially India/Kerala context)
-- Flag any violations or misalignments
-- Suggest precise fixes or approve as-is
-- Be detailed but fair — never rewrite the whole content, just highlight issues and corrections
-
-Structure your response in this exact format:
-
-Thought: [Step-by-step compliance reasoning]
-
-Compliance Score: [0–100]
-
-Status: [PASS / MINOR FIXES / MAJOR ISSUES]
-
-Issues & Fixes:
-• Issue 1: [description] → Fix: [exact suggestion]
-• Issue 2: ...
-
-Approved Version (if minor fixes):
-[The improved content with only necessary changes]
-
-Task: {task}
-Content to check: {content}
-"""
+    You are an expert Senior Editor and Content Reviewer.
+    
+    Your task is to REVIEW and POLISH the content, ensuring it's ready to publish while PRESERVING its creative energy and personality.
+    
+    CRITICAL RULES:
+    1. **PRESERVE CREATIVITY** - Keep hooks, emotional language, and personality intact
+    2. **FIX ONLY REAL ISSUES** - Grammar, factual errors, offensive content
+    3. **DO NOT SANITIZE** - Don't turn creative copy into bland corporate speak
+    4. **KEEP IT SUBSTANTIVE** - Don't shorten or strip the content
+    5. **OUTPUT THE ACTUAL CONTENT** - Not placeholder text like "[content here]"
+    6. **NO SAFETY THEATER** - Don't add unnecessary disclaimers or warnings
+    
+    What to check:
+    ✓ Grammar and spelling
+    ✓ Factual accuracy (if verifiable)
+    ✓ Offensive or harmful content
+    ✓ Readability and flow
+    
+    What NOT to change:
+    ✗ Creative hooks and emotional language
+    ✗ Platform-specific formatting (emojis, hashtags, line breaks)
+    ✗ Conversational tone
+    ✗ Persuasive elements
+    
+    Instructions:
+    Rewrite the content below to fix grammar and brand tone.
+    
+    CRITICAL:
+    - KEEP THE SAME TOPIC.
+    - DO NOT INVENT FACTS.
+    - OUTPUT ONLY THE POLISHED CONTENT.
+    
+    CONTENT TO POLISH:
+    {content}
+    
+    POLISHED CONTENT:
+    """
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # Compliance needs high precision & rule-following → Gemini Flash (strict mode)
-        self.llm = LLMFactory.get_default_llm()  # Bedrock
+        # Revert to default LLM (likely Bedrock/Nova Lite)
+        self.llm = LLMFactory.get_default_llm()
 
-        # Reusable prompt template
+        # Simple prompt template - we embed content directly in the system prompt equivalent
+        # because some models handle "User: {content}" better when it's part of the instruction block for this specific task.
         self.prompt = ChatPromptTemplate.from_messages([
-            ("system", self.role_prompt),
-            HumanMessage(content="{task}\nContent to check: {content}"),
+            ("human", self.role_prompt), 
         ])
-
-        logger.info(f"{self.name} initialized with Gemini Flash (strict mode)")
+        logger.info(f"{self.name} initialized with Default LLM (Proofreading Mode)")
 
     async def async_run(
         self,
@@ -124,16 +133,15 @@ Content to check: {content}
         """
         Extracts Thought and the rest (Score + Status + Issues + Approved) from output.
         """
-        if "Thought:" in raw and "Compliance Score:" in raw:
-            thought_part = raw.split("Compliance Score:", 1)[0].replace("Thought:", "").strip()
-            content_part = raw.split("Compliance Score:", 1)[1].strip()
-            return thought_part, content_part
-
-        # Fallback: best effort
-        if "Thought:" in raw:
-            thought, rest = raw.split("Thought:", 1)
-            return thought.strip(), rest.strip()
-
+        # DEBUG: Log raw output
+        logger.info(f"[DEBUG] Compliance raw output (first 500 chars):\n{raw[:500]}")
+        
+        if "FINAL CONTENT:" in raw:
+            thought_part, content_part = raw.split("FINAL CONTENT:", 1)
+            logger.info(f"[DEBUG] Compliance final content extracted: {content_part[:200]}")
+            return thought_part.strip(), content_part.strip()
+            
+        logger.warning("[DEBUG] No 'FINAL CONTENT:' marker found in Compliance output!")
         return "Performed compliance review.", raw.strip()
 
     def sync_run(self, task: str, content: str, **kwargs) -> AgentResponse:
