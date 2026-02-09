@@ -1,7 +1,7 @@
 backend/
 ├── config/
 │   ├── __init__.py
-│   ├── settings.py                # env vars + model selection logic
+│   ├── settings.py                
 │   └── logging_config.py
 ├── src/
 │   ├── __init__.py
