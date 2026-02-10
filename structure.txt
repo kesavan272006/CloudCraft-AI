@@ -12,11 +12,11 @@ backend/
 │   │   │   ├── __init__.py
 │   │   │   ├── endpoints/
 │   │   │   │   ├── __init__.py
-│   │   │   │   ├── forge.py          # main agentic endpoint
-│   │   │   │   ├── brand.py          # RAG upload + audit
-│   │   │   │   ├── vision.py         # image/video analysis
-│   │   │   │   ├── campaign.py       # planning / calendar
-│   │   │   │   └── pulse.py          # trends + predictions
+│   │   │   │   ├── forge.py         
+│   │   │   │   ├── brand.py          
+│   │   │   │   ├── vision.py         
+│   │   │   │   ├── campaign.py    
+│   │   │   │   └── pulse.py        
 │   │   └── dependencies.py
 │   ├── core/
 │   │   ├── __init__.py
