@@ -1,24 +1,23 @@
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect } from 'react';
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Separator } from "@/components/ui/separator";
-import { Hammer, Sparkles, Loader2, AlertCircle, MessageSquare, CheckCircle2, Copy, Check, Globe, RefreshCcw, Zap, Clock, Info, BrainCircuit, LayoutTemplate } from "lucide-react";
+import { Hammer, Sparkles, Loader2, AlertCircle, CheckCircle2, Copy, Globe, RefreshCcw, Zap, Users, ArrowRight, Wand2, ChevronDown, ChevronUp } from "lucide-react";
 import { createFileRoute } from '@tanstack/react-router';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import ReactMarkdown from 'react-markdown';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { PersonaSelector } from "@/components/persona/PersonaSelector";
+import { PersonaVariantsDisplay } from "@/components/persona/PersonaVariantsDisplay";
+import type { PersonaInfo, PersonaResponse } from "@/types/persona";
 
 export default function ForgePage() {
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
 
   // Transmute State
   const [transmuting, setTransmuting] = useState(false);
@@ -26,11 +25,21 @@ export default function ForgePage() {
   const [targetLanguage, setTargetLanguage] = useState('English');
   const [transmuteResult, setTransmuteResult] = useState<any>(null);
 
+  // Persona State
+  const [personas, setPersonas] = useState<PersonaInfo[]>([]);
+  const [selectedPersonas, setSelectedPersonas] = useState<string[]>([]);
+  const [generatingPersonas, setGeneratingPersonas] = useState(false);
+  const [personaResult, setPersonaResult] = useState<PersonaResponse | null>(null);
+
+  // UI State - Collapsible sections
+  const [showMasterContent, setShowMasterContent] = useState(true);
+  const [showTools, setShowTools] = useState(false);
+  const [activeTool, setActiveTool] = useState<'personas' | 'transmute' | null>(null);
+
+
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
-    setCopied(true);
     toast.success("Content copied to clipboard");
-    setTimeout(() => setCopied(false), 2000);
   };
 
   const cleanContent = (text: string) => {
@@ -55,6 +64,9 @@ export default function ForgePage() {
     setError(null);
     setResult(null);
     setTransmuteResult(null);
+    setPersonaResult(null);
+    setShowMasterContent(true);
+    setShowTools(false);
 
     try {
       const response = await fetch('http://localhost:8000/api/v1/forge', {
@@ -72,6 +84,8 @@ export default function ForgePage() {
 
       const data = await response.json();
       setResult(data);
+      // Auto-show tools after content is generated
+      setTimeout(() => setShowTools(true), 500);
     } catch (err: any) {
       setError(err.message || "Failed to connect to the Forge engine");
     } finally {
@@ -114,52 +128,174 @@ export default function ForgePage() {
     }
   };
 
+  // Fetch available personas on mount
+  useEffect(() => {
+    const fetchPersonas = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/v1/persona/list');
+        if (response.ok) {
+          const data = await response.json();
+          setPersonas(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch personas:', error);
+      }
+    };
+    fetchPersonas();
+  }, []);
+
+  const handleTogglePersona = (personaId: string) => {
+    setSelectedPersonas(prev =>
+      prev.includes(personaId)
+        ? prev.filter(id => id !== personaId)
+        : [...prev, personaId]
+    );
+  };
+
+  const handleGeneratePersonas = async () => {
+    if (selectedPersonas.length === 0) {
+      toast.error("Please select at least one persona");
+      return;
+    }
+
+    setGeneratingPersonas(true);
+    try {
+      const contentToAdapt = cleanContent(result?.final_content || "");
+
+      const response = await fetch('http://localhost:8000/api/v1/persona/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: contentToAdapt,
+          personas: selectedPersonas
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate persona variants");
+      }
+
+      const data = await response.json();
+      setPersonaResult(data);
+      toast.success(`Generated ${data.variants.length} persona variants!`);
+    } catch (error: any) {
+      console.error(error);
+      toast.error("Persona generation failed: " + error.message);
+    } finally {
+      setGeneratingPersonas(false);
+    }
+  };
+
+  const handleStartPersonas = () => {
+    setActiveTool('personas');
+    setTransmuteResult(null);
+    setPersonaResult(null);
+    setShowMasterContent(false);
+    setShowTools(false); // Hide tools to show persona selector
+  };
+
+  const handleStartTransmute = () => {
+    setActiveTool('transmute');
+    setPersonaResult(null);
+    setTransmuteResult(null);
+    setShowMasterContent(false);
+    setShowTools(false); // Hide tools to show transmute form
+  };
+
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] bg-background text-foreground overflow-hidden">
+    <div className="flex-1 h-screen flex flex-col bg-background text-foreground overflow-hidden">
       {/* Header */}
-      <div className="flex-none border-b p-4 flex items-center justify-between bg-card z-10">
-        <div className="flex items-center gap-3">
-          <div className="rounded-lg bg-primary/10 p-2">
-            <Hammer className="h-5 w-5 text-primary" />
+      <div className="flex-none border-b p-6 bg-gradient-to-r from-background/80 to-background/60 backdrop-blur-md">
+        <div className="flex items-center justify-between max-w-5xl mx-auto">
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <div className="absolute inset-0 bg-primary/30 blur-xl rounded-xl animate-pulse" />
+              <div className="relative p-2.5 bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5 rounded-xl border border-primary/20">
+                <Hammer className="h-5 w-5 text-primary" />
+              </div>
+            </div>
+            <div>
+              <h1 className="text-xl font-black bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">The Forge</h1>
+              <p className="text-xs text-muted-foreground font-medium">AI Content Operations</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-lg font-bold tracking-tight">The Forge</h1>
-            <p className="text-muted-foreground text-xs">AI Content Operations</p>
-          </div>
+          {result && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                setResult(null);
+                setTransmuteResult(null);
+                setPersonaResult(null);
+                setShowMasterContent(true);
+                setShowTools(false);
+              }}
+            >
+              <RefreshCcw className="w-4 h-4 mr-2" />
+              New Session
+            </Button>
+          )}
         </div>
-        {!result && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setPrompt("Create a viral LinkedIn post about the future of AI in 2026")}
-          >
-            <Sparkles className="mr-2 h-4 w-4" /> Load Example
-          </Button>
-        )}
       </div>
 
-      <div className="flex-1 flex overflow-hidden">
-        {/* Main Editor Area (Left Pane) */}
-        <div className="flex-1 flex flex-col border-r bg-muted/5 p-6 overflow-y-auto">
-          {!result ? (
-            <div className="flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full space-y-8">
-              <div className="text-center space-y-2">
-                <h2 className="text-2xl font-bold">What are we building today?</h2>
-                <p className="text-muted-foreground">Orchestrate a team of AI agents to research, write, and refine your content.</p>
+      {/* Main Content */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-5xl mx-auto p-8 space-y-6">
+          {/* Input Section */}
+          {!result && (
+            <div className="space-y-6 animate-in fade-in duration-700">
+              <div className="text-center space-y-3">
+                <h2 className="text-3xl font-black bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
+                  What are we building today?
+                </h2>
+                <p className="text-muted-foreground text-lg">
+                  Orchestrate a team of AI agents to research, write, and refine your content
+                </p>
               </div>
 
-              <div className="w-full space-y-4">
-                <Textarea
-                  placeholder="Describe your content goal..."
-                  className="min-h-[150px] text-lg p-6 rounded-xl shadow-sm border-2 focus-visible:ring-primary/20"
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                />
-                <Button size="lg" className="w-full h-12 text-base font-bold shadow-lg" onClick={handleGenerate} disabled={loading || !prompt.trim()}>
-                  {loading ? <Loader2 className="animate-spin mr-2" /> : <Sparkles className="mr-2" />}
-                  {loading ? "Agents at Work..." : "Ignite The Forge"}
-                </Button>
-              </div>
+              <Card className="bg-gradient-to-br from-muted/40 to-muted/20 border-2 border-border/50 shadow-xl">
+                <CardContent className="p-8 space-y-6">
+                  <Textarea
+                    placeholder="Describe your content goal... (e.g., 'Create a viral LinkedIn post about the future of AI in 2026')"
+                    className="min-h-[180px] text-base resize-none bg-background/50 border-2 focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 rounded-xl"
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && prompt && !loading) {
+                        handleGenerate();
+                      }
+                    }}
+                  />
+
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs text-muted-foreground">
+                      Press <kbd className="px-2 py-1 bg-muted border border-border rounded text-[10px] font-mono">Ctrl+Enter</kbd> to generate
+                    </div>
+                    {prompt && (
+                      <span className="text-xs text-primary/70 font-medium">{prompt.length} chars</span>
+                    )}
+                  </div>
+
+                  <Button
+                    size="lg"
+                    className="w-full h-14 text-base font-bold bg-gradient-to-r from-primary via-primary to-primary/90 hover:from-primary/90 hover:via-primary hover:to-primary shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 relative overflow-hidden group"
+                    onClick={handleGenerate}
+                    disabled={loading || !prompt.trim()}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                    {loading ? (
+                      <>
+                        <Loader2 className="animate-spin mr-2 relative z-10" />
+                        <span className="relative z-10">Agents at Work...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="mr-2 relative z-10" />
+                        <span className="relative z-10">Ignite The Forge</span>
+                      </>
+                    )}
+                  </Button>
+                </CardContent>
+              </Card>
 
               {error && (
                 <Alert variant="destructive">
@@ -169,135 +305,318 @@ export default function ForgePage() {
                 </Alert>
               )}
             </div>
-          ) : (
-            <div className="max-w-3xl mx-auto w-full space-y-6 animate-in fade-in duration-500">
-              <div className="flex items-center justify-between">
-                <Badge variant="outline" className="px-3 py-1 border-green-500/30 text-green-600 bg-green-500/5">
-                  <CheckCircle2 className="w-3 h-3 mr-1" /> Content Ready
-                </Badge>
-                <Button variant="ghost" size="sm" onClick={() => handleCopy(cleanContent(result.final_content))}>
-                  <Copy className="w-4 h-4 mr-2" /> Copy
-                </Button>
-              </div>
+          )}
 
-              <Card className="shadow-sm border-border">
-                <div className="bg-muted/30 px-6 py-4 border-b flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-primary" />
-                  <h3 className="font-bold text-lg text-primary">Master Consolidated Content</h3>
+          {/* Results Section */}
+          {result && (
+            <div className="space-y-6 animate-in fade-in duration-700">
+              {/* Generated Content - Collapsible */}
+              <Card className="bg-gradient-to-br from-green-500/5 via-background to-green-500/5 border-green-500/20 shadow-xl">
+                <div
+                  className="bg-gradient-to-r from-green-500/10 to-green-500/5 px-6 py-4 border-b border-green-500/20 flex items-center justify-between cursor-pointer hover:bg-green-500/15 transition-colors"
+                  onClick={() => setShowMasterContent(!showMasterContent)}
+                >
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-600" />
+                    <h3 className="font-bold text-lg text-green-600">Master Content</h3>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {showMasterContent && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCopy(cleanContent(result.final_content));
+                        }}
+                        className="hover:bg-green-500/10"
+                      >
+                        <Copy className="w-4 h-4 mr-2" />
+                        Copy
+                      </Button>
+                    )}
+                    {showMasterContent ? (
+                      <ChevronUp className="w-5 h-5 text-muted-foreground" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                    )}
+                  </div>
                 </div>
-                <CardContent className="p-8 prose prose-lg dark:prose-invert max-w-none">
-                  <ReactMarkdown>{cleanContent(result.final_content)}</ReactMarkdown>
-                </CardContent>
+                {showMasterContent && (
+                  <CardContent className="p-8 prose prose-lg dark:prose-invert max-w-none animate-in slide-in-from-top duration-300">
+                    <ReactMarkdown>{cleanContent(result.final_content)}</ReactMarkdown>
+                  </CardContent>
+                )}
               </Card>
 
-              <div className="flex justify-center pt-8">
-                <Button variant="outline" onClick={() => setResult(null)}>
-                  <RefreshCcw className="w-4 h-4 mr-2" /> Start New Session
-                </Button>
-              </div>
+              {/* Tools Section - Only show if no active tool */}
+              {showTools && !personaResult && !transmuteResult && (
+                <div className="space-y-4 animate-in fade-in slide-in-from-bottom duration-500">
+                  <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+                    <Wand2 className="h-5 w-5 text-primary" />
+                    What's Next?
+                  </h3>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Personas Tool */}
+                    <Card
+                      className="cursor-pointer transition-all duration-300 hover:scale-[1.02] bg-gradient-to-br from-purple-500/5 to-pink-500/5 border-purple-500/20 hover:border-purple-500/40 hover:shadow-lg hover:shadow-purple-500/10"
+                      onClick={handleStartPersonas}
+                    >
+                      <CardContent className="p-6">
+                        <div className="flex items-start gap-4">
+                          <div className="p-3 bg-purple-500/10 rounded-xl">
+                            <Users className="h-6 w-6 text-purple-500" />
+                          </div>
+                          <div className="flex-1 space-y-2">
+                            <h4 className="font-bold text-foreground">Audience Personas</h4>
+                            <p className="text-sm text-muted-foreground">
+                              Adapt content for Gen-Z, Professionals, Parents, and more
+                            </p>
+                          </div>
+                          <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Transmute Tool */}
+                    <Card
+                      className="cursor-pointer transition-all duration-300 hover:scale-[1.02] bg-gradient-to-br from-blue-500/5 to-cyan-500/5 border-blue-500/20 hover:border-blue-500/40 hover:shadow-lg hover:shadow-blue-500/10"
+                      onClick={handleStartTransmute}
+                    >
+                      <CardContent className="p-6">
+                        <div className="flex items-start gap-4">
+                          <div className="p-3 bg-blue-500/10 rounded-xl">
+                            <Globe className="h-6 w-6 text-blue-500" />
+                          </div>
+                          <div className="flex-1 space-y-2">
+                            <h4 className="font-bold text-foreground">Platform Transmute</h4>
+                            <p className="text-sm text-muted-foreground">
+                              Convert to Twitter threads, Instagram scripts, and more
+                            </p>
+                          </div>
+                          <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              )}
+
+              {/* Personas Workflow */}
+              {activeTool === 'personas' && !personaResult && (
+                <Card className="bg-gradient-to-br from-purple-500/5 via-background to-purple-500/5 border-purple-500/20 shadow-xl animate-in slide-in-from-right duration-500">
+                  <div className="bg-gradient-to-r from-purple-500/10 to-purple-500/5 px-6 py-4 border-b border-purple-500/20">
+                    <div className="flex items-center gap-2">
+                      <Users className="w-5 h-5 text-purple-600" />
+                      <h3 className="font-bold text-lg text-purple-600">Audience Personas</h3>
+                    </div>
+                  </div>
+                  <CardContent className="p-8 space-y-6">
+                    <PersonaSelector
+                      personas={personas}
+                      selectedPersonas={selectedPersonas}
+                      onTogglePersona={handleTogglePersona}
+                    />
+
+                    <div className="flex gap-3">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setActiveTool(null);
+                          setShowTools(true);
+                          setSelectedPersonas([]);
+                        }}
+                        className="flex-1"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        size="lg"
+                        className="flex-[2] h-12 font-bold bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                        onClick={handleGeneratePersonas}
+                        disabled={generatingPersonas || selectedPersonas.length === 0}
+                      >
+                        {generatingPersonas ? (
+                          <>
+                            <Loader2 className="animate-spin mr-2" />
+                            Generating...
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="mr-2" />
+                            Generate for {selectedPersonas.length} Persona{selectedPersonas.length !== 1 ? 's' : ''}
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Persona Results */}
+              {personaResult && (
+                <Card className="bg-gradient-to-br from-purple-500/5 via-background to-purple-500/5 border-purple-500/20 shadow-xl animate-in slide-in-from-right duration-500">
+                  <div className="bg-gradient-to-r from-purple-500/10 to-purple-500/5 px-6 py-4 border-b border-purple-500/20 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-5 h-5 text-green-600" />
+                      <h3 className="font-bold text-lg text-foreground">{personaResult.variants.length} Persona Variants</h3>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setPersonaResult(null);
+                        setSelectedPersonas([]);
+                        setActiveTool(null);
+                        setShowTools(true);
+                      }}
+                    >
+                      <RefreshCcw className="w-3 h-3 mr-2" />
+                      Back to Tools
+                    </Button>
+                  </div>
+                  <CardContent className="p-8">
+                    <PersonaVariantsDisplay
+                      variants={personaResult.variants}
+                      originalContent={personaResult.original_content}
+                    />
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Transmute Workflow */}
+              {activeTool === 'transmute' && !transmuteResult && (
+                <Card className="bg-gradient-to-br from-blue-500/5 via-background to-blue-500/5 border-blue-500/20 shadow-xl animate-in slide-in-from-right duration-500">
+                  <div className="bg-gradient-to-r from-blue-500/10 to-blue-500/5 px-6 py-4 border-b border-blue-500/20">
+                    <div className="flex items-center gap-2">
+                      <Globe className="w-5 h-5 text-blue-600" />
+                      <h3 className="font-bold text-lg text-blue-600">Platform Transmute</h3>
+                    </div>
+                  </div>
+                  <CardContent className="p-8 space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-bold text-foreground">Platform</label>
+                        <Select value={targetFormat} onValueChange={setTargetFormat}>
+                          <SelectTrigger className="h-12">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Twitter Thread">Twitter / X Thread</SelectItem>
+                            <SelectItem value="Instagram Reel Script">Instagram Reel Script</SelectItem>
+                            <SelectItem value="LinkedIn Post">LinkedIn Professional</SelectItem>
+                            <SelectItem value="Blog Post">Long-form Blog</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-bold text-foreground">Regional Dialect</label>
+                        <Select value={targetLanguage} onValueChange={setTargetLanguage}>
+                          <SelectTrigger className="h-12">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="English">English (Global)</SelectItem>
+                            <SelectItem value="Hinglish">Hinglish (North India)</SelectItem>
+                            <SelectItem value="Hindi">Hindi (Devanagari)</SelectItem>
+                            <SelectItem value="Tamil">Tamil</SelectItem>
+                            <SelectItem value="Malayalam">Malayalam</SelectItem>
+                            <SelectItem value="Kannada">Kannada</SelectItem>
+                            <SelectItem value="Marathi">Marathi</SelectItem>
+                            <SelectItem value="Bengali">Bengali</SelectItem>
+                            <SelectItem value="Telugu">Telugu</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setActiveTool(null);
+                          setShowTools(true);
+                        }}
+                        className="flex-1"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        size="lg"
+                        className="flex-[2] h-12 font-bold bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
+                        onClick={handleTransmute}
+                        disabled={transmuting}
+                      >
+                        {transmuting ? (
+                          <>
+                            <Loader2 className="animate-spin mr-2" />
+                            Transmuting...
+                          </>
+                        ) : (
+                          <>
+                            <Zap className="mr-2" />
+                            Transmute Content
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Transmute Results */}
+              {transmuteResult && (
+                <Card className="bg-gradient-to-br from-blue-500/5 via-background to-blue-500/5 border-blue-500/20 shadow-xl animate-in slide-in-from-right duration-500">
+                  <div className="bg-gradient-to-r from-blue-500/10 to-blue-500/5 px-6 py-4 border-b border-blue-500/20 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-5 h-5 text-green-600" />
+                      <h3 className="font-bold text-lg text-foreground">Transmuted Content</h3>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleCopy(transmuteResult.transformed_content)}
+                      >
+                        <Copy className="w-3 h-3 mr-2" />
+                        Copy
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setTransmuteResult(null);
+                          setActiveTool(null);
+                          setShowTools(true);
+                        }}
+                      >
+                        <RefreshCcw className="w-3 h-3 mr-2" />
+                        Back to Tools
+                      </Button>
+                    </div>
+                  </div>
+                  <CardContent className="p-8 space-y-4">
+                    <div className="prose prose-lg dark:prose-invert max-w-none">
+                      <ReactMarkdown>{transmuteResult.transformed_content}</ReactMarkdown>
+                    </div>
+                    <div className="text-xs text-muted-foreground italic bg-muted/30 p-3 rounded-lg">
+                      "{transmuteResult.regional_nuance}"
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {transmuteResult.suggested_tags?.map((t: string) => (
+                        <Badge key={t} variant="outline" className="text-[10px] text-primary border-primary/20">
+                          {t}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           )}
         </div>
-
-        {/* Sidebar Tools (Right Pane) */}
-        {result && (
-          <div className="w-[400px] flex-none bg-card border-l shadow-xl h-[calc(100vh-8rem)] flex flex-col">
-            <Tabs defaultValue="transmute" className="flex-1 flex flex-col overflow-hidden">
-              <div className="p-4 border-b flex-none">
-                <TabsList className="w-full grid grid-cols-2">
-                  <TabsTrigger value="timeline" className="gap-2"><BrainCircuit className="w-4 h-4" /> Intelligence</TabsTrigger>
-                  <TabsTrigger value="transmute" className="gap-2"><Globe className="w-4 h-4" /> Transmute</TabsTrigger>
-                </TabsList>
-              </div>
-
-              <TabsContent value="timeline" className="flex-1 overflow-y-auto p-0 m-0">
-                <div className="p-4 space-y-4">
-                  {result.thoughts?.map((t: any, i: number) => (
-                    <div key={i} className="relative pl-6 pb-6 border-l-2 border-muted last:border-0 last:pb-0">
-                      <div className="absolute top-0 left-[-5px] w-2.5 h-2.5 rounded-full bg-primary ring-4 ring-background" />
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold uppercase tracking-wider text-primary">{t.agent}</span>
-                          <span className="text-[10px] text-muted-foreground">Step {i + 1}</span>
-                        </div>
-                        <p className="text-sm text-muted-foreground bg-muted/30 p-3 rounded-lg border">
-                          <ReactMarkdown>{t.thought}</ReactMarkdown>
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </TabsContent>
-
-              <TabsContent value="transmute" className="flex-1 flex flex-col overflow-hidden p-0 m-0">
-                <div className="flex-1 overflow-y-auto p-4 space-y-6">
-                  <div className="space-y-4 bg-muted/10 p-4 rounded-xl border border-dashed">
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold uppercase text-muted-foreground">Platform</label>
-                      <Select value={targetFormat} onValueChange={setTargetFormat}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Twitter Thread">Twitter / X Thread</SelectItem>
-                          <SelectItem value="Instagram Reel Script">Instagram Reel Script</SelectItem>
-                          <SelectItem value="LinkedIn Post">LinkedIn Professional</SelectItem>
-                          <SelectItem value="Blog Post">Long-form Blog</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold uppercase text-muted-foreground">Regional Dialect</label>
-                      <Select value={targetLanguage} onValueChange={setTargetLanguage}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="English">English (Global)</SelectItem>
-                          <SelectItem value="Hinglish">Hinglish (North India)</SelectItem>
-                          <SelectItem value="Hindi">Hindi (Devanagari)</SelectItem>
-                          <SelectItem value="Tamil">Tamil</SelectItem>
-                          <SelectItem value="Malayalam">Malayalam</SelectItem>
-                          <SelectItem value="Kannada">Kannada</SelectItem>
-                          <SelectItem value="Marathi">Marathi</SelectItem>
-                          <SelectItem value="Bengali">Bengali</SelectItem>
-                          <SelectItem value="Telugu">Telugu</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <Button className="w-full font-bold uppercase tracking-wider" onClick={handleTransmute} disabled={transmuting}>
-                      {transmuting ? <Loader2 className="animate-spin mr-2" /> : <Zap className="mr-2 fill-current" />}
-                      Transmute
-                    </Button>
-                  </div>
-
-                  {transmuteResult && (
-                    <div className="space-y-4 animate-in slide-in-from-right-4">
-                      <div className="flex items-center justify-between border-b pb-2">
-                        <Badge variant="secondary" className="font-bold">RESULT</Badge>
-                        <span className="text-[10px] font-mono text-muted-foreground flex items-center gap-1">
-                          <Clock className="w-3 h-3" /> {transmuteResult.estimated_reading_time}
-                        </span>
-                      </div>
-                      <div className="bg-background border rounded-lg p-4 text-sm leading-relaxed max-h-[400px] overflow-y-auto shadow-inner">
-                        <ReactMarkdown>{transmuteResult.transformed_content}</ReactMarkdown>
-                      </div>
-                      <div className="text-xs text-muted-foreground italic bg-muted/30 p-2 rounded">
-                        "{transmuteResult.regional_nuance}"
-                      </div>
-                      <div className="flex flex-wrap gap-1">
-                        {transmuteResult.suggested_tags?.map((t: string) => (
-                          <Badge key={t} variant="outline" className="text-[10px] text-primary border-primary/20">{t}</Badge>
-                        ))}
-                      </div>
-                      <Button variant="secondary" size="sm" className="w-full" onClick={() => handleCopy(transmuteResult.transformed_content)}>
-                        Copy Result
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </TabsContent>
-            </Tabs>
-          </div>
-        )}
       </div>
     </div>
   );

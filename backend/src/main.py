@@ -9,7 +9,7 @@ except ImportError:
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.api.v1.endpoints import forge, vision, genesis, competitor, oracle, scout, brand, campaign
+from src.api.v1.endpoints import forge, vision, genesis, competitor, oracle, scout, brand, campaign, persona
 
 app = FastAPI(
     title="CloudCraft AI Backend",
@@ -35,6 +35,7 @@ app.include_router(oracle.router, prefix="/api/v1/oracle", tags=["Performance Or
 app.include_router(scout.router, prefix="/api/v1/scout", tags=["Local Scout"])
 app.include_router(brand.router, prefix="/api/v1/brand", tags=["Brand Brain"])
 app.include_router(campaign.router, prefix="/api/v1/campaigns", tags=["Campaign Architect"])
+app.include_router(persona.router, tags=["Persona Engine"])
 
 @app.get("/health")
 async def health_check():

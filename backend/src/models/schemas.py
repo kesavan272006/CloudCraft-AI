@@ -127,3 +127,27 @@ class Campaign(CampaignBase):
     status: str  # draft, active, completed
     strategy: Optional[CampaignStrategy] = None
     created_at: str
+
+# --- PERSONA ENGINE SCHEMAS ---
+class PersonaInfo(BaseModel):
+    id: str
+    name: str
+    description: str
+    age_range: str
+    platforms: List[str]
+
+class PersonaVariant(BaseModel):
+    persona_id: str
+    persona_name: str
+    content: str
+    platform_suggestion: str
+    tone_used: str
+
+class PersonaRequest(BaseModel):
+    content: str
+    personas: List[str]  # List of persona IDs to generate for
+
+class PersonaResponse(BaseModel):
+    original_content: str
+    variants: List[PersonaVariant]
+    status: str = "success"
