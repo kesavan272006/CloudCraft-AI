@@ -151,3 +151,36 @@ class PersonaResponse(BaseModel):
     original_content: str
     variants: List[PersonaVariant]
     status: str = "success"
+
+# Performance Prediction Schemas
+class PredictedMetrics(BaseModel):
+    likes: int
+    shares: int
+    comments: int
+    reach: int
+
+class PerformancePrediction(BaseModel):
+    overall_score: int
+    engagement_potential: int
+    platform_fit: int
+    audience_alignment: int
+    virality_score: int
+    predicted_metrics: PredictedMetrics
+    best_platform: str
+    best_posting_time: str
+    strengths: List[str]
+    improvements: List[str]
+    confidence: str
+
+class PerformanceRequest(BaseModel):
+    content: str
+    platform: str = "General"
+    persona: str = "General"
+
+class PerformanceResponse(BaseModel):
+    content: str
+    platform: str
+    persona: str
+    prediction: PerformancePrediction
+    status: str = "success"
+

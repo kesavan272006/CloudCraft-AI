@@ -11,13 +11,19 @@ import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { PersonaSelector } from "@/components/persona/PersonaSelector";
 import { PersonaVariantsDisplay } from "@/components/persona/PersonaVariantsDisplay";
+import { PerformanceCard } from "@/components/performance/PerformanceCard";
 import type { PersonaInfo, PersonaResponse } from "@/types/persona";
+import type { PerformanceResponse } from "@/types/performance";
 
 export default function ForgePage() {
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Performance State
+  const [analyzingPerformance, setAnalyzingPerformance] = useState(false);
+  const [performanceResult, setPerformanceResult] = useState<PerformanceResponse | null>(null);
 
   // Transmute State
   const [transmuting, setTransmuting] = useState(false);
@@ -65,8 +71,10 @@ export default function ForgePage() {
     setResult(null);
     setTransmuteResult(null);
     setPersonaResult(null);
+    setPerformanceResult(null);
     setShowMasterContent(true);
     setShowTools(false);
+    setActiveTool(null);
 
     try {
       const response = await fetch('http://localhost:8000/api/v1/forge', {
@@ -90,6 +98,40 @@ export default function ForgePage() {
       setError(err.message || "Failed to connect to the Forge engine");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePredictPerformance = async () => {
+    setAnalyzingPerformance(true);
+    try {
+      const contentToAnalyze = cleanContent(result?.final_content || "");
+      if (!contentToAnalyze || contentToAnalyze.length < 10) {
+        throw new Error("Content appears empty or too short.");
+      }
+
+      const response = await fetch('http://localhost:8000/api/v1/performance/predict', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content: contentToAnalyze,
+          platform: "General",
+          persona: "General Audience"
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to analyze performance");
+      }
+      const data = await response.json();
+      setPerformanceResult(data);
+      toast.success("Performance analysis complete!");
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Analysis failed: " + err.message);
+    } finally {
+      setAnalyzingPerformance(false);
     }
   };
 
@@ -322,18 +364,35 @@ export default function ForgePage() {
                   </div>
                   <div className="flex items-center gap-2">
                     {showMasterContent && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleCopy(cleanContent(result.final_content));
-                        }}
-                        className="hover:bg-green-500/10"
-                      >
-                        <Copy className="w-4 h-4 mr-2" />
-                        Copy
-                      </Button>
+                      <>
+                        {!performanceResult && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 border-green-500/30 text-green-600 hover:bg-green-500/10 hover:text-green-700"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handlePredictPerformance();
+                            }}
+                            disabled={analyzingPerformance}
+                          >
+                            {analyzingPerformance ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Zap className="w-3 h-3 mr-1" />}
+                            {analyzingPerformance ? "Analyzing..." : "Predict Score"}
+                          </Button>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCopy(cleanContent(result.final_content));
+                          }}
+                          className="hover:bg-green-500/10"
+                        >
+                          <Copy className="w-4 h-4 mr-2" />
+                          Copy
+                        </Button>
+                      </>
                     )}
                     {showMasterContent ? (
                       <ChevronUp className="w-5 h-5 text-muted-foreground" />
@@ -348,6 +407,31 @@ export default function ForgePage() {
                   </CardContent>
                 )}
               </Card>
+
+              {/* Performance Prediction Result */}
+              {performanceResult && (
+                <div className="space-y-4 animate-in fade-in slide-in-from-top duration-500">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-bold flex items-center gap-2">
+                      <Zap className="h-5 w-5 text-yellow-500" />
+                      Performance Prediction
+                    </h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setPerformanceResult(null)}
+                      className="text-muted-foreground hover:text-foreground h-8"
+                    >
+                      Dismiss
+                    </Button>
+                  </div>
+                  <PerformanceCard
+                    prediction={performanceResult.prediction}
+                    platform={performanceResult.platform}
+                    persona={performanceResult.persona}
+                  />
+                </div>
+              )}
 
               {/* Tools Section - Only show if no active tool */}
               {showTools && !personaResult && !transmuteResult && (
