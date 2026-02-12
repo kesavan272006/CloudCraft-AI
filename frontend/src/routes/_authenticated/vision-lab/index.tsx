@@ -1,38 +1,35 @@
 import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { 
-  Sparkles, 
-  Download, 
-  Loader2, 
-  Image as ImageIcon, 
-  RefreshCw,
-  Maximize2,
+import {
+  Sparkles,
+  Download,
+  Loader2,
+  Image as ImageIcon,
   Wand2,
   Zap,
-  Copy,
-  Check,
   Lightbulb,
-  ChevronRight
+  ArrowRight,
+  Stars,
+  Palette,
+  Maximize2
 } from "lucide-react"
 
 const quickPrompts = [
-  "A futuristic city at night with flying cars and neon lights",
-  "A serene mountain lake at sunrise with mist",
-  "A cozy bookshop in Paris on a rainy evening",
-  "A magical forest with glowing mushrooms and fireflies",
-  "A vintage car on a desert highway at sunset"
+  { text: "A futuristic city at night with flying cars and neon lights", emoji: "🌃" },
+  { text: "A serene mountain lake at sunrise with mist", emoji: "🏔️" },
+  { text: "A cozy bookshop in Paris on a rainy evening", emoji: "📚" },
+  { text: "A magical forest with glowing mushrooms and fireflies", emoji: "🌲" },
+  { text: "A vintage car on a desert highway at sunset", emoji: "🚗" }
 ]
 
 export default function VisionLabPage() {
   const [prompt, setPrompt] = useState("")
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<{ image_url: string; refined_prompt: string } | null>(null)
-  const [copied, setCopied] = useState(false)
-  const [showQuickPrompts, setShowQuickPrompts] = useState(false)
 
   const handleGenerate = async () => {
     if (!prompt) return
@@ -70,241 +67,51 @@ export default function VisionLabPage() {
     }
   }
 
-  const copyPrompt = () => {
-    if (result?.refined_prompt) {
-      navigator.clipboard.writeText(result.refined_prompt)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    }
-  }
-
   const useQuickPrompt = (quickPrompt: string) => {
     setPrompt(quickPrompt)
-    setShowQuickPrompts(false)
   }
 
   return (
-    <div className="flex-1 h-screen flex flex-col bg-gradient-to-br from-background via-background to-primary/5 text-foreground overflow-hidden relative">
-      {/* Animated Background Pattern */}
-      <div className="absolute inset-0 opacity-[0.015] pointer-events-none">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(120,119,198,0.3),rgba(255,255,255,0))]" />
-        <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle, rgba(120,119,198,0.1) 1px, transparent 1px)`,
-          backgroundSize: '50px 50px'
-        }} />
-      </div>
+    <div className="flex-1 h-screen flex bg-background text-foreground overflow-hidden relative">
+      {/* Animated background */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-background to-background pointer-events-none" />
 
-      {/* Header */}
-      <div className="relative p-4 md:px-10 border-b border-border/40 flex items-center justify-between backdrop-blur-xl bg-card/30">
-        <div className="flex items-center gap-3">
-          <div className="relative p-2.5 bg-gradient-to-br from-primary/20 to-primary/5 rounded-xl shadow-lg shadow-primary/10 ring-1 ring-primary/20">
-            <Wand2 className="h-6 w-6 text-primary" />
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent rounded-xl animate-pulse" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-black bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent uppercase tracking-tight">
-              Vision Lab
-            </h1>
-            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">AI-Powered Image Generation</p>
-          </div>
-        </div>
-        {result && (
-           <div className="flex gap-2">
-             <Button 
-               variant="outline" 
-               size="sm" 
-               onClick={handleDownload}
-               className="group relative overflow-hidden border-primary/20 hover:border-primary/40 transition-all"
-             >
-               <Download className="h-4 w-4 mr-2 group-hover:translate-y-0.5 transition-transform" /> 
-               Download
-             </Button>
-             <Button 
-               variant="outline" 
-               size="sm" 
-               onClick={() => window.open(result.image_url, '_blank')}
-               className="group relative overflow-hidden border-primary/20 hover:border-primary/40 transition-all"
-             >
-               <Maximize2 className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" /> 
-               Full View
-             </Button>
-             <Button 
-               variant="ghost" 
-               size="sm" 
-               onClick={() => setResult(null)}
-               className="hover:bg-destructive/10 hover:text-destructive transition-colors"
-             >
-               <RefreshCw className="h-4 w-4 mr-2 group-hover:rotate-180 transition-transform duration-500" /> 
-               Reset
-             </Button>
-           </div>
-        )}
-      </div>
-
-      {/* Main Content: Scrollable Body */}
-      <div className="flex-1 overflow-y-auto p-4 md:p-10 space-y-6 relative">
-        <div className="max-w-5xl mx-auto grid gap-6">
-          
-          {/* Output Display */}
-          <div className="min-h-[300px] md:min-h-[500px] w-full relative group">
-            {!result && !loading ? (
-              <div className="absolute inset-0 border-2 border-dashed border-primary/20 rounded-3xl flex flex-col items-center justify-center bg-gradient-to-br from-muted/30 to-transparent backdrop-blur-sm">
-                <div className="relative">
-                  <ImageIcon className="h-20 w-20 mb-6 text-primary/40 animate-pulse" />
-                  <Sparkles className="h-6 w-6 text-primary/60 absolute -top-2 -right-2 animate-bounce" />
-                </div>
-                <p className="font-bold uppercase tracking-widest text-sm text-muted-foreground/60">Awaiting Vision Prompt...</p>
-                <p className="text-xs text-muted-foreground/40 mt-2">Enter a description below to generate stunning visuals</p>
+      {/* LEFT PANEL - Input & Controls */}
+      <div className="w-full md:w-[480px] lg:w-[560px] border-r border-border/50 flex flex-col relative z-10 backdrop-blur-sm bg-background/50">
+        {/* Header */}
+        <div className="p-6 border-b border-border/50 bg-gradient-to-r from-background/80 to-background/60 backdrop-blur-md">
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <div className="absolute inset-0 bg-primary/30 blur-xl rounded-xl animate-pulse" />
+              <div className="relative p-2.5 bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5 rounded-xl border border-primary/20">
+                <Wand2 className="h-5 w-5 text-primary" />
               </div>
-            ) : loading ? (
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-muted/10 to-primary/5 animate-pulse rounded-3xl flex flex-col items-center justify-center backdrop-blur-sm border border-primary/20">
-                <div className="relative">
-                  <Loader2 className="h-16 w-16 text-primary animate-spin mb-6" />
-                  <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse" />
-                </div>
-                <p className="text-base font-black uppercase bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent animate-pulse mb-2">
-                  Generating High-Res Magic...
-                </p>
-                <div className="flex gap-1 mt-4">
-                  {[...Array(3)].map((_, i) => (
-                    <div 
-                      key={i} 
-                      className="w-2 h-2 rounded-full bg-primary/60 animate-bounce"
-                      style={{ animationDelay: `${i * 0.15}s` }}
-                    />
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-6 animate-in fade-in zoom-in duration-700">
-                <div className="relative group/image">
-                  <img 
-                    src={result?.image_url} 
-                    alt="Generated Content" 
-                    className="w-full h-auto rounded-3xl shadow-2xl border border-border/50 bg-muted transition-all duration-500 group-hover/image:scale-[1.02] group-hover/image:shadow-primary/10"
-                  />
-                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover/image:opacity-100 transition-opacity duration-300" />
-                  
-                  {/* Floating Badge */}
-                  <div className="absolute top-4 right-4 opacity-0 group-hover/image:opacity-100 transition-all duration-300 transform group-hover/image:translate-y-0 translate-y-2">
-                    <Badge className="bg-primary/90 text-primary-foreground backdrop-blur-sm shadow-lg">
-                      <Zap className="h-3 w-3 mr-1" />
-                      AI Generated
-                    </Badge>
-                  </div>
-
-                  {/* Quick Actions on Hover */}
-                  <div className="absolute bottom-4 left-4 right-4 flex gap-2 opacity-0 group-hover/image:opacity-100 transition-all duration-300 transform group-hover/image:translate-y-0 translate-y-2">
-                    <Button 
-                      size="sm" 
-                      onClick={handleDownload}
-                      className="flex-1 bg-background/90 hover:bg-background text-foreground backdrop-blur-sm shadow-lg"
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Download
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      onClick={() => window.open(result?.image_url, '_blank')}
-                      className="flex-1 bg-background/90 hover:bg-background text-foreground backdrop-blur-sm shadow-lg"
-                    >
-                      <Maximize2 className="h-4 w-4 mr-2" />
-                      View Full
-                    </Button>
-                  </div>
-                </div>
-                
-                <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-primary/30 shadow-lg shadow-primary/5 backdrop-blur-sm hover:shadow-xl hover:shadow-primary/10 transition-all duration-300">
-                  <CardHeader className="p-5 pb-3">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-xs font-black uppercase text-primary tracking-widest flex items-center gap-2">
-                        <div className="p-1.5 bg-primary/20 rounded-md">
-                          <Sparkles className="h-3.5 w-3.5" />
-                        </div>
-                        AI Refined Prompt
-                      </CardTitle>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={copyPrompt}
-                        className="h-7 px-2 hover:bg-primary/10"
-                      >
-                        {copied ? (
-                          <Check className="h-3.5 w-3.5 text-green-500" />
-                        ) : (
-                          <Copy className="h-3.5 w-3.5" />
-                        )}
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-5 pt-0">
-                    <p className="text-sm text-foreground/80 leading-relaxed font-medium">
-                      {result?.refined_prompt}
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Footer: Fixed Input Section */}
-      <div className="relative border-t border-border/40 bg-gradient-to-br from-card/95 via-card/90 to-card/95 backdrop-blur-xl p-4 md:p-6 shadow-2xl">
-        <div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent pointer-events-none" />
-        
-        {/* Quick Prompts Dropdown */}
-        {showQuickPrompts && (
-          <div className="absolute bottom-full left-0 right-0 mb-2 px-4 md:px-6 animate-in slide-in-from-bottom-4 fade-in duration-300">
-            <div className="max-w-5xl mx-auto">
-              <Card className="bg-card/95 backdrop-blur-xl border-primary/20 shadow-2xl">
-                <CardHeader className="p-4 pb-2">
-                  <CardTitle className="text-xs font-black uppercase text-primary tracking-widest flex items-center gap-2">
-                    <Lightbulb className="h-3.5 w-3.5" />
-                    Quick Prompts
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-4 pt-2 space-y-2">
-                  {quickPrompts.map((qp, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => useQuickPrompt(qp)}
-                      className="w-full text-left p-3 rounded-lg bg-muted/50 hover:bg-primary/10 border border-transparent hover:border-primary/20 transition-all duration-200 group"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-foreground/80 group-hover:text-primary transition-colors">
-                          {qp}
-                        </span>
-                        <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                      </div>
-                    </button>
-                  ))}
-                </CardContent>
-              </Card>
+            </div>
+            <div>
+              <h1 className="text-xl font-black bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">Vision Lab</h1>
+              <p className="text-xs text-muted-foreground font-medium">AI-Powered Image Generation</p>
             </div>
           </div>
-        )}
+        </div>
 
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-4 items-end relative">
-          <div className="flex-1 w-full space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Your Vision
-              </label>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowQuickPrompts(!showQuickPrompts)}
-                className="h-7 text-xs hover:text-primary transition-colors"
-              >
-                <Lightbulb className="h-3.5 w-3.5 mr-1.5" />
-                {showQuickPrompts ? 'Hide' : 'Show'} Ideas
-              </Button>
+        {/* Main Input Area */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          {/* Prompt Input */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-primary/10 rounded-lg">
+                <Palette className="h-3.5 w-3.5 text-primary" />
+              </div>
+              <label className="text-sm font-bold text-foreground">Your Vision</label>
             </div>
+
             <div className="relative group">
-              <Textarea 
-                placeholder="Describe your vision in detail... (e.g., 'A cyberpunk street in Tokyo at sunset with neon signs reflecting on wet pavement')"
-                className="resize-none h-28 bg-background/50 border-2 border-border/50 focus-visible:border-primary/50 focus-visible:ring-primary/20 rounded-2xl transition-all duration-300 group-hover:border-primary/30 backdrop-blur-sm shadow-lg peer"
+              {/* Glow effect on focus */}
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/0 via-primary/20 to-primary/0 rounded-xl opacity-0 group-focus-within:opacity-100 blur transition-opacity duration-500" />
+
+              <Textarea
+                placeholder="Describe what you want to create... Be specific about style, mood, colors, and details."
+                className="relative min-h-[160px] resize-none bg-gradient-to-br from-muted/40 to-muted/20 border-2 border-border/50 focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 rounded-xl text-sm transition-all hover:border-primary/30"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 onKeyDown={(e) => {
@@ -314,34 +121,200 @@ export default function VisionLabPage() {
                 }}
               />
               {prompt && (
-                <div className="absolute bottom-2 right-2 text-[10px] text-muted-foreground/60 font-medium">
-                  {prompt.length} characters
+                <div className="absolute bottom-3 right-3 text-xs text-muted-foreground bg-background/90 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-border/50 shadow-sm">
+                  {prompt.length} chars
                 </div>
               )}
             </div>
-            <p className="text-[10px] text-muted-foreground/60 flex items-center gap-1">
-              <Zap className="h-3 w-3" />
-              Press Ctrl+Enter to generate
-            </p>
+
+            <div className="flex items-center justify-between px-1">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Zap className="h-3 w-3 text-primary/60" />
+                <span>Press <kbd className="px-1.5 py-0.5 bg-muted/50 border border-border/50 rounded text-[10px] font-mono">Ctrl+Enter</kbd></span>
+              </div>
+              {prompt && (
+                <span className="text-xs text-primary/70 font-medium animate-pulse">Ready ✨</span>
+              )}
+            </div>
           </div>
-          <Button 
-            onClick={handleGenerate} 
+
+          {/* Quick Prompts */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-primary/10 rounded-lg">
+                <Lightbulb className="h-3.5 w-3.5 text-primary" />
+              </div>
+              <label className="text-sm font-bold text-foreground">Quick Ideas</label>
+            </div>
+
+            <div className="space-y-2">
+              {quickPrompts.map((qp, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => useQuickPrompt(qp.text)}
+                  className="w-full text-left p-3 rounded-xl bg-gradient-to-br from-muted/40 to-muted/20 hover:from-primary/10 hover:to-primary/5 border border-border/40 hover:border-primary/50 transition-all duration-300 text-xs text-foreground/80 hover:text-primary group relative overflow-hidden"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                  <div className="flex items-center gap-2.5 relative">
+                    <span className="text-base">{qp.emoji}</span>
+                    <span className="flex-1 line-clamp-1">{qp.text}</span>
+                    <ArrowRight className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* AI Refined Prompt (if result exists) */}
+          {result && (
+            <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-primary/30 shadow-lg shadow-primary/5 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent opacity-50" />
+              <CardContent className="p-4 space-y-2 relative">
+                <div className="flex items-center gap-2 text-xs font-bold text-primary">
+                  <Stars className="h-3.5 w-3.5" />
+                  AI Enhanced Prompt
+                </div>
+                <p className="text-xs text-foreground/70 leading-relaxed">
+                  {result.refined_prompt}
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        {/* Generate Button */}
+        <div className="p-6 border-t border-border/50 bg-gradient-to-r from-background/80 to-background/60 backdrop-blur-md">
+          <Button
+            onClick={handleGenerate}
             disabled={loading || !prompt}
-            className="w-full md:w-52 h-28 rounded-2xl font-black text-base flex flex-col gap-2 shadow-2xl shadow-primary/30 bg-gradient-to-br from-primary to-primary/90 hover:from-primary/90 hover:to-primary hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100 relative overflow-hidden group"
+            className="w-full h-12 bg-gradient-to-r from-primary via-primary to-primary/90 hover:from-primary/90 hover:via-primary hover:to-primary text-primary-foreground font-bold rounded-xl shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
             {loading ? (
               <>
-                <Loader2 className="h-7 w-7 animate-spin" />
-                <span className="text-xs tracking-wider">GENERATING...</span>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin relative z-10" />
+                <span className="relative z-10">Generating...</span>
               </>
             ) : (
               <>
-                <Sparkles className="h-7 w-7 group-hover:scale-110 group-hover:rotate-12 transition-transform" />
-                <span className="tracking-wider">GENERATE</span>
+                <Sparkles className="h-4 w-4 mr-2 group-hover:rotate-12 group-hover:scale-110 transition-transform relative z-10" />
+                <span className="relative z-10">Generate Image</span>
               </>
             )}
           </Button>
+        </div>
+      </div>
+
+      {/* RIGHT PANEL - Preview */}
+      <div className="flex-1 flex flex-col relative z-10">
+        {/* Preview Header */}
+        <div className="p-6 border-b border-border/50 flex items-center justify-between bg-gradient-to-r from-background/60 to-background/80 backdrop-blur-md">
+          <div className="flex items-center gap-2">
+            <ImageIcon className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm font-semibold text-foreground">Preview</span>
+            {result && (
+              <Badge variant="outline" className="ml-2 gap-1 bg-primary/5 border-primary/20">
+                <Sparkles className="h-2.5 w-2.5" />
+                Generated
+              </Badge>
+            )}
+          </div>
+          {result && (
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.open(result.image_url, '_blank')}
+                className="gap-2 hover:bg-primary/5 hover:border-primary/30 transition-colors"
+              >
+                <Maximize2 className="h-3 w-3" />
+                Full View
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleDownload}
+                className="gap-2 hover:bg-primary/5 hover:border-primary/30 transition-colors"
+              >
+                <Download className="h-3 w-3" />
+                Download
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {/* Preview Area */}
+        <div className="flex-1 p-8 flex items-center justify-center bg-gradient-to-br from-muted/10 via-background to-muted/20">
+          {!result && !loading ? (
+            <div className="text-center space-y-6 max-w-md animate-in fade-in duration-700">
+              <div className="relative inline-block">
+                <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full animate-pulse" />
+                <div className="relative p-10 bg-gradient-to-br from-muted/40 to-muted/20 rounded-3xl border border-border/50">
+                  <ImageIcon className="h-24 w-24 text-muted-foreground/40" />
+                </div>
+              </div>
+              <div className="space-y-3">
+                <h3 className="text-2xl font-black bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
+                  Ready to Create
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Enter your vision on the left and click Generate to bring it to life with AI
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2 justify-center pt-2">
+                <Badge variant="outline" className="gap-1.5 bg-background/50 backdrop-blur-sm">
+                  <Zap className="h-3 w-3 text-primary" />
+                  High Quality
+                </Badge>
+                <Badge variant="outline" className="gap-1.5 bg-background/50 backdrop-blur-sm">
+                  <Sparkles className="h-3 w-3 text-primary" />
+                  AI Enhanced
+                </Badge>
+                <Badge variant="outline" className="gap-1.5 bg-background/50 backdrop-blur-sm">
+                  <Wand2 className="h-3 w-3 text-primary" />
+                  Instant
+                </Badge>
+              </div>
+            </div>
+          ) : loading ? (
+            <div className="text-center space-y-8 animate-in fade-in duration-500">
+              <div className="relative inline-block">
+                <div className="absolute inset-0 bg-primary/40 blur-3xl rounded-full animate-pulse" />
+                <div className="relative">
+                  <Loader2 className="h-20 w-20 text-primary animate-spin" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/30 to-primary/0 blur-xl animate-pulse" />
+                </div>
+              </div>
+              <div className="space-y-3">
+                <h3 className="text-2xl font-black bg-gradient-to-r from-primary via-purple-500 to-primary bg-clip-text text-transparent animate-pulse">
+                  Creating Your Vision
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Our AI is painting your imagination into reality...
+                </p>
+                <div className="flex gap-1.5 justify-center pt-2">
+                  {[...Array(5)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="w-2 h-2 rounded-full bg-primary/60 animate-bounce"
+                      style={{ animationDelay: `${i * 0.1}s` }}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center p-4 animate-in fade-in zoom-in duration-700">
+              <div className="relative group max-w-full max-h-full">
+                <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-purple-500/20 to-primary/20 rounded-2xl opacity-0 group-hover:opacity-100 blur transition-opacity duration-500" />
+                <img
+                  src={result?.image_url}
+                  alt="Generated"
+                  className="relative max-w-full max-h-full rounded-2xl shadow-2xl object-contain border border-border/50"
+                />
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
