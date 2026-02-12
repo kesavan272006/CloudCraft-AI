@@ -351,7 +351,7 @@ export default function ForgePage() {
 
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-5xl mx-auto p-8 space-y-6">
+        <div className="max-w-6xl mx-auto p-8 space-y-10">
           {/* Input Section */}
           {!result && (
             <div className="space-y-6 animate-in fade-in duration-700">
@@ -627,15 +627,20 @@ export default function ForgePage() {
 
               {/* Persona Results */}
               {personaResult && (
-                <Card className="bg-gradient-to-br from-purple-500/5 via-background to-purple-500/5 border-purple-500/20 shadow-xl animate-in slide-in-from-right duration-500">
-                  <div className="bg-gradient-to-r from-purple-500/10 to-purple-500/5 px-6 py-4 border-b border-purple-500/20 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-5 h-5 text-green-600" />
-                      <h3 className="font-bold text-lg text-foreground">{personaResult.variants.length} Persona Variants</h3>
+                <div className="space-y-8 animate-in slide-in-from-right duration-700">
+                  <div className="flex items-center justify-between px-2">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-green-500/10 rounded-full">
+                        <CheckCircle2 className="w-5 h-5 text-green-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-black text-xl text-foreground">Generation Complete</h3>
+                        <p className="text-xs text-muted-foreground uppercase tracking-widest font-black">{personaResult.variants.length} Targeted Variants Ready</p>
+                      </div>
                     </div>
                     <Button
-                      variant="outline"
-                      size="sm"
+                      variant="ghost"
+                      className="hover:bg-primary/10 text-primary font-bold group"
                       onClick={() => {
                         setPersonaResult(null);
                         setSelectedPersonas([]);
@@ -643,18 +648,18 @@ export default function ForgePage() {
                         setShowTools(true);
                       }}
                     >
-                      <RefreshCcw className="w-3 h-3 mr-2" />
+                      <RefreshCcw className="w-4 h-4 mr-2 group-hover:rotate-180 transition-transform duration-500" />
                       Back to Tools
                     </Button>
                   </div>
-                  <CardContent className="p-8">
+
+                  <div className="bg-background/40 backdrop-blur-sm rounded-[2rem] border-2 border-border/50 p-12 shadow-2xl">
                     <PersonaVariantsDisplay
                       variants={personaResult.variants}
-                      originalContent={personaResult.original_content}
                       onSchedule={handleSchedule}
                     />
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               )}
 
               {/* Transmute Workflow */}

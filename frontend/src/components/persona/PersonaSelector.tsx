@@ -47,18 +47,22 @@ export function PersonaSelector({ personas, selectedPersonas, onTogglePersona }:
                         <Card
                             key={persona.id}
                             className={`cursor-pointer transition-all duration-300 hover:scale-[1.02] ${isSelected
-                                    ? `bg-gradient-to-br ${colorClass} shadow-lg`
-                                    : "bg-muted/20 border-border/40 hover:border-primary/30"
+                                ? `bg-gradient-to-br ${colorClass} shadow-lg`
+                                : "bg-muted/20 border-border/40 hover:border-primary/30"
                                 }`}
                             onClick={() => onTogglePersona(persona.id)}
                         >
                             <CardContent className="p-4">
                                 <div className="flex items-start gap-3">
-                                    <Checkbox
-                                        checked={isSelected}
-                                        onCheckedChange={() => onTogglePersona(persona.id)}
+                                    <div
                                         className="mt-1"
-                                    />
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        <Checkbox
+                                            checked={isSelected}
+                                            onCheckedChange={() => onTogglePersona(persona.id)}
+                                        />
+                                    </div>
                                     <div className="flex-1 space-y-2">
                                         <div className="flex items-center gap-2">
                                             <Icon className={`h-4 w-4 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`} />

@@ -1,5 +1,6 @@
-from .base_agent import BaseAgent
-from typing import List
+from __future__ import annotations
+from src.agents.base_agent import BaseAgent, AgentResponse
+from typing import List, Dict, Optional, Any
 
 class PersonaAgent(BaseAgent):
     name = "Persona Adapter"
@@ -10,49 +11,64 @@ class PersonaAgent(BaseAgent):
         return f"""
 You are the Persona Adapter - an expert at tailoring content for specific audiences.
 
-YOUR TASK:
-Transform the given content to perfectly match the target audience persona.
+YOUR MISSION:
+Take the "Original Content" and COMPLETELY REWRITE it to sound like the target audience. 
+If the audience is Gen-Z, use their slang and rapid-fire rhythm. 
+If it's Professional, use industry logic and sophisticated vocabulary.
 
 {persona_modifier}
 
 CRITICAL RULES:
-1. MAINTAIN THE CORE MESSAGE - Don't change what you're saying, change HOW you say it
-2. ADAPT EVERYTHING:
-   - Language style and vocabulary
-   - Tone and emotion
-   - Cultural references
-   - Emoji usage
-   - Sentence structure
-   - Call-to-action style
+1. DO NOT REPEAT THE ORIGINAL TEXT - Every sentence must be adapted.
+2. CHANGE THE HOOK - Use a hook that works for THIS specific persona.
+3. ADAPT ALL ELEMENTS:
+   - Vocabulary: Use words specific to their lifestyle.
+   - Tone: Funny, serious, empathetic, or bold as required.
+   - Cultural references: Mention things they care about.
+   - Emoji usage: Match their natural digital behavior.
+   - Call-to-action: Use a closing that they would actually respond to.
 
-3. BE AUTHENTIC - Sound natural for that persona, not forced
-4. PLATFORM AWARENESS - Consider where this content will be posted
-5. LENGTH - Keep it appropriate for the platform and audience attention span
+4. BE AUTHENTIC - Sound natural, like a member of that tribe, not like an AI trying to fit in.
+5. PLATFORM FIT - Ensure the length and style match where this audience hangs out.
 
 OUTPUT FORMAT:
-Return ONLY the adapted content. No explanations, no meta-commentary.
+Return ONLY the adapted content. No explanations, no "Here is the adapted content", no "Output:".
 Just the final, persona-optimized content ready to post.
 """
 
-    def adapt_content(self, original_content: str, persona_modifier: str) -> str:
-        """
-        Adapt content for a specific persona
+    async def async_run(self, task: str, context: dict = None, history: list = None) -> AgentResponse:
+        """Override to use persona-specific prompt logic"""
+        from langchain_core.messages import HumanMessage
         
-        Args:
-            original_content: The original content to adapt
-            persona_modifier: Persona-specific instructions
-            
-        Returns:
-            Adapted content as string
-        """
+        # Build the specific system prompt from context
+        persona_modifier = context.get("persona_modifier", "") if context else ""
         role_prompt = self.get_role_prompt(persona_modifier)
         
-        task = f"""
-ORIGINAL CONTENT:
-{original_content}
+        try:
+            # We use a combined prompt for persona adaptation to keep it simple and direct
+            full_prompt = f"{role_prompt}\n\n{task}"
+            
+            response = await self.llm.ainvoke([HumanMessage(content=full_prompt)])
+            raw_output = response.content.strip()
+            
+            return AgentResponse(
+                thought=f"Adapted content based on {persona_modifier[:50]}...",
+                output=raw_output,
+                confidence=0.9,
+                needs_more_info=False
+            )
+        except Exception as e:
+            return AgentResponse(
+                thought=f"Error: {str(e)}",
+                output="Failed to adapt content.",
+                confidence=0.0,
+                needs_more_info=True
+            )
 
-Transform this content according to the persona guidelines above.
-"""
-        
-        result = self.run(task, system_prompt=role_prompt)
-        return result.strip()
+    async def adapt_content(self, original_content: str, persona_modifier: str) -> str:
+        """
+        Adapt content for a specific persona
+        """
+        task = f"ORIGINAL CONTENT:\n{original_content}\n\nAdapt this for the target audience."
+        result = await self.async_run(task, context={"persona_modifier": persona_modifier})
+        return result.output.strip()

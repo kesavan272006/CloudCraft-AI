@@ -29,7 +29,7 @@ class PersonaService:
             for persona_id, config in personas.items()
         ]
     
-    def generate_persona_variants(
+    async def generate_persona_variants(
         self, 
         original_content: str, 
         persona_ids: List[str]
@@ -57,7 +57,7 @@ class PersonaService:
                 persona_modifier = get_persona_prompt_modifier(persona_id)
                 
                 # Generate adapted content
-                adapted_content = self.agent.adapt_content(
+                adapted_content = await self.agent.adapt_content(
                     original_content=original_content,
                     persona_modifier=persona_modifier
                 )

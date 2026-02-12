@@ -36,7 +36,7 @@ async def generate_persona_variants(request: PersonaRequest):
         
         logger.info(f"Generating variants for {len(request.personas)} personas")
         
-        response = persona_service.generate_persona_variants(
+        response = await persona_service.generate_persona_variants(
             original_content=request.content,
             persona_ids=request.personas
         )
