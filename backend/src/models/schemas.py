@@ -184,3 +184,17 @@ class PerformanceResponse(BaseModel):
     prediction: PerformancePrediction
     status: str = "success"
 
+# Calendar & Scheduler Schemas
+class ScheduledPost(BaseModel):
+    id: str
+    content: str
+    platform: str
+    scheduled_time: str # ISO format string
+    status: str = "scheduled" # scheduled, posted, draft
+    performance_score: Optional[int] = None
+    persona_name: Optional[str] = None
+
+class CalendarResponse(BaseModel):
+    posts: List[ScheduledPost]
+    status: str = "success"
+

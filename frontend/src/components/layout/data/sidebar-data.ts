@@ -10,6 +10,7 @@ import {
   Settings,
   HelpCircle,
   Radio,
+  Layers,
 } from 'lucide-react'
 import { type SidebarData } from '../types'
 
@@ -64,6 +65,11 @@ export const sidebarData: SidebarData = {
         {
           title: 'Campaign Architect',
           url: '/campaign-architect',
+          icon: Layers,
+        },
+        {
+          title: 'Campaign Calendar',
+          url: '/calendar',
           icon: CalendarDays,
         },
         {
@@ -83,7 +89,6 @@ export const sidebarData: SidebarData = {
       items: [
         {
           title: 'Settings',
-          url: '/settings',
           icon: Settings,
           items: [
             {

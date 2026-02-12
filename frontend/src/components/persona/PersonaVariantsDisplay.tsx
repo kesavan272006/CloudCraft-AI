@@ -2,12 +2,13 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { PersonaVariant } from "@/types/persona"
-import { Copy, Check, Users, Briefcase, Baby, Globe, Rocket } from "lucide-react"
+import { Copy, Check, Users, Briefcase, Baby, Globe, Rocket, CalendarDays } from "lucide-react"
 import { useState } from "react"
 
 interface PersonaVariantsDisplayProps {
     variants: PersonaVariant[]
     originalContent: string
+    onSchedule?: (content: string, platform: string, personaName: string) => void
 }
 
 const PERSONA_ICONS: Record<string, any> = {
@@ -26,7 +27,7 @@ const PERSONA_COLORS: Record<string, string> = {
     entrepreneur: "from-yellow-500/10 to-amber-500/10 border-yellow-500/30",
 }
 
-export function PersonaVariantsDisplay({ variants, originalContent }: PersonaVariantsDisplayProps) {
+export function PersonaVariantsDisplay({ variants, originalContent, onSchedule }: PersonaVariantsDisplayProps) {
     const [copiedId, setCopiedId] = useState<string | null>(null)
 
     const handleCopy = (content: string, personaId: string) => {
@@ -86,18 +87,30 @@ export function PersonaVariantsDisplay({ variants, originalContent }: PersonaVar
                                             <Icon className="h-4 w-4 text-primary" />
                                             <h4 className="text-sm font-bold text-foreground">{variant.persona_name}</h4>
                                         </div>
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => handleCopy(variant.content, variant.persona_id)}
-                                            className="h-7 px-2"
-                                        >
-                                            {copiedId === variant.persona_id ? (
-                                                <Check className="h-3 w-3 text-green-500" />
-                                            ) : (
-                                                <Copy className="h-3 w-3" />
+                                        <div className="flex items-center gap-1">
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => handleCopy(variant.content, variant.persona_id)}
+                                                className="h-7 px-2"
+                                            >
+                                                {copiedId === variant.persona_id ? (
+                                                    <Check className="h-3 w-3 text-green-500" />
+                                                ) : (
+                                                    <Copy className="h-3 w-3" />
+                                                )}
+                                            </Button>
+                                            {onSchedule && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => onSchedule(variant.content, variant.platform_suggestion, variant.persona_name)}
+                                                    className="h-7 px-2 text-primary"
+                                                >
+                                                    <CalendarDays className="h-3 w-3" />
+                                                </Button>
                                             )}
-                                        </Button>
+                                        </div>
                                     </div>
                                     <div className="flex flex-wrap gap-1.5 mt-2">
                                         <Badge variant="outline" className="text-[10px] px-1.5 py-0">

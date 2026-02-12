@@ -38,6 +38,7 @@ import { Route as AuthenticatedForgeIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedCompetitorPulseIndexRouteImport } from './routes/_authenticated/competitor-pulse/index'
 import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
 import { Route as AuthenticatedCampaignArchitectIndexRouteImport } from './routes/_authenticated/campaign-architect/index'
+import { Route as AuthenticatedCalendarIndexRouteImport } from './routes/_authenticated/calendar/index'
 import { Route as AuthenticatedBrand_brainIndexRouteImport } from './routes/_authenticated/brand_brain/index'
 import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated/apps/index'
 import { Route as ClerkAuthenticatedUserManagementRouteImport } from './routes/clerk/_authenticated/user-management'
@@ -200,6 +201,12 @@ const AuthenticatedCampaignArchitectIndexRoute =
     path: '/campaign-architect/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCalendarIndexRoute =
+  AuthenticatedCalendarIndexRouteImport.update({
+    id: '/calendar/',
+    path: '/calendar/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedBrand_brainIndexRoute =
   AuthenticatedBrand_brainIndexRouteImport.update({
     id: '/brand_brain/',
@@ -283,6 +290,7 @@ export interface FileRoutesByFullPath {
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/brand_brain': typeof AuthenticatedBrand_brainIndexRoute
+  '/calendar': typeof AuthenticatedCalendarIndexRoute
   '/campaign-architect': typeof AuthenticatedCampaignArchitectIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/competitor-pulse': typeof AuthenticatedCompetitorPulseIndexRoute
@@ -320,6 +328,7 @@ export interface FileRoutesByTo {
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/brand_brain': typeof AuthenticatedBrand_brainIndexRoute
+  '/calendar': typeof AuthenticatedCalendarIndexRoute
   '/campaign-architect': typeof AuthenticatedCampaignArchitectIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/competitor-pulse': typeof AuthenticatedCompetitorPulseIndexRoute
@@ -362,6 +371,7 @@ export interface FileRoutesById {
   '/clerk/_authenticated/user-management': typeof ClerkAuthenticatedUserManagementRoute
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
   '/_authenticated/brand_brain/': typeof AuthenticatedBrand_brainIndexRoute
+  '/_authenticated/calendar/': typeof AuthenticatedCalendarIndexRoute
   '/_authenticated/campaign-architect/': typeof AuthenticatedCampaignArchitectIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
   '/_authenticated/competitor-pulse/': typeof AuthenticatedCompetitorPulseIndexRoute
@@ -402,6 +412,7 @@ export interface FileRouteTypes {
     | '/clerk/user-management'
     | '/apps'
     | '/brand_brain'
+    | '/calendar'
     | '/campaign-architect'
     | '/chats'
     | '/competitor-pulse'
@@ -439,6 +450,7 @@ export interface FileRouteTypes {
     | '/clerk/user-management'
     | '/apps'
     | '/brand_brain'
+    | '/calendar'
     | '/campaign-architect'
     | '/chats'
     | '/competitor-pulse'
@@ -480,6 +492,7 @@ export interface FileRouteTypes {
     | '/clerk/_authenticated/user-management'
     | '/_authenticated/apps/'
     | '/_authenticated/brand_brain/'
+    | '/_authenticated/calendar/'
     | '/_authenticated/campaign-architect/'
     | '/_authenticated/chats/'
     | '/_authenticated/competitor-pulse/'
@@ -715,6 +728,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCampaignArchitectIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/calendar/': {
+      id: '/_authenticated/calendar/'
+      path: '/calendar'
+      fullPath: '/calendar'
+      preLoaderRoute: typeof AuthenticatedCalendarIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/brand_brain/': {
       id: '/_authenticated/brand_brain/'
       path: '/brand_brain'
@@ -817,6 +837,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedBrand_brainIndexRoute: typeof AuthenticatedBrand_brainIndexRoute
+  AuthenticatedCalendarIndexRoute: typeof AuthenticatedCalendarIndexRoute
   AuthenticatedCampaignArchitectIndexRoute: typeof AuthenticatedCampaignArchitectIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
   AuthenticatedCompetitorPulseIndexRoute: typeof AuthenticatedCompetitorPulseIndexRoute
@@ -836,6 +857,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedBrand_brainIndexRoute: AuthenticatedBrand_brainIndexRoute,
+  AuthenticatedCalendarIndexRoute: AuthenticatedCalendarIndexRoute,
   AuthenticatedCampaignArchitectIndexRoute:
     AuthenticatedCampaignArchitectIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,

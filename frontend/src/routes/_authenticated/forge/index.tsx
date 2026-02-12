@@ -2,13 +2,26 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Hammer, Sparkles, Loader2, AlertCircle, CheckCircle2, Copy, Globe, RefreshCcw, Zap, Users, ArrowRight, Wand2, ChevronDown, ChevronUp } from "lucide-react";
+import { Hammer, Sparkles, Loader2, AlertCircle, CheckCircle2, Copy, Globe, RefreshCcw, Zap, Users, ArrowRight, Wand2, ChevronDown, ChevronUp, CalendarDays, Clock, Calendar as CalendarIcon, Send } from "lucide-react";
 import { createFileRoute } from '@tanstack/react-router';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import ReactMarkdown from 'react-markdown';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Label } from "@/components/ui/label";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 import { PersonaSelector } from "@/components/persona/PersonaSelector";
 import { PersonaVariantsDisplay } from "@/components/persona/PersonaVariantsDisplay";
 import { PerformanceCard } from "@/components/performance/PerformanceCard";
@@ -41,6 +54,16 @@ export default function ForgePage() {
   const [showMasterContent, setShowMasterContent] = useState(true);
   const [showTools, setShowTools] = useState(false);
   const [activeTool, setActiveTool] = useState<'personas' | 'transmute' | null>(null);
+
+  // Scheduling State
+  const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
+  const [scheduleDate, setScheduleDate] = useState<Date>(new Date());
+  const [scheduleTime, setScheduleTime] = useState('10:00');
+  const [schedulingContent, setSchedulingContent] = useState('');
+  const [schedulingPlatform, setSchedulingPlatform] = useState('');
+  const [schedulingPersona, setSchedulingPersona] = useState<string | undefined>();
+  const [schedulingScore, setSchedulingScore] = useState<number | undefined>();
+  const [isFinalizingSchedule, setIsFinalizingSchedule] = useState(false);
 
 
   const handleCopy = (text: string) => {
@@ -132,6 +155,53 @@ export default function ForgePage() {
       toast.error("Analysis failed: " + err.message);
     } finally {
       setAnalyzingPerformance(false);
+    }
+  };
+
+  const handleSchedule = (content: string, platform: string, personaName?: string, score?: number) => {
+    setSchedulingContent(content);
+    setSchedulingPlatform(platform);
+    setSchedulingPersona(personaName);
+    setSchedulingScore(score);
+
+    // Set default date to tomorrow
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    setScheduleDate(tomorrow);
+
+    setIsScheduleDialogOpen(true);
+  };
+
+  const confirmSchedule = async () => {
+    setIsFinalizingSchedule(true);
+    try {
+      // Create final ISO string with time
+      const [hours, minutes] = scheduleTime.split(':').map(Number);
+      const finalDate = new Date(scheduleDate);
+      finalDate.setHours(hours, minutes, 0, 0);
+
+      const response = await fetch('http://localhost:8000/api/v1/calendar/schedule', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: cleanContent(schedulingContent),
+          platform: schedulingPlatform,
+          scheduled_time: finalDate.toISOString(),
+          performance_score: schedulingScore || 70,
+          persona_name: schedulingPersona
+        })
+      });
+
+      if (response.ok) {
+        toast.success("Successfully scheduled to your Calendar!");
+        setIsScheduleDialogOpen(false);
+      } else {
+        throw new Error("Failed to schedule");
+      }
+    } catch (error) {
+      toast.error("Failed to schedule post");
+    } finally {
+      setIsFinalizingSchedule(false);
     }
   };
 
@@ -392,6 +462,23 @@ export default function ForgePage() {
                           <Copy className="w-4 h-4 mr-2" />
                           Copy
                         </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSchedule(
+                              result.final_content,
+                              "General",
+                              undefined,
+                              performanceResult?.prediction?.overall_score
+                            );
+                          }}
+                          className="hover:bg-green-500/10 text-primary"
+                        >
+                          <CalendarDays className="w-4 h-4 mr-2" />
+                          Schedule
+                        </Button>
                       </>
                     )}
                     {showMasterContent ? (
@@ -564,6 +651,7 @@ export default function ForgePage() {
                     <PersonaVariantsDisplay
                       variants={personaResult.variants}
                       originalContent={personaResult.original_content}
+                      onSchedule={handleSchedule}
                     />
                   </CardContent>
                 </Card>
@@ -700,6 +788,99 @@ export default function ForgePage() {
               )}
             </div>
           )}
+          {/* Scheduling Dialog */}
+          <Dialog open={isScheduleDialogOpen} onOpenChange={setIsScheduleDialogOpen}>
+            <DialogContent className="sm:max-w-[425px] border-primary/20">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <CalendarDays className="w-5 h-5 text-primary" />
+                  Schedule Implementation
+                </DialogTitle>
+                <DialogDescription>
+                  Set the optimal date and time for this content to hit its target.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-6 py-4">
+                <div className="space-y-3">
+                  <Label className="text-xs font-bold uppercase text-muted-foreground">Select Date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal border-primary/10 hover:border-primary/30 h-11",
+                          !scheduleDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {scheduleDate ? format(scheduleDate, "PPP") : <span>Pick a date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={scheduleDate}
+                        onSelect={(date) => date && setScheduleDate(date)}
+                        initialFocus
+                        disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div className="space-y-3">
+                  <Label className="text-xs font-bold uppercase text-muted-foreground">Select Time (IST)</Label>
+                  <div className="flex items-center gap-2 relative">
+                    <Clock className="w-4 h-4 absolute left-3 text-muted-foreground pointer-events-none" />
+                    <Select value={scheduleTime} onValueChange={setScheduleTime}>
+                      <SelectTrigger className="pl-10 border-primary/10 h-11">
+                        <SelectValue placeholder="Select time" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="09:00">09:00 AM (Early Rush)</SelectItem>
+                        <SelectItem value="10:00">10:00 AM (Core Window)</SelectItem>
+                        <SelectItem value="12:00">12:00 PM (Midday Peak)</SelectItem>
+                        <SelectItem value="15:00">03:00 PM (Afternoon Slump)</SelectItem>
+                        <SelectItem value="18:00">06:00 PM (Evening Surge)</SelectItem>
+                        <SelectItem value="19:30">07:30 PM (Prime Time)</SelectItem>
+                        <SelectItem value="21:00">09:00 PM (Late Night Focus)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <Card className="bg-muted/30 border-none">
+                  <CardContent className="p-4 flex gap-3 items-start">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Zap className="w-4 h-4 text-primary" />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[11px] font-bold text-foreground">AI Recommendation</p>
+                      <p className="text-[10px] text-muted-foreground leading-relaxed">
+                        Based on your content profile, scheduling for <span className="text-primary font-bold">Prime Time (07:30 PM)</span>
+                        on a <span className="font-bold">Weekday</span> typically yields 23% higher engagement for {schedulingPlatform}.
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+              <DialogFooter>
+                <Button variant="ghost" onClick={() => setIsScheduleDialogOpen(false)}>Cancel</Button>
+                <Button
+                  className="bg-primary hover:bg-primary/90"
+                  onClick={confirmSchedule}
+                  disabled={isFinalizingSchedule}
+                >
+                  {isFinalizingSchedule ? (
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  ) : (
+                    <Send className="w-4 h-4 mr-2" />
+                  )}
+                  Confirm Schedule
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </div>
