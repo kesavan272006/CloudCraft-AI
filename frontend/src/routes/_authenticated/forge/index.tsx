@@ -135,7 +135,9 @@ export default function ForgePage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({
+          prompt
+        }),
       });
 
       if (!response.ok) {
@@ -409,8 +411,10 @@ export default function ForgePage() {
                   />
 
                   <div className="flex items-center justify-between">
-                    <div className="text-xs text-muted-foreground">
-                      Press <kbd className="px-2 py-1 bg-muted border border-border rounded text-[10px] font-mono">Ctrl+Enter</kbd> to generate
+                    <div className="flex items-center gap-4">
+                      <div className="text-xs text-muted-foreground">
+                        Press <kbd className="px-2 py-1 bg-muted border border-border rounded text-[10px] font-mono">Ctrl+Enter</kbd> to generate
+                      </div>
                     </div>
                     {prompt && (
                       <span className="text-xs text-primary/70 font-medium">{prompt.length} chars</span>

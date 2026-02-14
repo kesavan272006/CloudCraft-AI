@@ -35,7 +35,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
-BEDROCK_MODEL_ID = os.getenv("BEDROCK_MODEL_ID", "anthropic.claude-3-sonnet-20240229-v1:0")
+BEDROCK_MODEL_ID = os.getenv("BEDROCK_MODEL_ID", "amazon.nova-lite-v1:0")
 
 # OpenRouter / Nemotron (New)
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
@@ -108,9 +108,10 @@ class LLMFactory:
                 if not GEMINI_API_KEY:
                     raise ValueError("GEMINI_API_KEY not found in .env")
 
-                logger.info(f"Using Gemini model: {GEMINI_MODEL}")
+                target_model = model_id or GEMINI_MODEL
+                logger.info(f"Using Gemini model: {target_model}")
                 return ChatGoogleGenerativeAI(
-                    model=GEMINI_MODEL,
+                    model=target_model,
                     google_api_key=GEMINI_API_KEY,
                     temperature=temperature,
                     max_output_tokens=max_tokens,

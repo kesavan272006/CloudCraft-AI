@@ -9,7 +9,7 @@ logger = get_logger(__name__)
 class LocalScoutService:
     @staticmethod
     async def get_localized_insights(city: str, lat: float, lng: float):
-        llm = LLMFactory.get_llm(provider="openrouter")
+        llm = LLMFactory.get_llm() # Defaults to Bedrock
         tools = LLMFactory.get_tools()
         search_tool = next((t for t in tools if t.name == "web_search"), None)
 

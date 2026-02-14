@@ -15,6 +15,7 @@ from .copywriter_agent import CopywriterAgent
 from .designer_agent import DesignerAgent
 from .compliance_agent import ComplianceAgent
 from ..utils.logger import get_logger
+from typing import Optional, Dict, Any, List
 
 logger = get_logger(__name__)
 
@@ -230,7 +231,8 @@ forge_graph = build_forge_graph()
 
 async def run_forge_workflow(
     user_prompt: str,
-    thread_id: str = "default_thread"
+    thread_id: str = "default_thread",
+    image_context: Optional[Dict[str, Any]] = None
 ) -> dict:
     # CRITICAL DEBUG: Log the exact user prompt received
     logger.info(f"=" * 80)
@@ -240,8 +242,21 @@ async def run_forge_workflow(
     
     config = {"configurable": {"thread_id": thread_id}}
 
+    content = user_prompt
+    if image_context:
+        content = f"""
+        {user_prompt}
+        
+        VISUAL CONTEXT FROM VISION LAB:
+        Vibe: {image_context.get('vibe_description')}
+        Detected Context: {image_context.get('detected_context')}
+        Suggested Tone: {image_context.get('suggested_tone')}
+        
+        INSTRUCTIONS: Ensure the content matches the visual vibe perfectly.
+        """
+
     initial_state: AgentState = {
-        "messages": [HumanMessage(content=user_prompt)],
+        "messages": [HumanMessage(content=content)],
         "next_agent": "supervisor",
         "final_output": None,
         "thought_history": []

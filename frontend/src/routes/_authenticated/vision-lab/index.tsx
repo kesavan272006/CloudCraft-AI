@@ -1,6 +1,5 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
@@ -10,313 +9,502 @@ import {
   Loader2,
   Image as ImageIcon,
   Wand2,
-  Zap,
-  Lightbulb,
+  Camera,
   ArrowRight,
-  Stars,
-  Palette,
-  Maximize2
+  Maximize2,
+  ChevronLeft,
+  LayoutGrid,
+  Zap,
+  CheckCircle2,
+  Settings2,
+  RefreshCw,
+  Palette
 } from "lucide-react"
+import { VisionAudit } from "@/components/persona/VisionAudit"
+import { toast } from "sonner"
+import { cn } from "@/lib/utils"
+
+type VisionMode = 'generate' | 'enhance' | 'idle'
 
 const quickPrompts = [
-  { text: "A futuristic city at night with flying cars and neon lights", emoji: "🌃" },
-  { text: "A serene mountain lake at sunrise with mist", emoji: "🏔️" },
-  { text: "A cozy bookshop in Paris on a rainy evening", emoji: "📚" },
-  { text: "A magical forest with glowing mushrooms and fireflies", emoji: "🌲" },
-  { text: "A vintage car on a desert highway at sunset", emoji: "🚗" }
+  "Futuristic skyline with neon architecture",
+  "Serene mountain landscape at dawn",
+  "Cyberpunk street photography",
+  "Minimalist product shot with soft lighting",
+  "Ethereal forest with bioluminescent plants"
 ]
 
 export default function VisionLabPage() {
+  // Navigation & Mode State
+  const [activeMode, setActiveMode] = useState<VisionMode>('idle')
+  const [showResult, setShowResult] = useState(false)
+
+  // Generation State
   const [prompt, setPrompt] = useState("")
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<{ image_url: string; refined_prompt: string } | null>(null)
 
+  // Audit & Enhance State
+  const [analyzingImage, setAnalyzingImage] = useState(false)
+  const [imageAnalysis, setImageAnalysis] = useState<any>(null)
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null)
+  const [uploadedImageBase64, setUploadedImageBase64] = useState<string | null>(null)
+  const [enhancing, setEnhancing] = useState(false)
+  const [enhancedResult, setEnhancedResult] = useState<{ enhanced_image_url: string; enhancement_prompt: string } | null>(null)
+
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const resetAll = () => {
+    setActiveMode('idle')
+    setShowResult(false)
+    setPrompt("")
+    setResult(null)
+    setImageAnalysis(null)
+    setUploadedImageUrl(null)
+    setUploadedImageBase64(null)
+    setEnhancedResult(null)
+  }
+
   const handleGenerate = async () => {
     if (!prompt) return
     setLoading(true)
+    setResult(null)
+    setEnhancedResult(null)
     try {
-      const response = await fetch('http://localhost:8000/api/v1/vision/generate-image', {
+      const response = await fetch('http://127.0.0.1:8000/api/v1/vision/generate-image', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt }),
       })
       const data = await response.json()
       setResult(data)
+      setShowResult(true)
+      toast.success("Generation complete")
     } catch (error) {
-      console.error("Generation failed", error)
+      toast.error("Generation failed")
     } finally {
       setLoading(false)
     }
   }
 
-  const handleDownload = async () => {
-    if (!result?.image_url) return
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploadedImageUrl(null)
+    setImageAnalysis(null)
+    setEnhancedResult(null)
+    setResult(null)
+
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      setUploadedImageUrl(reader.result as string)
+      setUploadedImageBase64(reader.result as string)
+      setActiveMode('enhance')
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const handleAudit = async () => {
+    if (!uploadedImageBase64) return
+    setAnalyzingImage(true)
     try {
-      const response = await fetch(result.image_url)
+      const response = await fetch('http://127.0.0.1:8000/api/v1/vision/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image_base64: uploadedImageBase64 })
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setImageAnalysis(data)
+        toast.success("Audit complete")
+      } else {
+        toast.error("Audit failed")
+      }
+    } catch (error) {
+      toast.error("Audit failed")
+    } finally {
+      setAnalyzingImage(false)
+    }
+  }
+
+  const handleEnhance = async () => {
+    if (!uploadedImageBase64 || !imageAnalysis) return
+    setEnhancing(true)
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/v1/vision/enhance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          image_base64: uploadedImageBase64,
+          audit_results: imageAnalysis,
+          user_prompt: prompt
+        })
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setEnhancedResult(data)
+        setShowResult(true)
+        toast.success("Master image ready")
+      } else {
+        toast.error("Enhancement failed")
+      }
+    } catch (error) {
+      toast.error("Enhancement failed")
+    } finally {
+      setEnhancing(false)
+    }
+  }
+
+  const handleDownload = async () => {
+    const url = enhancedResult?.enhanced_image_url || result?.image_url
+    if (!url) return
+    try {
+      const response = await fetch(url)
       const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
+      const downloadUrl = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
-      a.href = url
-      a.download = `vision-lab-${Date.now()}.png`
+      a.href = downloadUrl
+      a.download = `vision-master-${Date.now()}.png`
       document.body.appendChild(a)
       a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
+      window.URL.revokeObjectURL(downloadUrl)
     } catch (error) {
       console.error("Download failed", error)
     }
   }
 
-  const useQuickPrompt = (quickPrompt: string) => {
-    setPrompt(quickPrompt)
+  // --- RENDERING ---
+
+  if (activeMode === 'idle') {
+    return (
+      <div className="flex-1 h-screen flex flex-col items-center justify-center bg-background relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary/10 via-background to-background pointer-events-none" />
+
+        <div className="relative space-y-12 max-w-5xl w-full px-6 text-center z-10 animate-in fade-in zoom-in duration-700">
+          <div className="space-y-4">
+            <h1 className="text-6xl font-black tracking-tighter text-foreground">
+              Vision <span className="text-primary">Lab</span>
+            </h1>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Choose your path to visual excellence. Generate from raw imagination or audit and enhance your existing assets.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* PATH A: THE ORACLE */}
+            <div
+              onClick={() => setActiveMode('generate')}
+              className="group relative h-96 bg-gradient-to-br from-muted/50 to-muted/30 rounded-[2.5rem] border-2 border-border/50 hover:border-primary/40 p-8 flex flex-col items-center justify-center gap-6 cursor-pointer transition-all duration-500 hover:scale-[1.02] overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="w-24 h-24 rounded-3xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                <Wand2 className="h-10 w-10 text-primary group-hover:scale-110 transition-transform" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-2xl font-bold">The Oracle</h3>
+                <p className="text-muted-foreground text-sm max-w-[240px]">Create stunning visuals from scratch with AI expansion.</p>
+              </div>
+              <Button variant="outline" className="rounded-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all">
+                Enter Generator <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* PATH B: THE MASTER */}
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              className="group relative h-96 bg-gradient-to-br from-muted/50 to-muted/30 rounded-[2.5rem] border-2 border-border/50 hover:border-emerald-500/40 p-8 flex flex-col items-center justify-center gap-6 cursor-pointer transition-all duration-500 hover:scale-[1.02] overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="w-24 h-24 rounded-3xl bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/20 transition-colors">
+                <Camera className="h-10 w-10 text-emerald-500 group-hover:scale-110 transition-transform" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-2xl font-bold">The Master</h3>
+                <p className="text-muted-foreground text-sm max-w-[240px]">Audit aesthetics and enhance existing photos to master quality.</p>
+              </div>
+              <Button variant="outline" className="rounded-full group-hover:bg-emerald-600 group-hover:text-white group-hover:border-emerald-600 transition-all">
+                Upload Asset <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept="image/*"
+                onChange={handleImageUpload}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="flex-1 h-screen flex bg-background text-foreground overflow-hidden relative">
-      {/* Animated background */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-background to-background pointer-events-none" />
-
-      {/* LEFT PANEL - Input & Controls */}
-      <div className="w-full md:w-[480px] lg:w-[560px] border-r border-border/50 flex flex-col relative z-10 backdrop-blur-sm bg-background/50">
-        {/* Header */}
-        <div className="p-6 border-b border-border/50 bg-gradient-to-r from-background/80 to-background/60 backdrop-blur-md">
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="absolute inset-0 bg-primary/30 blur-xl rounded-xl animate-pulse" />
-              <div className="relative p-2.5 bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5 rounded-xl border border-primary/20">
-                <Wand2 className="h-5 w-5 text-primary" />
-              </div>
-            </div>
-            <div>
-              <h1 className="text-xl font-black bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">Vision Lab</h1>
-              <p className="text-xs text-muted-foreground font-medium">AI-Powered Image Generation</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Input Area */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          {/* Prompt Input */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-primary/10 rounded-lg">
-                <Palette className="h-3.5 w-3.5 text-primary" />
-              </div>
-              <label className="text-sm font-bold text-foreground">Your Vision</label>
-            </div>
-
-            <div className="relative group">
-              {/* Glow effect on focus */}
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/0 via-primary/20 to-primary/0 rounded-xl opacity-0 group-focus-within:opacity-100 blur transition-opacity duration-500" />
-
-              <Textarea
-                placeholder="Describe what you want to create... Be specific about style, mood, colors, and details."
-                className="relative min-h-[160px] resize-none bg-gradient-to-br from-muted/40 to-muted/20 border-2 border-border/50 focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 rounded-xl text-sm transition-all hover:border-primary/30"
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && prompt && !loading) {
-                    handleGenerate()
-                  }
-                }}
-              />
-              {prompt && (
-                <div className="absolute bottom-3 right-3 text-xs text-muted-foreground bg-background/90 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-border/50 shadow-sm">
-                  {prompt.length} chars
-                </div>
-              )}
-            </div>
-
-            <div className="flex items-center justify-between px-1">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Zap className="h-3 w-3 text-primary/60" />
-                <span>Press <kbd className="px-1.5 py-0.5 bg-muted/50 border border-border/50 rounded text-[10px] font-mono">Ctrl+Enter</kbd></span>
-              </div>
-              {prompt && (
-                <span className="text-xs text-primary/70 font-medium animate-pulse">Ready ✨</span>
-              )}
-            </div>
+    <div className="flex-1 h-screen flex bg-background text-foreground overflow-hidden">
+      {/* SIDEBAR PANEL (Only if not showResult) */}
+      {!showResult && (
+        <aside className="w-[440px] border-r border-border/50 flex flex-col bg-muted/20 backdrop-blur-md animate-in slide-in-from-left duration-500">
+          <div className="p-6 border-b border-border/50 flex items-center justify-between">
+            <Button variant="ghost" size="sm" onClick={resetAll} className="h-8 gap-2">
+              <ChevronLeft className="h-4 w-4" /> Back to Choice
+            </Button>
+            <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20">
+              {activeMode === 'generate' ? 'Oracle Mode' : 'Master Mode'}
+            </Badge>
           </div>
 
-          {/* Quick Prompts */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-primary/10 rounded-lg">
-                <Lightbulb className="h-3.5 w-3.5 text-primary" />
-              </div>
-              <label className="text-sm font-bold text-foreground">Quick Ideas</label>
-            </div>
-
-            <div className="space-y-2">
-              {quickPrompts.map((qp, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => useQuickPrompt(qp.text)}
-                  className="w-full text-left p-3 rounded-xl bg-gradient-to-br from-muted/40 to-muted/20 hover:from-primary/10 hover:to-primary/5 border border-border/40 hover:border-primary/50 transition-all duration-300 text-xs text-foreground/80 hover:text-primary group relative overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                  <div className="flex items-center gap-2.5 relative">
-                    <span className="text-base">{qp.emoji}</span>
-                    <span className="flex-1 line-clamp-1">{qp.text}</span>
-                    <ArrowRight className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+          <div className="flex-1 overflow-y-auto p-6 space-y-8">
+            {activeMode === 'generate' ? (
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 font-bold text-sm">
+                    <Palette className="h-4 w-4 text-primary" /> Describe Vision
                   </div>
-                </button>
-              ))}
-            </div>
+                  <Textarea
+                    placeholder="Enter keywords or a detailed description..."
+                    className="min-h-[200px] bg-background/50 border-2 border-border/50 focus-visible:border-primary/50 transition-all text-sm rounded-2xl"
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-3">
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider px-1">Quick Starters</p>
+                  <div className="grid grid-cols-1 gap-2">
+                    {quickPrompts.map((qp, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setPrompt(qp)}
+                        className="text-left px-4 py-3 rounded-xl bg-background/50 border border-border/40 hover:border-primary/30 hover:bg-primary/5 transition-all text-xs"
+                      >
+                        {qp}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-8">
+                <div className="p-4 bg-background/50 rounded-2xl border-2 border-border/50">
+                  <p className="text-xs font-bold text-muted-foreground mb-3 px-1 uppercase tracking-wider">Source Asset</p>
+                  <div className="relative aspect-square rounded-xl overflow-hidden shadow-sm">
+                    <img src={uploadedImageUrl || ""} className="w-full h-full object-cover" alt="Source" />
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="absolute bottom-2 right-2 h-8 w-8 rounded-full"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <RefreshCw className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <Button
+                    className="w-full h-14 rounded-2xl font-bold gap-2 text-lg"
+                    disabled={analyzingImage || !!imageAnalysis}
+                    onClick={handleAudit}
+                  >
+                    {analyzingImage ? <Loader2 className="h-5 w-5 animate-spin" /> : <Zap className="h-5 w-5" />}
+                    {imageAnalysis ? "Audit Complete" : "Launch Vision Audit"}
+                  </Button>
+
+                  {imageAnalysis && (
+                    <div className="space-y-4 animate-in fade-in slide-in-from-top duration-500">
+                      <div className="p-4 bg-emerald-500/5 rounded-2xl border border-emerald-500/20 text-emerald-600 text-xs font-medium flex gap-3">
+                        <CheckCircle2 className="h-4 w-4 shrink-0" />
+                        Aesthetics analyzed. Ready for Master Enhancement.
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase px-1">Bias Influence (Optional)</label>
+                        <Textarea
+                          placeholder="Guide the enhancement... (e.g. moody, bright, cinematic)"
+                          className="bg-background/50 border-border/50 text-xs rounded-xl h-20"
+                          value={prompt}
+                          onChange={(e) => setPrompt(e.target.value)}
+                        />
+                      </div>
+                      <Button
+                        className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black gap-2 text-lg shadow-lg shadow-emerald-500/20"
+                        onClick={handleEnhance}
+                        disabled={enhancing}
+                      >
+                        {enhancing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5 " />}
+                        Generate Master Asset
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* AI Refined Prompt (if result exists) */}
-          {result && (
-            <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-primary/30 shadow-lg shadow-primary/5 overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent opacity-50" />
-              <CardContent className="p-4 space-y-2 relative">
-                <div className="flex items-center gap-2 text-xs font-bold text-primary">
-                  <Stars className="h-3.5 w-3.5" />
-                  AI Enhanced Prompt
-                </div>
-                <p className="text-xs text-foreground/70 leading-relaxed">
-                  {result.refined_prompt}
-                </p>
-              </CardContent>
-            </Card>
+          {activeMode === 'generate' && (
+            <div className="p-6 border-t border-border/50">
+              <Button
+                onClick={handleGenerate}
+                disabled={loading || !prompt}
+                className="w-full h-14 rounded-2xl bg-primary text-primary-foreground font-black text-lg shadow-lg shadow-primary/20"
+              >
+                {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5 mr-2" />}
+                Ignite Vision
+              </Button>
+            </div>
           )}
-        </div>
+        </aside>
+      )}
 
-        {/* Generate Button */}
-        <div className="p-6 border-t border-border/50 bg-gradient-to-r from-background/80 to-background/60 backdrop-blur-md">
-          <Button
-            onClick={handleGenerate}
-            disabled={loading || !prompt}
-            className="w-full h-12 bg-gradient-to-r from-primary via-primary to-primary/90 hover:from-primary/90 hover:via-primary hover:to-primary text-primary-foreground font-bold rounded-xl shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-            {loading ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin relative z-10" />
-                <span className="relative z-10">Generating...</span>
-              </>
-            ) : (
-              <>
-                <Sparkles className="h-4 w-4 mr-2 group-hover:rotate-12 group-hover:scale-110 transition-transform relative z-10" />
-                <span className="relative z-10">Generate Image</span>
-              </>
-            )}
-          </Button>
-        </div>
-      </div>
-
-      {/* RIGHT PANEL - Preview */}
-      <div className="flex-1 flex flex-col relative z-10">
-        {/* Preview Header */}
-        <div className="p-6 border-b border-border/50 flex items-center justify-between bg-gradient-to-r from-background/60 to-background/80 backdrop-blur-md">
-          <div className="flex items-center gap-2">
-            <ImageIcon className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-semibold text-foreground">Preview</span>
-            {result && (
-              <Badge variant="outline" className="ml-2 gap-1 bg-primary/5 border-primary/20">
-                <Sparkles className="h-2.5 w-2.5" />
-                Generated
+      {/* MAIN VIEWPORT */}
+      <main className="flex-1 flex flex-col relative">
+        <header className="h-16 border-b border-border/50 flex items-center justify-between px-8 bg-background/60 backdrop-blur-md z-20">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 font-bold text-sm tracking-tight text-foreground/80">
+              <LayoutGrid className="h-4 w-4" />
+              Vision Studio
+            </div>
+            {showResult && (
+              <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 px-3 uppercase text-[10px] font-black">
+                Master Asset Ready
               </Badge>
             )}
           </div>
-          {result && (
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => window.open(result.image_url, '_blank')}
-                className="gap-2 hover:bg-primary/5 hover:border-primary/30 transition-colors"
-              >
-                <Maximize2 className="h-3 w-3" />
-                Full View
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleDownload}
-                className="gap-2 hover:bg-primary/5 hover:border-primary/30 transition-colors"
-              >
-                <Download className="h-3 w-3" />
-                Download
-              </Button>
-            </div>
-          )}
-        </div>
+          <div className="flex gap-2">
+            {showResult && (
+              <>
+                <Button variant="outline" size="sm" className="rounded-full gap-2 px-6" onClick={() => setShowResult(false)}>
+                  <RefreshCw className="h-3.5 w-3.5" /> Reconfigure
+                </Button>
+                <Button size="sm" className="rounded-full bg-primary text-primary-foreground gap-2 px-6" onClick={handleDownload}>
+                  <Download className="h-3.5 w-3.5" /> Export Master
+                </Button>
+              </>
+            )}
+          </div>
+        </header>
 
-        {/* Preview Area */}
-        <div className="flex-1 p-8 flex items-center justify-center bg-gradient-to-br from-muted/10 via-background to-muted/20">
-          {!result && !loading ? (
-            <div className="text-center space-y-6 max-w-md animate-in fade-in duration-700">
-              <div className="relative inline-block">
-                <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full animate-pulse" />
-                <div className="relative p-10 bg-gradient-to-br from-muted/40 to-muted/20 rounded-3xl border border-border/50">
-                  <ImageIcon className="h-24 w-24 text-muted-foreground/40" />
+        <div className="flex-1 overflow-y-auto bg-dot-pattern flex flex-col items-center justify-center p-8">
+          {!showResult ? (
+            <div className="w-full max-w-4xl space-y-8 flex flex-col items-center">
+              {(loading || enhancing) ? (
+                <div className="flex flex-col items-center gap-6 animate-pulse">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150" />
+                    <Loader2 className="h-16 w-16 text-primary animate-spin relative z-10" />
+                  </div>
+                  <div className="text-center space-y-2">
+                    <h2 className="text-2xl font-black text-foreground">{enhancing ? "Fining Aesthetic Details..." : "Architecting Vision..."}</h2>
+                    <p className="text-muted-foreground text-sm">Processing through professional neural networks...</p>
+                  </div>
                 </div>
-              </div>
-              <div className="space-y-3">
-                <h3 className="text-2xl font-black bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
-                  Ready to Create
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Enter your vision on the left and click Generate to bring it to life with AI
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-2 justify-center pt-2">
-                <Badge variant="outline" className="gap-1.5 bg-background/50 backdrop-blur-sm">
-                  <Zap className="h-3 w-3 text-primary" />
-                  High Quality
-                </Badge>
-                <Badge variant="outline" className="gap-1.5 bg-background/50 backdrop-blur-sm">
-                  <Sparkles className="h-3 w-3 text-primary" />
-                  AI Enhanced
-                </Badge>
-                <Badge variant="outline" className="gap-1.5 bg-background/50 backdrop-blur-sm">
-                  <Wand2 className="h-3 w-3 text-primary" />
-                  Instant
-                </Badge>
-              </div>
-            </div>
-          ) : loading ? (
-            <div className="text-center space-y-8 animate-in fade-in duration-500">
-              <div className="relative inline-block">
-                <div className="absolute inset-0 bg-primary/40 blur-3xl rounded-full animate-pulse" />
-                <div className="relative">
-                  <Loader2 className="h-20 w-20 text-primary animate-spin" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/30 to-primary/0 blur-xl animate-pulse" />
+              ) : (
+                <div className="w-full h-[600px] bg-muted/20 border-2 border-dashed border-border/50 rounded-[2.5rem] flex flex-col items-center justify-center gap-4 text-center">
+                  <div className="p-6 rounded-3xl bg-background/50 border border-border/50">
+                    <ImageIcon className="h-12 w-12 text-muted-foreground/30" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="font-bold text-muted-foreground">Ready for Input</p>
+                    <p className="text-xs text-muted-foreground/60">Please complete the configuration on the left</p>
+                  </div>
                 </div>
-              </div>
-              <div className="space-y-3">
-                <h3 className="text-2xl font-black bg-gradient-to-r from-primary via-purple-500 to-primary bg-clip-text text-transparent animate-pulse">
-                  Creating Your Vision
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  Our AI is painting your imagination into reality...
-                </p>
-                <div className="flex gap-1.5 justify-center pt-2">
-                  {[...Array(5)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="w-2 h-2 rounded-full bg-primary/60 animate-bounce"
-                      style={{ animationDelay: `${i * 0.1}s` }}
-                    />
-                  ))}
-                </div>
-              </div>
+              )}
             </div>
           ) : (
-            <div className="w-full h-full flex items-center justify-center p-4 animate-in fade-in zoom-in duration-700">
-              <div className="relative group max-w-full max-h-full">
-                <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-purple-500/20 to-primary/20 rounded-2xl opacity-0 group-hover:opacity-100 blur transition-opacity duration-500" />
-                <img
-                  src={result?.image_url}
-                  alt="Generated"
-                  className="relative max-w-full max-h-full rounded-2xl shadow-2xl object-contain border border-border/50"
-                />
+            <div className="w-full h-full flex flex-col items-center gap-12 max-w-7xl animate-in fade-in zoom-in duration-700">
+
+              {/* COMPARISON VIEW */}
+              <div className="w-full grid md:grid-cols-2 gap-8 items-start">
+                {/* BEFORE / SOURCE */}
+                {activeMode === 'enhance' ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between px-2">
+                      <span className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">Source Asset</span>
+                      <Badge variant="secondary" className="rounded-full">Raw</Badge>
+                    </div>
+                    <div className="relative group rounded-3xl overflow-hidden border-2 border-border/50 shadow-xl bg-background">
+                      <img
+                        src={uploadedImageUrl || ""}
+                        alt="Source"
+                        className="w-full object-contain max-h-[60vh]"
+                        style={imageAnalysis && !enhancedResult ? {
+                          filter: `brightness(${imageAnalysis.aesthetic_audit.brightness}) contrast(${imageAnalysis.aesthetic_audit.contrast}) saturate(${imageAnalysis.aesthetic_audit.saturation})`
+                        } : {}}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between px-2">
+                      <span className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">Aesthetic Analysis</span>
+                      <Badge variant="secondary" className="rounded-full">Logic</Badge>
+                    </div>
+                    <div className="p-8 rounded-3xl border-2 border-border/50 bg-muted/20 h-full flex flex-col justify-center gap-6">
+                      <div className="space-y-2">
+                        <p className="text-xs font-bold text-primary uppercase">Prompt Logic</p>
+                        <p className="text-sm italic text-muted-foreground leading-relaxed">"{result?.refined_prompt}"</p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="p-4 rounded-2xl bg-background border border-border/30">
+                          <p className="text-[10px] font-bold text-muted-foreground uppercase mb-1">DPI</p>
+                          <p className="text-xl font-black">300</p>
+                        </div>
+                        <div className="p-4 rounded-2xl bg-background border border-border/30">
+                          <p className="text-[10px] font-bold text-muted-foreground uppercase mb-1">Format</p>
+                          <p className="text-xl font-black">PNG</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* AFTER / MASTER */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between px-2">
+                    <span className="text-[10px] uppercase font-bold tracking-widest text-primary">Master Result</span>
+                    <Badge className="rounded-full bg-primary text-primary-foreground">Optimized</Badge>
+                  </div>
+                  <div className="relative group rounded-3xl overflow-hidden border-4 border-primary/20 shadow-2xl shadow-primary/10 bg-background transition-transform duration-500 hover:scale-[1.01]">
+                    <img
+                      src={enhancedResult?.enhanced_image_url || result?.image_url || ""}
+                      alt="Master Result"
+                      className="w-full object-contain max-h-[60vh]"
+                    />
+                    <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button size="icon" variant="secondary" className="h-10 w-10 rounded-full" onClick={handleDownload}>
+                        <Download className="h-5 w-5" />
+                      </Button>
+                      <Button size="icon" variant="secondary" className="h-10 w-10 rounded-full" onClick={() => window.open(enhancedResult?.enhanced_image_url || result?.image_url, '_blank')}>
+                        <Maximize2 className="h-5 w-5" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              {/* AUDIT DETAILS (Only if enhanced) */}
+              {imageAnalysis && (
+                <div className="w-full bg-muted/20 rounded-3xl p-8 border border-border/50">
+                  <div className="flex items-center gap-4 mb-8">
+                    <Settings2 className="h-6 w-6 text-primary" />
+                    <div>
+                      <h3 className="font-bold text-xl">Aesthetic Intelligence Report</h3>
+                      <p className="text-xs text-muted-foreground">Hardware-accelerated analysis results</p>
+                    </div>
+                  </div>
+                  <VisionAudit analysis={imageAnalysis} imageUrl={uploadedImageUrl || ""} />
+                </div>
+              )}
             </div>
           )}
         </div>
-      </div>
+      </main>
+      <input
+        type="file"
+        ref={fileInputRef}
+        className="hidden"
+        accept="image/*"
+        onChange={handleImageUpload}
+      />
     </div>
   )
 }

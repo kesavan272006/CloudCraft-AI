@@ -214,3 +214,26 @@ class CalendarResponse(BaseModel):
     posts: List[ScheduledPost]
     status: str = "success"
 
+# --- VISION LAB SCHEMAS ---
+class VisionAnalysisRequest(BaseModel):
+    image_base64: str
+    filename: Optional[str] = None
+
+class AestheticAudit(BaseModel):
+    brightness: float
+    contrast: float
+    saturation: float
+    temperature: str
+    clarity_score: int
+    pro_tip: str
+
+class VisionAnalysisResponse(BaseModel):
+    vibe_description: str
+    detected_context: str
+    suggested_tone: str
+    aesthetic_audit: AestheticAudit
+    status: str = "success"
+
+class VisionEnhancementRequest(BaseModel):
+    image_base64: str
+    audit_results: Dict[str, Any]

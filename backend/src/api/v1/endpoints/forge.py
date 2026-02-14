@@ -5,6 +5,7 @@ from src.models.schemas import ForgeResponse, TransmuteRequest, TransmuteRespons
 from src.services.brand_service import BrandService
 from src.agents.transmuter_agent import TransmuterAgent
 from src.utils.logger import get_logger
+from typing import List, Dict, Optional, Any
 import json
 import re
 
@@ -14,23 +15,21 @@ router = APIRouter()
 
 class ForgeRequest(BaseModel):
     prompt: str
+    image_context: Optional[Dict[str, Any]] = None
 
 from fastapi.concurrency import run_in_threadpool
 
 @router.post("/forge", response_model=ForgeResponse)
 async def forge_content(request: ForgeRequest):
     try:
-        # TEMPORARILY DISABLED BRAND CONTEXT TO DEBUG CONTENT RELEVANCE ISSUE
-        # brand_context = await run_in_threadpool(BrandService.get_brand_context)
-        # enriched_prompt = f"""
-        # {brand_context}
-        # 
-        # USER REQUEST:
-        # {request.prompt}
         # """
+        pass
 
-        # 3. Run the Forge Workflow (LangGraph) with RAW user prompt
-        result = await run_forge_workflow(request.prompt)
+        # 3. Run the Forge Workflow (LangGraph) with user prompt and optional image context
+        result = await run_forge_workflow(
+            user_prompt=request.prompt,
+            image_context=request.image_context
+        )
         
         return ForgeResponse(
             final_content=result["final_content"],
@@ -38,6 +37,7 @@ async def forge_content(request: ForgeRequest):
             status="success"
         )
     except Exception as e:
+        logger.error(f"Forge failed: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/transmute", response_model=TransmuteResponse)
