@@ -1,0 +1,12 @@
+.kiro/
+.env
+__pycache__/
+*.pyc
+node_modules/
+dist/
+.DS_Store
+*.md.bak
+venv/
+.venv/
+data/oracle_history.json
+data/brand_brain.json
