@@ -190,9 +190,25 @@ class ScheduledPost(BaseModel):
     content: str
     platform: str
     scheduled_time: str # ISO format string
-    status: str = "scheduled" # scheduled, posted, draft
+    status: str = "scheduled" # scheduled, auditing, dispatched, failed, draft
     performance_score: Optional[int] = None
     persona_name: Optional[str] = None
+    aws_mission_id: Optional[str] = None
+    webhook_url: Optional[str] = None
+    execution_logs: List[str] = []
+
+class MissionExecutionRequest(BaseModel):
+    content: str
+    platform: str
+    scheduled_at: str # ISO format
+    persona_name: Optional[str] = None
+    webhook_url: Optional[str] = "https://hook.us1.make.com/your-default-hook" # Placeholder
+
+class MissionExecutionResponse(BaseModel):
+    post_id: str
+    aws_mission_id: str
+    status: str
+    message: str
 
 class CalendarResponse(BaseModel):
     posts: List[ScheduledPost]

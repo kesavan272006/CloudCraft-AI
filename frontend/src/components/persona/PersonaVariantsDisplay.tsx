@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { PersonaVariant } from "@/types/persona"
 import { Copy, Check, Users, Briefcase, Baby, Globe, Rocket, CalendarDays } from "lucide-react"
 import { useState } from "react"
+import { ScheduleMissionDialog } from "./ScheduleMissionDialog"
 
 interface PersonaVariantsDisplayProps {
     variants: PersonaVariant[]
@@ -21,12 +22,31 @@ const PERSONA_ICONS: Record<string, any> = {
 
 
 export function PersonaVariantsDisplay({ variants, onSchedule }: PersonaVariantsDisplayProps) {
+    const [selectedForSchedule, setSelectedForSchedule] = useState<{ content: string, platform: string, personaName: string } | null>(null)
     const [copiedId, setCopiedId] = useState<string | null>(null)
 
     const handleCopy = (content: string, personaId: string) => {
         navigator.clipboard.writeText(content)
         setCopiedId(personaId)
         setTimeout(() => setCopiedId(null), 2000)
+    }
+
+    const handleExecuteMission = async (data: { scheduled_at: string, webhook_url: string }) => {
+        if (!selectedForSchedule) return
+
+        const response = await fetch("http://127.0.0.1:8000/api/v1/nexus/execute", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                content: selectedForSchedule.content,
+                platform: selectedForSchedule.platform,
+                persona_name: selectedForSchedule.personaName,
+                scheduled_at: data.scheduled_at,
+                webhook_url: data.webhook_url
+            })
+        })
+
+        if (!response.ok) throw new Error("Failed to execute mission")
     }
 
     return (
@@ -89,7 +109,11 @@ export function PersonaVariantsDisplay({ variants, onSchedule }: PersonaVariants
                                             variant="ghost"
                                             size="icon"
                                             className="h-8 w-8 rounded-md hover:bg-background hover:text-primary"
-                                            onClick={() => onSchedule(variant.content, variant.platform_suggestion, variant.persona_name)}
+                                            onClick={() => setSelectedForSchedule({
+                                                content: variant.content,
+                                                platform: variant.platform_suggestion,
+                                                personaName: variant.persona_name
+                                            })}
                                         >
                                             <CalendarDays className="h-3.5 w-3.5" />
                                         </Button>
@@ -107,6 +131,16 @@ export function PersonaVariantsDisplay({ variants, onSchedule }: PersonaVariants
                     )
                 })}
             </div>
+            {selectedForSchedule && (
+                <ScheduleMissionDialog
+                    isOpen={!!selectedForSchedule}
+                    onClose={() => setSelectedForSchedule(null)}
+                    content={selectedForSchedule.content}
+                    platform={selectedForSchedule.platform}
+                    personaName={selectedForSchedule.personaName}
+                    onExecute={handleExecuteMission}
+                />
+            )}
         </div>
     )
 }

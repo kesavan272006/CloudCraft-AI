@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import ReactMarkdown from 'react-markdown';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
+import { NexusMissionStatus } from "@/components/persona/NexusMissionStatus";
 import {
   Dialog,
   DialogContent,
@@ -45,7 +46,36 @@ export default function ForgePage() {
   const [transmuteResult, setTransmuteResult] = useState<any>(null);
 
   // Persona State
-  const [personas, setPersonas] = useState<PersonaInfo[]>([]);
+  const [personas, setPersonas] = useState<PersonaInfo[]>([
+    {
+      id: "gen_z",
+      name: "Gen-Z (18-24)",
+      description: "Young, digital-native, trend-conscious",
+      age_range: "18-24",
+      platforms: ["Instagram", "TikTok", "Snapchat"]
+    },
+    {
+      id: "professional",
+      name: "Working Professional (25-35)",
+      description: "Career-focused, value-driven, time-conscious",
+      age_range: "25-35",
+      platforms: ["LinkedIn", "Twitter"]
+    },
+    {
+      id: "parent",
+      name: "Parents (30-50)",
+      description: "Family-focused, health-conscious, practical",
+      age_range: "30-50",
+      platforms: ["Facebook", "WhatsApp"]
+    },
+    {
+      id: "entrepreneur",
+      name: "Entrepreneurs (25-40)",
+      description: "Visionary, growth-minded, innovation-focused",
+      age_range: "25-40",
+      platforms: ["Twitter", "LinkedIn"]
+    }
+  ]);
   const [selectedPersonas, setSelectedPersonas] = useState<string[]>([]);
   const [generatingPersonas, setGeneratingPersonas] = useState(false);
   const [personaResult, setPersonaResult] = useState<PersonaResponse | null>(null);
@@ -100,7 +130,7 @@ export default function ForgePage() {
     setActiveTool(null);
 
     try {
-      const response = await fetch('http://localhost:8000/api/v1/forge', {
+      const response = await fetch('http://127.0.0.1:8000/api/v1/forge', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -132,7 +162,7 @@ export default function ForgePage() {
         throw new Error("Content appears empty or too short.");
       }
 
-      const response = await fetch('http://localhost:8000/api/v1/performance/predict', {
+      const response = await fetch('http://127.0.0.1:8000/api/v1/performance/predict', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -180,7 +210,7 @@ export default function ForgePage() {
       const finalDate = new Date(scheduleDate);
       finalDate.setHours(hours, minutes, 0, 0);
 
-      const response = await fetch('http://localhost:8000/api/v1/calendar/schedule', {
+      const response = await fetch('http://127.0.0.1:8000/api/v1/calendar/schedule', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -213,7 +243,7 @@ export default function ForgePage() {
         throw new Error("Source content appears empty or too short.");
       }
 
-      const response = await fetch('http://localhost:8000/api/v1/transmute', {
+      const response = await fetch('http://127.0.0.1:8000/api/v1/transmute', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -244,7 +274,7 @@ export default function ForgePage() {
   useEffect(() => {
     const fetchPersonas = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/v1/persona/list');
+        const response = await fetch('http://127.0.0.1:8000/api/v1/persona/list');
         if (response.ok) {
           const data = await response.json();
           setPersonas(data);
@@ -621,6 +651,8 @@ export default function ForgePage() {
                         )}
                       </Button>
                     </div>
+                    {/* Nexus Missions Live Tracker */}
+                    <NexusMissionStatus />
                   </CardContent>
                 </Card>
               )}
