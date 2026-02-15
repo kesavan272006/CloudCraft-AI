@@ -3,7 +3,6 @@
 > **The Agentic Command Center for Content Intelligence**  
 > *Transforming digital storytelling from trial-and-error into a data-driven, high-impact autonomous workflow.*
 
-![CloudCraft AI Banner](./assets/banner.png)
 
 ---
 
