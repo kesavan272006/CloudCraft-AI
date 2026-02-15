@@ -432,7 +432,7 @@ MIT License — see [LICENSE](./LICENSE) for details.
 
 ## 🙏 Credits
 
-Built with ❤️ by the **CloudCraft AI Team**.
+Built with ❤️ by **Kesavan & team**.
 
 ### Special Thanks To
 - [React](https://react.dev) — UI framework
@@ -446,8 +446,8 @@ Built with ❤️ by the **CloudCraft AI Team**.
 
 ## 📞 Contact
 
-**Founder:** [Your Name]  
-**Email:** hello@cloudcraft-ai.com  
+**Founder:** [Kesavan G]  
+**Github:** https://github.com/kesavan272006  
 **Website:** https://cloudcraft-ai.com  
 **Location:** Bharat 🇮🇳
 
