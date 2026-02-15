@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import ReactFlow, {
     Background,
     Controls,
-    MiniMap,
     useNodesState,
     useEdgesState
 } from 'reactflow';
@@ -12,8 +11,7 @@ import axios from 'axios';
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import { Zap, Search, TrendingUp, Globe, Loader2, Building2, Palmtree, Laptop, Briefcase } from "lucide-react";
+import { Zap, Search, Globe, Loader2, Building2, Palmtree, Laptop, Briefcase } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuTrigger,
@@ -74,7 +72,7 @@ export const GenesisCanvas = ({ initialInput, autoStart }: GenesisCanvasProps) =
             return res.data as any;
         },
         enabled: !!processId,
-        refetchInterval: (data) => data?.status === 'complete' ? false : 2000 // Poll every 2s until complete
+        refetchInterval: (query) => query.data?.status === 'complete' ? false : 2000 // Poll every 2s until complete
     });
 
     // Sync Graph Data to React Flow
@@ -83,7 +81,7 @@ export const GenesisCanvas = ({ initialInput, autoStart }: GenesisCanvasProps) =
             // Basic diffing to avoid re-renders impacting drag - simplified for MVP
             // In prod, use deeper diff or custom hooks provided by ReactFlow
             // For now, we just overwrite nodes if count changes or status changes
-            setNodes((nds) => {
+            setNodes(() => {
                 const newNodes = graphData.nodes.map((n: any) => ({
                     ...n,
                     type: n.type === 'root' ? 'source' : (n.type === 'strategy' ? 'strategy' : 'asset')

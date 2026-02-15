@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge'
-import { Rocket, Send, Clock, AlertCircle } from 'lucide-react'
+import { Rocket, Send, Clock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export function ActivityFeed({ activities }: { activities: any[] }) {

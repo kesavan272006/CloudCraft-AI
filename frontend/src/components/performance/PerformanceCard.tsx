@@ -108,21 +108,21 @@ export function PerformanceCard({ prediction, platform = "General", persona = "G
                                 <span>Platform Fit ({platform})</span>
                                 <span className="font-bold">{prediction.platform_fit}%</span>
                             </div>
-                            <Progress value={prediction.platform_fit} className="h-2" indicatorColor={getProgressColor(prediction.platform_fit)} />
+                            <Progress value={prediction.platform_fit} className="h-2" />
                         </div>
                         <div className="space-y-1">
                             <div className="flex justify-between text-sm">
                                 <span>Audience Alignment ({persona})</span>
                                 <span className="font-bold">{prediction.audience_alignment}%</span>
                             </div>
-                            <Progress value={prediction.audience_alignment} className="h-2" indicatorColor={getProgressColor(prediction.audience_alignment)} />
+                            <Progress value={prediction.audience_alignment} className="h-2" />
                         </div>
                         <div className="space-y-1">
                             <div className="flex justify-between text-sm">
                                 <span>Virality Potential</span>
                                 <span className="font-bold">{prediction.virality_score}%</span>
                             </div>
-                            <Progress value={prediction.virality_score} className="h-2" indicatorColor={getProgressColor(prediction.virality_score)} />
+                            <Progress value={prediction.virality_score} className="h-2" />
                         </div>
                     </CardContent>
                 </Card>
