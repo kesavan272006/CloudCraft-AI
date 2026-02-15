@@ -1,23 +1,22 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyACZaG1JLdj0KdOpwZr0cE5JSCgfct1wNA",
-  authDomain: "cloudcraft-ai.firebaseapp.com",
-  projectId: "cloudcraft-ai",
-  storageBucket: "cloudcraft-ai.firebasestorage.app",
-  messagingSenderId: "477903949581",
-  appId: "1:477903949581:web:ab969b016a4c01f498ea44",
-  measurementId: "G-R069L7GRL1"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app)
-getAnalytics(app);
+export const auth = getAuth(app);
+
+// Analytics only runs in the browser
+if (typeof window !== "undefined") {
+  getAnalytics(app);
+}
