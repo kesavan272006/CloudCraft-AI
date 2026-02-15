@@ -9,13 +9,9 @@ import {
   Radar,
   Search,
   TrendingUp,
-  Clock,
-  Lightbulb,
   ShieldCheck,
   Loader2,
-  Instagram,
   Zap,
-  Check,
   Copy
 } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -26,13 +22,10 @@ export default function CompetitorPulsePage() {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
-  const [copied, setCopied] = useState(false)
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text)
-    setCopied(true)
     toast.success("Strategy copied!")
-    setTimeout(() => setCopied(false), 2000)
   }
 
   const handleSearch = async () => {

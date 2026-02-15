@@ -1,11 +1,11 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
 import {
-  BarChart3, Loader2, TrendingUp,
+  Loader2, TrendingUp,
   Target, PieChart as PieIcon, BarChart as BarIcon,
   MessageSquareQuote, ChevronLeft, History, Clock, Share2,
   ArrowUpRight, Gauge, Activity, ShieldCheck, Zap

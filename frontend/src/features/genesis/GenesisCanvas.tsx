@@ -120,7 +120,7 @@ export const GenesisCanvas = ({ initialInput, autoStart }: GenesisCanvasProps) =
         }
     };
 
-    const handleTrendJack = async () => {
+    const _handleTrendJack = async () => {
         if (!processId) return;
         setIsTrending(true);
         try {

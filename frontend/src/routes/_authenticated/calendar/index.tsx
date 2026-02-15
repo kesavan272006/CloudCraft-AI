@@ -181,7 +181,7 @@ function CampaignCalendarPage() {
     const rows: any[] = []
     let days: any[] = []
 
-    calendarDays.forEach((day, i) => {
+    calendarDays.forEach((day, _i) => {
       const dayPosts = posts.filter(post => isSameDay(parseISO(post.scheduled_time), day))
 
       days.push(
