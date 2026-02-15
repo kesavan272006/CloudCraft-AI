@@ -4,7 +4,7 @@ FROM python:3.11-slim
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy your requirements.txt first to use Docker caching
+# Copy your requirements.txt first to use Docker caches
 COPY requirements.txt .
 
 # Install your project dependencies
