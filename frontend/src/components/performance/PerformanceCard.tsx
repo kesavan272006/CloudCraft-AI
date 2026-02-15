@@ -1,9 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
 import { PerformancePrediction } from "@/types/performance"
-import { TrendingUp, Users, Smartphone, Zap, ThumbsUp, MessageCircle, Share2, Eye, Calendar, Award, AlertTriangle, CheckCircle2 } from "lucide-react"
+import { TrendingUp, Smartphone, Zap, ThumbsUp, MessageCircle, Share2, Eye, Calendar, Award, AlertTriangle, CheckCircle2 } from "lucide-react"
 
 interface PerformanceCardProps {
     prediction: PerformancePrediction
@@ -101,7 +100,7 @@ export function PerformanceCard({ prediction, platform = "General", persona = "G
                                 <span>Engagement Potential</span>
                                 <span className="font-bold">{prediction.engagement_potential}%</span>
                             </div>
-                            <Progress value={prediction.engagement_potential} className="h-2" indicatorColor={getProgressColor(prediction.engagement_potential)} />
+                            <Progress value={prediction.engagement_potential} className="h-2" />
                         </div>
                         <div className="space-y-1">
                             <div className="flex justify-between text-sm">

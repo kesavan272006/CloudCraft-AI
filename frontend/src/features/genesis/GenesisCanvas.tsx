@@ -72,7 +72,9 @@ export const GenesisCanvas = ({ initialInput, autoStart }: GenesisCanvasProps) =
             return res.data as any;
         },
         enabled: !!processId,
-        refetchInterval: (query) => query.data?.status === 'complete' ? false : 2000 // Poll every 2s until complete
+        refetchInterval: (query) => {
+            return query.state.data?.status === 'complete' ? false : 2000; // Poll every 2s until complete
+        }
     });
 
     // Sync Graph Data to React Flow
@@ -115,23 +117,6 @@ export const GenesisCanvas = ({ initialInput, autoStart }: GenesisCanvasProps) =
             toast.error(`Failed to start Genesis: ${e.response?.data?.detail || e.message}`);
         } finally {
             setIsStarting(false);
-        }
-    };
-
-    const _handleTrendJack = async () => {
-        if (!processId) return;
-        setIsTrending(true);
-        try {
-            await axios.post(`${API_URL}/trend-jack`, {
-                process_id: processId,
-                trend: "Barbie Movie Styling (Pink, Plastic, Fantastic)"
-            });
-            toast.info("Injecting Global Trend...");
-            refetch(); // Force immediate update check
-        } catch (e) {
-            toast.error("Trend Jack failed");
-        } finally {
-            setIsTrending(false);
         }
     };
 
