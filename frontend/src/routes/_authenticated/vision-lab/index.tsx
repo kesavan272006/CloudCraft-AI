@@ -22,7 +22,6 @@ import {
 } from "lucide-react"
 import { VisionAudit } from "@/components/persona/VisionAudit"
 import { toast } from "sonner"
-import { cn } from "@/lib/utils"
 
 type VisionMode = 'generate' | 'enhance' | 'idle'
 

@@ -1,9 +1,8 @@
 import { create } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
 
 interface AudienceSegment {
-    segment_name: str
-    pain_point: str
+    segment_name: string
+    pain_point: string
 }
 
 interface CampaignStrategy {
@@ -45,7 +44,7 @@ const API_BASE = 'http://localhost:8000/api/v1/campaigns'
 export const useCampaignStore = create<CampaignState>()(
     // Persist active campaign selection locally if needed, but strict API sync is better for lists
     // We'll skip persist for now to rely on fresh API data
-    (set, get) => ({
+    (set) => ({
         campaigns: [],
         activeCampaign: null,
         isFetching: false,

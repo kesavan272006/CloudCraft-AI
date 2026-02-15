@@ -1,37 +1,107 @@
+# ============================================================================
+# CloudCraft AI Backend - Complete Python Dependencies
+# ============================================================================
+# Version: 1.0.0
+# Last Updated: February 2026
+# All dependencies extracted from actual codebase imports
+# ============================================================================
+
+# ─────────────────────────────────────────────────────────────────────────
 # CORE WEB FRAMEWORK
-fastapi>=0.104.0
-uvicorn[standard]>=0.24.0
-python-multipart>=0.0.6
+# ─────────────────────────────────────────────────────────────────────────
+fastapi>=0.104.0                    # FastAPI web framework
+uvicorn[standard]>=0.24.0           # ASGI server with performance extras
+python-multipart>=0.0.6             # Multipart form data parsing
 
-# CONFIGURATION
-python-dotenv>=1.0.0
-pydantic>=2.0.0
-pydantic-settings>=2.0.0
+# ─────────────────────────────────────────────────────────────────────────
+# CONFIGURATION & ENVIRONMENT
+# ─────────────────────────────────────────────────────────────────────────
+python-dotenv>=1.0.0                # Environment variable loading
+pydantic>=2.0.0                     # Data validation
+pydantic-settings>=2.0.0            # Settings management
+pydantic-core>=2.0.0                # Pydantic core validation
 
-# AI/ML FRAMEWORKS (Essential for The Forge & Video Studio)
-langchain>=0.1.0
-langchain-core>=0.1.0
-langchain-community>=0.1.0
-langchain-openai>=0.1.0
-langchain-google-genai>=0.0.1
-langchain-aws>=0.1.0
+# ─────────────────────────────────────────────────────────────────────────
+# LANGCHAIN CORE & INTEGRATIONS
+# ─────────────────────────────────────────────────────────────────────────
+langchain>=0.1.0                    # LLM application framework
+langchain-core>=0.1.0               # Core abstractions
+langchain-community>=0.1.0          # Community tools
 
-# AWS (For your Bedrock & S3 storage)
-boto3>=1.28.0
-botocore>=1.31.0
+# LLM Provider Integrations
+langchain-openai>=0.1.0             # OpenAI/OpenRouter integration
+langchain-google-genai>=0.0.1       # Google Gemini integration
+langchain-aws>=0.1.0                # AWS Bedrock integration
+langchain-huggingface>=0.0.1        # HuggingFace models integration
 
-# VECTOR DB (For context-aware generation)
-chromadb>=0.4.0
-sentence-transformers>=2.2.0
+# ─────────────────────────────────────────────────────────────────────────
+# LANGGRAPH (Multi-Agent Orchestration)
+# ─────────────────────────────────────────────────────────────────────────
+langgraph>=0.0.20                   # Agent workflow graphs (CRITICAL for Supervisor)
+langgraph-checkpoint>=0.0.1         # Checkpoint/memory for agent state
 
-# PROCESSING & UTILS
-pillow>=10.0.0
-requests>=2.31.0
-httpx>=0.25.0
-PyJWT>=2.8.0
-aiofiles>=23.0.0
-jinja2>=3.1.0
+# ─────────────────────────────────────────────────────────────────────────
+# AWS SERVICES
+# ─────────────────────────────────────────────────────────────────────────
+boto3>=1.28.0                       # AWS SDK for Python
+botocore>=1.31.0                    # Low-level AWS interface
 
-# LOGGING
-python-json-logger>=2.0.0
-langchain-huggingface
+# ─────────────────────────────────────────────────────────────────────────
+# VECTOR DATABASE & EMBEDDINGS
+# ─────────────────────────────────────────────────────────────────────────
+chromadb>=0.4.0                     # Vector database for RAG
+sentence-transformers>=2.2.0        # Sentence embeddings
+
+# ─────────────────────────────────────────────────────────────────────────
+# HUGGING FACE
+# ─────────────────────────────────────────────────────────────────────────
+huggingface-hub>=0.19.0             # HuggingFace model hub client (CRITICAL)
+
+# ─────────────────────────────────────────────────────────────────────────
+# SEARCH & RESEARCH TOOLS
+# ─────────────────────────────────────────────────────────────────────────
+tavily-python>=0.3.0                # Tavily search API (CRITICAL for ResearcherAgent)
+
+# ─────────────────────────────────────────────────────────────────────────
+# HTTP & ASYNC CLIENTS
+# ─────────────────────────────────────────────────────────────────────────
+requests>=2.31.0                    # HTTP requests
+httpx>=0.25.0                       # Modern async HTTP client
+
+# ─────────────────────────────────────────────────────────────────────────
+# FILE & DOCUMENT PROCESSING
+# ─────────────────────────────────────────────────────────────────────────
+pypdf>=3.17.0                       # PDF reading (if needed)
+pillow>=10.0.0                      # Image processing
+pillow-simd>=9.0.0                  # SIMD-optimized Pillow (optional performance)
+
+# ─────────────────────────────────────────────────────────────────────────
+# UTILITIES
+# ─────────────────────────────────────────────────────────────────────────
+PyJWT>=2.8.0                        # JWT token handling
+aiofiles>=23.0.0                    # Async file I/O
+jinja2>=3.1.0                       # Template engine for prompts
+python-slugify>=8.0.0               # URL-safe string conversion
+
+# ─────────────────────────────────────────────────────────────────────────
+# LOGGING & MONITORING
+# ─────────────────────────────────────────────────────────────────────────
+python-json-logger>=2.0.0           # JSON logging formatter
+
+# ─────────────────────────────────────────────────────────────────────────
+# TYPE CHECKING
+# ─────────────────────────────────────────────────────────────────────────
+typing-extensions>=4.8.0            # Backports for newer typing features
+
+# ─────────────────────────────────────────────────────────────────────────
+# OPTIONAL DEVELOPMENT DEPENDENCIES
+# ─────────────────────────────────────────────────────────────────────────
+# Uncomment for local development:
+# pytest>=7.4.0                     # Testing framework
+# pytest-asyncio>=0.21.0            # Async test support
+# pytest-cov>=4.1.0                 # Coverage reporting
+# black>=23.0.0                     # Code formatter
+# flake8>=6.1.0                     # Linter
+# mypy>=1.7.0                       # Type checker
+# isort>=5.12.0                     # Import sorter
+# pylint>=3.0.0                     # Advanced linter

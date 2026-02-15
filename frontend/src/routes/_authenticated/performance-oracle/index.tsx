@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
 import {
-  BarChart3, Sparkles, Loader2, TrendingUp, BrainCircuit,
-  Target, AlertCircle, PieChart as PieIcon, BarChart as BarIcon,
+  BarChart3, Loader2, TrendingUp,
+  Target, PieChart as PieIcon, BarChart as BarIcon,
   MessageSquareQuote, ChevronLeft, History, Clock, Share2,
   ArrowUpRight, Gauge, Activity, ShieldCheck, Zap
 } from "lucide-react"
@@ -27,7 +27,7 @@ type OracleState = 'idle' | 'scanning' | 'results'
 export default function PerformanceOraclePage() {
   const [activeState, setActiveState] = useState<OracleState>('idle')
   const [content, setContent] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [_loading, setLoading] = useState(false)
   const [result, setResult] = useState<any>(null)
   const [history, setHistory] = useState<any[]>([])
   const [historyLoading, setHistoryLoading] = useState(false)
@@ -346,7 +346,7 @@ export default function PerformanceOraclePage() {
                     label={({ name, value }) => `${name} ${value}%`}
                     stroke="none"
                   >
-                    {result.sentiment.map((entry: any, index: number) => (
+                    {result.sentiment.map((_entry: any, index: number) => (
                       <Cell key={`cell-${index}`} fill={VIBRANT_COLORS[index % VIBRANT_COLORS.length]} />
                     ))}
                   </Pie>
@@ -368,10 +368,10 @@ export default function PerformanceOraclePage() {
                   <XAxis type="number" hide />
                   <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 12, fontWeight: 'black' }} width={80} />
                   <Bar dataKey="value" radius={[0, 8, 8, 0]} barSize={32}>
-                    {result.platform_reach.map((entry: any, index: number) => (
+                    {result.platform_reach.map((_entry: any, index: number) => (
                       <Cell key={`cell-${index}`} fill={VIBRANT_COLORS[index % VIBRANT_COLORS.length]} strokeOpacity={0.2} stroke={VIBRANT_COLORS[index % VIBRANT_COLORS.length]} />
                     ))}
-                    <LabelList dataKey="value" position="right" formatter={(v: number) => `${v}%`} style={{ fontSize: '12px', fontWeight: 'black', fill: '#444' }} />
+                    <LabelList dataKey="value" position="right" formatter={(v: any) => `${v}%`} style={{ fontSize: '12px', fontWeight: 'black', fill: '#444' }} />
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
