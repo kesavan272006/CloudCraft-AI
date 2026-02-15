@@ -42,7 +42,6 @@ export const GenesisCanvas = ({ initialInput, autoStart }: GenesisCanvasProps) =
     const { brandName, brandDescription, brandVoice, targetAudience } = useBrandStore();
     const [inputSource, setInputSource] = useState(initialInput || "");
     const [processId, setProcessId] = useState<string | null>(null);
-    const [isTrending, setIsTrending] = useState(false);
     const [isStarting, setIsStarting] = useState(false);
 
     // Auto-start effect
@@ -93,11 +92,11 @@ export const GenesisCanvas = ({ initialInput, autoStart }: GenesisCanvasProps) =
 
             setEdges(graphData.edges);
 
-            if (graphData.status === 'complete' && !isTrending) {
+            if (graphData.status === 'complete') {
                 toast.success("Campaign Generation Complete!");
             }
         }
-    }, [graphData, setNodes, setEdges, isTrending]);
+    }, [graphData, setNodes, setEdges]);
 
     const handleStart = async () => {
         if (!inputSource || isStarting) return;
