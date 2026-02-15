@@ -1,22 +1,36 @@
-fastapi
-uvicorn
-python-dotenv
-pydantic-settings
-langchain
-langchain-community
-langchain-groq
-langchain-google-genai
-langchain-aws
-boto3
-chromadb
-sentence-transformers
-pypdf
-pillow
-python-multipart
-langchain-huggingface
-langchain-openai
-tavily-python
-requests
-httpx
-jinja2
-python-slugify
+# CORE WEB FRAMEWORK
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+python-multipart>=0.0.6
+
+# CONFIGURATION
+python-dotenv>=1.0.0
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+
+# AI/ML FRAMEWORKS (Essential for The Forge & Video Studio)
+langchain>=0.1.0
+langchain-core>=0.1.0
+langchain-community>=0.1.0
+langchain-openai>=0.1.0
+langchain-google-genai>=0.0.1
+langchain-aws>=0.1.0
+
+# AWS (For your Bedrock & S3 storage)
+boto3>=1.28.0
+botocore>=1.31.0
+
+# VECTOR DB (For context-aware generation)
+chromadb>=0.4.0
+sentence-transformers>=2.2.0
+
+# PROCESSING & UTILS
+pillow>=10.0.0
+requests>=2.31.0
+httpx>=0.25.0
+PyJWT>=2.8.0
+aiofiles>=23.0.0
+jinja2>=3.1.0
+
+# LOGGING
+python-json-logger>=2.0.0
