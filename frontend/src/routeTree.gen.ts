@@ -27,6 +27,7 @@ import { Route as ClerkAuthenticatedRouteRouteImport } from './routes/clerk/_aut
 import { Route as ClerkauthRouteRouteImport } from './routes/clerk/(auth)/route'
 import { Route as AuthenticatedSettingsRouteRouteImport } from './routes/_authenticated/settings/route'
 import { Route as AuthenticatedVisionLabIndexRouteImport } from './routes/_authenticated/vision-lab/index'
+import { Route as AuthenticatedVideoIndexRouteImport } from './routes/_authenticated/video/index'
 import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authenticated/users/index'
 import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authenticated/tasks/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
@@ -139,6 +140,11 @@ const AuthenticatedVisionLabIndexRoute =
     path: '/vision-lab/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedVideoIndexRoute = AuthenticatedVideoIndexRouteImport.update({
+  id: '/video/',
+  path: '/video/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedUsersIndexRoute = AuthenticatedUsersIndexRouteImport.update({
   id: '/users/',
   path: '/users/',
@@ -302,6 +308,7 @@ export interface FileRoutesByFullPath {
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
+  '/video': typeof AuthenticatedVideoIndexRoute
   '/vision-lab': typeof AuthenticatedVisionLabIndexRoute
 }
 export interface FileRoutesByTo {
@@ -340,6 +347,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
+  '/video': typeof AuthenticatedVideoIndexRoute
   '/vision-lab': typeof AuthenticatedVisionLabIndexRoute
 }
 export interface FileRoutesById {
@@ -383,6 +391,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
+  '/_authenticated/video/': typeof AuthenticatedVideoIndexRoute
   '/_authenticated/vision-lab/': typeof AuthenticatedVisionLabIndexRoute
 }
 export interface FileRouteTypes {
@@ -424,6 +433,7 @@ export interface FileRouteTypes {
     | '/settings/'
     | '/tasks'
     | '/users'
+    | '/video'
     | '/vision-lab'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -462,6 +472,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/tasks'
     | '/users'
+    | '/video'
     | '/vision-lab'
   id:
     | '__root__'
@@ -504,6 +515,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/'
     | '/_authenticated/tasks/'
     | '/_authenticated/users/'
+    | '/_authenticated/video/'
     | '/_authenticated/vision-lab/'
   fileRoutesById: FileRoutesById
 }
@@ -649,6 +661,13 @@ declare module '@tanstack/react-router' {
       path: '/vision-lab'
       fullPath: '/vision-lab'
       preLoaderRoute: typeof AuthenticatedVisionLabIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/video/': {
+      id: '/_authenticated/video/'
+      path: '/video'
+      fullPath: '/video'
+      preLoaderRoute: typeof AuthenticatedVideoIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/users/': {
@@ -848,6 +867,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPerformanceOracleIndexRoute: typeof AuthenticatedPerformanceOracleIndexRoute
   AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
+  AuthenticatedVideoIndexRoute: typeof AuthenticatedVideoIndexRoute
   AuthenticatedVisionLabIndexRoute: typeof AuthenticatedVisionLabIndexRoute
 }
 
@@ -871,6 +891,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedPerformanceOracleIndexRoute,
   AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
+  AuthenticatedVideoIndexRoute: AuthenticatedVideoIndexRoute,
   AuthenticatedVisionLabIndexRoute: AuthenticatedVisionLabIndexRoute,
 }
 

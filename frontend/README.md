@@ -1,119 +1,146 @@
-# Shadcn Admin Dashboard
+# CloudCraft AI — Frontend
 
-Admin Dashboard UI crafted with Shadcn and Vite. Built with responsiveness and accessibility in mind.
+The agentic command center UI for content intelligence. Built with **React, TypeScript, Vite, and Shadcn/UI**.
 
-![alt text](public/images/shadcn-admin.png)
+---
 
-[![Sponsored by Clerk](https://img.shields.io/badge/Sponsored%20by-Clerk-5b6ee1?logo=clerk)](https://go.clerk.com/GttUAaK)
+## 🎯 Quick Start
 
-I've been creating dashboard UIs at work and for my personal projects. I always wanted to make a reusable collection of dashboard UI for future projects; and here it is now. While I've created a few custom components, some of the code is directly adapted from ShadcnUI examples.
+### Prerequisites
+- Node.js 18+
+- pnpm (recommended)
 
-> This is not a starter project (template) though. I'll probably make one in the future.
-
-## Features
-
-- Light/dark mode
-- Responsive
-- Accessible
-- With built-in Sidebar component
-- Global search command
-- 10+ pages
-- Extra custom components
-- RTL support
-
-<details>
-<summary>Customized Components (click to expand)</summary>
-
-This project uses Shadcn UI components, but some have been slightly modified for better RTL (Right-to-Left) support and other improvements. These customized components differ from the original Shadcn UI versions.
-
-If you want to update components using the Shadcn CLI (e.g., `npx shadcn@latest add <component>`), it's generally safe for non-customized components. For the listed customized ones, you may need to manually merge changes to preserve the project's modifications and avoid overwriting RTL support or other updates.
-
-> If you don't require RTL support, you can safely update the 'RTL Updated Components' via the Shadcn CLI, as these changes are primarily for RTL compatibility. The 'Modified Components' may have other customizations to consider.
-
-### Modified Components
-
-- scroll-area
-- sonner
-- separator
-
-### RTL Updated Components
-
-- alert-dialog
-- calendar
-- command
-- dialog
-- dropdown-menu
-- select
-- table
-- sheet
-- sidebar
-- switch
-
-**Notes:**
-
-- **Modified Components**: These have general updates, potentially including RTL adjustments.
-- **RTL Updated Components**: These have specific changes for RTL language support (e.g., layout, positioning).
-- For implementation details, check the source files in `src/components/ui/`.
-- All other Shadcn UI components in the project are standard and can be safely updated via the CLI.
-
-</details>
-
-## Tech Stack
-
-**UI:** [ShadcnUI](https://ui.shadcn.com) (TailwindCSS + RadixUI)
-
-**Build Tool:** [Vite](https://vitejs.dev/)
-
-**Routing:** [TanStack Router](https://tanstack.com/router/latest)
-
-**Type Checking:** [TypeScript](https://www.typescriptlang.org/)
-
-**Linting/Formatting:** [ESLint](https://eslint.org/) & [Prettier](https://prettier.io/)
-
-**Icons:** [Lucide Icons](https://lucide.dev/icons/), [Tabler Icons](https://tabler.io/icons) (Brand icons only)
-
-**Auth (partial):** [Clerk](https://go.clerk.com/GttUAaK)
-
-## Run Locally
-
-Clone the project
+### Installation
 
 ```bash
-  git clone https://github.com/satnaing/shadcn-admin.git
+# Install dependencies
+pnpm install
+
+# Start development server
+pnpm run dev
 ```
 
-Go to the project directory
+The application will be available at `http://localhost:5173`
 
+---
+
+## 🛠️ Tech Stack
+
+- **React 19** — UI framework
+- **TypeScript** — Type safety
+- **Vite** — Build tool
+- **TanStack Router** — Modern routing
+- **Tailwind CSS** — Styling
+- **Shadcn/UI** — Component library
+- **Clerk** — Authentication
+- **React Query** — Data fetching
+- **Zustand** — State management
+- **React Hook Form** — Form handling
+- **Zod** — Validation
+
+---
+
+## 📁 Project Structure
+
+```
+src/
+├── components/          # Reusable UI components
+│   ├── ui/             # Shadcn/UI components
+│   ├── layout/         # Layout components (Sidebar, Header, Footer)
+│   ├── data-table/     # Data table components
+│   ├── performance/    # Performance-related components
+│   └── persona/        # Persona-related components
+├── features/           # Feature modules
+│   ├── auth/           # Authentication screens
+│   ├── settings/       # Settings module
+│   ├── dashboard/      # Dashboard features
+│   └── ...
+├── routes/             # TanStack Router routes
+├── hooks/              # Custom React hooks
+├── stores/             # Zustand stores
+├── context/            # React context providers
+├── lib/                # Utility functions & helpers
+├── types/              # TypeScript type definitions
+├── styles/             # Global CSS
+├── assets/             # Images, logos, icons
+├── config/             # Configuration files
+└── main.tsx            # Entry point
+```
+
+---
+
+## 🚀 Available Commands
+
+| Command | Purpose |
+|---------|---------|
+| `pnpm run dev` | Start development server with hot reload |
+| `pnpm build` | Build for production |
+| `pnpm preview` | Preview production build |
+| `pnpm lint` | Run ESLint |
+| `pnpm format:check` | Check code formatting |
+| `pnpm format` | Auto-format code with Prettier |
+| `pnpm knip` | Find unused files/imports |
+
+---
+
+## 🔐 Authentication
+
+CloudCraft AI uses **Clerk** for authentication. Configuration:
+- Set `VITE_CLERK_PUBLISHABLE_KEY` in `.env.local`
+- OAuth flows (Google, GitHub, etc.)
+- MFA support
+- User profile management
+
+---
+
+## 🎨 Component Customization
+
+Many Shadcn UI components have been customized for RTL support and specific workflows:
+
+**Modified Components:**
+- `scroll-area` — Optimized for data tables
+- `sonner` — Toast notifications
+- `separator` — Visual hierarchy
+
+**RTL Updated Components:**
+- `alert-dialog`, `calendar`, `command`, `dialog`, `dropdown-menu`, `select`, `table`, `sheet`, `sidebar`, `switch`
+
+---
+
+## 📦 Deployment
+
+### Netlify
 ```bash
-  cd shadcn-admin
+pnpm build
 ```
+Deploy the `dist/` folder to Netlify.
 
-Install dependencies
+### Vercel
+Connect your GitHub repository to Vercel for automatic deployments.
 
+### Run Locally
 ```bash
-  pnpm install
+pnpm preview
 ```
 
-Start the server
+---
 
-```bash
-  pnpm run dev
+## 🔗 API Integration
+
+The frontend connects to the backend FastAPI server. Ensure environment variables are configured:
+```
+VITE_API_BASE_URL=http://localhost:8000
+VITE_CLERK_PUBLISHABLE_KEY=your_clerk_key
 ```
 
-## Sponsoring this project ❤️
+---
 
-If you find this project helpful or use this in your own work, consider [sponsoring me](https://github.com/sponsors/satnaing) to support development and maintenance. You can [buy me a coffee](https://buymeacoffee.com/satnaing) as well. Don’t worry, every penny helps. Thank you! 🙏
+## 📝 License
 
-For questions or sponsorship inquiries, feel free to reach out at [satnaingdev@gmail.com](mailto:satnaingdev@gmail.com).
+MIT License
 
-### Current Sponsor
+---
 
-- [Clerk](https://go.clerk.com/GttUAaK) - authentication and user management for the modern web
+**Built with ❤️ for content creators.**
 
-## Author
 
-Crafted with 🤍 by [@satnaing](https://github.com/satnaing)
-
-## License
-
-Licensed under the [MIT License](https://choosealicense.com/licenses/mit/)

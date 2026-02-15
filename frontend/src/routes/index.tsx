@@ -33,7 +33,7 @@ function IndexSwitcher() {
 function LandingPageUI() {
   return (
     <div className='min-h-screen bg-background text-foreground'>
-      {/* Navbar aligned with Shadcn Header styles */}
+      {/* Navbar aligned with CloudCraft UI styles */}
       <header className='sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
         <div className='container mx-auto flex h-16 items-center justify-between px-4'>
           <div className='flex items-center gap-2'>
@@ -75,7 +75,7 @@ function LandingPageUI() {
           </div>
         </section>
 
-        {/* Features using Shadcn Cards */}
+        {/* Features using CloudCraft Components */}
         <section className='grid gap-6 pb-20 md:grid-cols-3'>
           <FeatureCard 
             title="Brand Brain" 
