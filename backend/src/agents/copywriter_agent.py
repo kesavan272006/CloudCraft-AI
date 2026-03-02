@@ -1,9 +1,6 @@
 import asyncio
 from typing import Any, Dict, Optional
 
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.messages import HumanMessage
-
 from src.core.llm_factory import LLMFactory
 from .base_agent import BaseAgent, AgentResponse
 from ..utils.logger import get_logger
@@ -72,21 +69,15 @@ Performance Notes:
 • Why this will stop the scroll
 • Key engagement drivers
 • Platform fit score
-
-Task: {task}
 """
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # Copywriter benefits from creative flair → Llama-3.2-3B is stronger here
         self.llm = LLMFactory.get_default_llm()  # Bedrock
-        # Reusable prompt template
-        self.prompt = ChatPromptTemplate.from_messages([
-            ("system", self.role_prompt),
-            HumanMessage(content="{task}"),
-        ])
+        # Prompt template handled by BaseAgent.__init__
 
-        logger.info(f"{self.name} initialized with Llama-3.2-3B")
+        logger.info(f"{self.name} initialized")
 
     async def async_run(
         self,
@@ -109,10 +100,12 @@ Task: {task}
                 context_str = context if isinstance(context, str) else str(context)
                 combined_task = f"RESEARCH INSIGHTS / CONTEXT:\n{context_str}\n\nUSER TASK:\n{task}"
 
-            chain = self.prompt | self.llm
+            # Use prompt_template from BaseAgent
+            chain = self.prompt_template | self.llm
 
             response = await chain.ainvoke({
                 "task": combined_task,
+                "history": history
             })
 
             raw_output = response.content.strip()
@@ -137,6 +130,24 @@ Task: {task}
                 confidence=0.0,
                 needs_more_info=True,
             )
+
+    async def stream_run(
+        self,
+        task: str,
+        context: Optional[str | Dict[str, Any]] = None,
+        history: Optional[list] = None,
+    ):
+        """
+        Streaming version of copywriting.
+        """
+        history = history or []
+        combined_task = task
+        if context:
+            context_str = context if isinstance(context, str) else str(context)
+            combined_task = f"RESEARCH INSIGHTS / CONTEXT:\n{context_str}\n\nUSER TASK:\n{task}"
+            
+        async for chunk in super().stream_run(combined_task, history=history):
+            yield chunk
 
     def _parse_copy_output(self, raw: str) -> tuple[str, str]:
         """
@@ -164,7 +175,7 @@ if __name__ == "__main__":
     async def test_copywriter():
         agent = CopywriterAgent()
         result = await agent.async_run(
-            task="Write an Instagram reel script + caption about Kerala backwaters at sunset for Gen Z audience, including trending hashtags and emotional hook. Use research: serene, nostalgic mood, houseboats, golden hour."
+            task="Write an Instagram reel script + caption about digital marketing trends."
         )
         print("═" * 70)
         print("Copywriter Agent Output")

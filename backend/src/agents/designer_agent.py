@@ -58,19 +58,13 @@ Image Prompt: Cinematic sunset beach with silhouetted palm trees, vibrant orange
 Platform Notes:
 • 9:16 for Instagram Reels
 • Grabs attention with emotional golden hour aesthetic
-
-Task: {task}
 """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # Designer needs creative + visual thinking → Gemini Flash is excellent
         self.llm = LLMFactory.get_default_llm()  # Bedrock
 
-        # Reusable prompt template
-        self.prompt = ChatPromptTemplate.from_messages([
-            ("system", self.role_prompt),
-            HumanMessage(content="{task}"),
-        ])
+        # Prompt template handled by BaseAgent.__init__ using self.role_prompt
 
         logger.info(f"{self.name} initialized with Gemini Flash")
 
@@ -95,7 +89,7 @@ Task: {task}
                 context_str = context if isinstance(context, str) else str(context)
                 combined_task = f"COPYWRITER DRAFT / CONTEXT:\n{context_str}\n\nDESIGN TASK:\n{task}"
 
-            chain = self.prompt | self.llm
+            chain = self.prompt_template | self.llm
 
             response = await chain.ainvoke({
                 "task": combined_task,

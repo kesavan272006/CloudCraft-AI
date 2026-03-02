@@ -1,13 +1,14 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 from src.agents.supervisor import run_forge_workflow
 from src.models.schemas import ForgeResponse, TransmuteRequest, TransmuteResponse
 from src.services.brand_service import BrandService
 from src.agents.transmuter_agent import TransmuterAgent
 from src.utils.logger import get_logger
-from typing import List, Dict, Optional, Any
+from typing import List, Dict, Optional, Any, AsyncGenerator
 import json
 import re
+import asyncio
 
 logger = get_logger(__name__)
 
@@ -18,6 +19,93 @@ class ForgeRequest(BaseModel):
     image_context: Optional[Dict[str, Any]] = None
 
 from fastapi.concurrency import run_in_threadpool
+from fastapi.responses import StreamingResponse
+from src.agents.supervisor import (
+    run_forge_workflow,
+    run_forge_workflow_stream,
+    run_focus_group_stream,
+    run_autopilot_stream
+)
+
+
+async def _disconnect_aware_stream(
+    request: Request,
+    generator: AsyncGenerator,
+    label: str
+) -> AsyncGenerator:
+    """
+    Wraps any SSE async-generator with client-disconnect detection.
+    After every chunk is yielded, checks if the browser has closed the
+    connection and stops the generator immediately if so.
+    This prevents LLM calls from running in the background after the
+    user navigates away or clicks Stop.
+    """
+    try:
+        async for chunk in generator:
+            if await request.is_disconnected():
+                logger.info(f"[{label}] Client disconnected — stopping stream.")
+                break
+            yield chunk
+    except asyncio.CancelledError:
+        logger.info(f"[{label}] Stream cancelled.")
+    finally:
+        # Ensure the inner generator is properly closed
+        await generator.aclose()
+        logger.debug(f"[{label}] Generator closed.")
+
+
+@router.get("/forge/stream")
+async def forge_content_stream(request: Request, prompt: str):
+    """
+    Streams the forge workflow in real-time using SSE.
+    Stops immediately when the client disconnects.
+    """
+    try:
+        gen = run_forge_workflow_stream(user_prompt=prompt)
+        return StreamingResponse(
+            _disconnect_aware_stream(request, gen, "ForgeStream"),
+            media_type="text/event-stream",
+            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
+        )
+    except Exception as e:
+        logger.error(f"Forge stream failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/forge/focus-group/stream")
+async def focus_group_stream(request: Request, content: str):
+    """
+    Streams parallel focus group reactions.
+    Stops immediately when the client disconnects.
+    """
+    try:
+        gen = run_focus_group_stream(content=content)
+        return StreamingResponse(
+            _disconnect_aware_stream(request, gen, "FocusGroupStream"),
+            media_type="text/event-stream",
+            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
+        )
+    except Exception as e:
+        logger.error(f"Focus group stream failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/forge/autopilot/stream")
+async def autopilot_stream(request: Request, content: str):
+    """
+    Streams autonomous campaign optimization loop.
+    Stops immediately when the client disconnects or clicks Stop.
+    """
+    try:
+        gen = run_autopilot_stream(content=content)
+        return StreamingResponse(
+            _disconnect_aware_stream(request, gen, "AutopilotStream"),
+            media_type="text/event-stream",
+            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
+        )
+    except Exception as e:
+        logger.error(f"Autopilot stream failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/forge", response_model=ForgeResponse)
 async def forge_content(request: ForgeRequest):

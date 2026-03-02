@@ -1,5 +1,6 @@
 import asyncio
-from typing import Annotated, Literal
+import json
+from typing import Annotated, Literal, Optional, Dict, Any, List
 from collections.abc import Sequence
 
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
@@ -14,8 +15,10 @@ from .researcher_agent import ResearcherAgent
 from .copywriter_agent import CopywriterAgent
 from .designer_agent import DesignerAgent
 from .compliance_agent import ComplianceAgent
+from .focus_group_agent import FocusGroupAgent
+from .strategist_agent import StrategistAgent
+from .performance_agent import PerformanceAgent
 from ..utils.logger import get_logger
-from typing import Optional, Dict, Any, List
 
 logger = get_logger(__name__)
 
@@ -305,8 +308,225 @@ async def run_forge_workflow(
         "status": "success"
     }
 
+async def run_forge_workflow_stream(
+    user_prompt: str,
+    thread_id: str = "default_thread",
+    image_context: Optional[Dict[str, Any]] = None
+):
+    """
+    Streaming version of the forge workflow.
+    Yields events as JSON strings.
+    """
+    try:
+        config = {"configurable": {"thread_id": thread_id}}
+        
+        content = user_prompt
+        if image_context:
+            content = f"""
+            {user_prompt}
+            
+            VISUAL CONTEXT FROM VISION LAB:
+            Vibe: {image_context.get('vibe_description')}
+            Detected Context: {image_context.get('detected_context')}
+            Suggested Tone: {image_context.get('suggested_tone')}
+            """
 
-# Full test
+        initial_state: AgentState = {
+            "messages": [HumanMessage(content=content)],
+            "next_agent": "supervisor",
+            "final_output": None,
+            "thought_history": []
+        }
+
+        # Yield initial event
+        yield f"data: {json.dumps({'event': 'workflow_start', 'data': {'prompt': user_prompt}})}\n\n"
+
+        # Define agents for streaming
+        researcher = ResearcherAgent()
+        copywriter = CopywriterAgent()
+        designer = DesignerAgent()
+        compliance = ComplianceAgent()
+        
+        # 1. Researcher
+        yield f"data: {json.dumps({'event': 'agent_start', 'data': {'agent': 'Researcher'}})}\n\n"
+        prompt = content
+        res_output = ""
+        async for chunk in researcher.stream_run(prompt):
+            res_output += chunk
+            yield f"data: {json.dumps({'event': 'agent_chunk', 'data': {'agent': 'Researcher', 'chunk': chunk}})}\n\n"
+        
+        state_thought_history = []
+        state_thought_history.append({"agent": "Researcher", "thought": "Researched via live stream.", "output": res_output})
+        yield f"data: {json.dumps({'event': 'agent_complete', 'data': {'agent': 'Researcher', 'output': res_output, 'thought': 'Completed research.'}})}\n\n"
+
+        # 2. Copywriter
+        yield f"data: {json.dumps({'event': 'agent_start', 'data': {'agent': 'Copywriter'}})}\n\n"
+        copy_context = {"context": f"Research facts: {res_output}"}
+        copy_output = ""
+        async for chunk in copywriter.stream_run(prompt, context=copy_context):
+            copy_output += chunk
+            yield f"data: {json.dumps({'event': 'agent_chunk', 'data': {'agent': 'Copywriter', 'chunk': chunk}})}\n\n"
+            
+        state_thought_history.append({"agent": "Copywriter", "thought": "Drafted copy via live stream.", "output": copy_output})
+        yield f"data: {json.dumps({'event': 'agent_complete', 'data': {'agent': 'Copywriter', 'output': copy_output, 'thought': 'Completed copywriting.'}})}\n\n"
+
+        # 3. Designer
+        yield f"data: {json.dumps({'event': 'agent_start', 'data': {'agent': 'Designer'}})}\n\n"
+        design_context = {"context": f"Research: {res_output}\nCopy: {copy_output}"}
+        design_output = ""
+        async for chunk in designer.stream_run(prompt, context=design_context):
+            design_output += chunk
+            yield f"data: {json.dumps({'event': 'agent_chunk', 'data': {'agent': 'Designer', 'chunk': chunk}})}\n\n"
+            
+        state_thought_history.append({"agent": "Designer", "thought": "Architected visual plan via live stream.", "output": design_output})
+        yield f"data: {json.dumps({'event': 'agent_complete', 'data': {'agent': 'Designer', 'output': design_output, 'thought': 'Completed visual design.'}})}\n\n"
+
+        # 4. Compliance
+        yield f"data: {json.dumps({'event': 'agent_start', 'data': {'agent': 'Compliance'}})}\n\n"
+        content_to_check = f"Copy: {copy_output}\nDesign: {design_output}"
+        comp_output = ""
+        async for chunk in compliance.stream_run(prompt, context={"content": content_to_check}):
+            comp_output += chunk
+            yield f"data: {json.dumps({'event': 'agent_chunk', 'data': {'agent': 'Compliance', 'chunk': chunk}})}\n\n"
+            
+        state_thought_history.append({"agent": "Compliance", "thought": "Verified brand alignment.", "output": comp_output})
+
+        # Final Content Extraction
+        final_content = comp_output.replace("FINAL CONTENT:", "").strip()
+        yield f"data: {json.dumps({'event': 'workflow_complete', 'data': {'final_content': final_content, 'thoughts': state_thought_history, 'status': 'success'}})}\n\n"
+
+    except Exception as e:
+        logger.error(f"Stream error: {str(e)}", exc_info=True)
+        yield f"data: {json.dumps({'event': 'error', 'data': {'message': str(e)}})}\n\n"
+
+async def run_focus_group_stream(content: str):
+    """
+    Runs a parallel focus group of distinct personas.
+    Uses asyncio.gather so all reactions run concurrently and the stream
+    ends cleanly when ALL tasks are done. No infinite loops.
+    """
+    personas = [
+        {"name": "Gen-Z Trendsetter",      "trait": "Always on TikTok, hates 'cringe' corporate speak, loves authenticity.", "emoji": "🔥"},
+        {"name": "Busy Corporate Executive","trait": "No time for fluff, wants ROI and clear logic, prefers LinkedIn-style professionalism.", "emoji": "💼"},
+        {"name": "Tech Enthusiast",         "trait": "Loves innovation, technical details, and future-forward concepts.", "emoji": "🚀"},
+    ]
+
+    def sse(event: str, data: dict) -> str:
+        return f"data: {json.dumps({'event': event, 'data': data})}\n\n"
+
+    try:
+        focus_agent = FocusGroupAgent()
+        yield sse("focus_group_start", {"message": "Assembling Digital Focus Group..."})
+
+        # Shared queue so we can yield reactions as they arrive (concurrent execution)
+        queue: asyncio.Queue = asyncio.Queue()
+        done_flag = asyncio.Event()
+
+        async def get_reaction(p: dict):
+            await queue.put(sse("persona_thinking", {"name": p["name"], "emoji": p["emoji"]}))
+            try:
+                # 30-second hard timeout per persona so one slow LLM can't block forever
+                reaction = await asyncio.wait_for(
+                    focus_agent.react(content, p["name"], p["trait"]),
+                    timeout=30.0
+                )
+            except asyncio.TimeoutError:
+                reaction = "Took too long to respond — moving on."
+            except Exception as e:
+                logger.error(f"Persona {p['name']} error: {e}")
+                reaction = "Couldn't process that right now."
+            await queue.put(sse("persona_reaction", {"name": p["name"], "emoji": p["emoji"], "reaction": reaction}))
+
+        # Kick off all persona tasks concurrently, signal when all done
+        async def run_all():
+            await asyncio.gather(*[get_reaction(p) for p in personas], return_exceptions=True)
+            done_flag.set()
+
+        asyncio.create_task(run_all())
+
+        # Drain queue until all tasks are done AND queue is empty
+        while not (done_flag.is_set() and queue.empty()):
+            try:
+                item = await asyncio.wait_for(queue.get(), timeout=0.2)
+                yield item
+            except asyncio.TimeoutError:
+                continue  # check done_flag again
+
+        yield sse("focus_group_complete", {"summary": "Focus group session ended."})
+        yield sse("stream_done", {})
+
+    except asyncio.CancelledError:
+        logger.info("Focus group stream cancelled.")
+    except Exception as e:
+        logger.error(f"Focus group stream error: {str(e)}", exc_info=True)
+        yield f"data: {json.dumps({'event': 'error', 'data': {'message': str(e)}})}\n\n"
+
+async def run_autopilot_stream(content: str):
+    """
+    Autonomous campaign optimization loop.
+    Disconnect detection is handled by the _disconnect_aware_stream wrapper in forge.py.
+    This generator just needs to yield SSE-formatted strings with proper \\n\\n endings.
+    """
+    from fastapi.concurrency import run_in_threadpool
+
+    def sse(event: str, data: dict) -> str:
+        return f"data: {json.dumps({'event': event, 'data': data})}\n\n"
+
+    try:
+        perf_agent = PerformanceAgent()
+        strat_agent = StrategistAgent()
+        copy_agent = CopywriterAgent()
+
+        yield sse("autopilot_start", {"message": "Initiating Autonomous Campaign Loop..."})
+
+        # Step 1: Deploy
+        yield sse("autopilot_step", {"step": "DEPLOYED", "message": "Content deployed to virtual sandbox."})
+        await asyncio.sleep(0.5)
+
+        # Step 2: Initial performance analysis
+        yield sse("autopilot_step", {"step": "ANALYZING", "message": "Running performance analysis..."})
+        init_perf = await run_in_threadpool(perf_agent.analyze_performance, content)
+        yield sse("autopilot_metrics", {"metrics": init_perf["predicted_metrics"], "score": init_perf["overall_score"]})
+
+        # Step 3: Strategic pivot decision
+        yield sse("autopilot_step", {"step": "STRATEGIZING", "message": "Strategist reviewing engagement data..."})
+        pivot_decision = await strat_agent.decide_pivot(init_perf, content)
+
+        if pivot_decision["status"] == "PIVOT" or init_perf["overall_score"] < 90:
+            yield sse("autopilot_pivot", {"reason": pivot_decision["analysis"], "fix": pivot_decision["directive"]})
+
+            # Step 4: Autonomous rewrite (streaming — yields per-chunk so disconnect check fires)
+            yield sse("agent_start", {"agent": "Copywriter", "task": "Optimizing content for higher engagement"})
+            revised_content = ""
+            async for chunk in copy_agent.stream_run(
+                f"Revise this content based on this directive: {pivot_decision['directive']}\n\nCONTENT:\n{content}"
+            ):
+                revised_content += chunk
+                yield sse("agent_chunk", {"agent": "Copywriter", "chunk": chunk})
+
+            # Step 5: Final performance re-scan
+            yield sse("autopilot_step", {"step": "OPTIMIZED", "message": "Validating optimized variant..."})
+            final_perf = await run_in_threadpool(perf_agent.analyze_performance, revised_content)
+            yield sse("autopilot_metrics", {"metrics": final_perf["predicted_metrics"], "score": final_perf["overall_score"]})
+            yield sse("autopilot_complete", {
+                "final_content": revised_content,
+                "improvement": final_perf["overall_score"] - init_perf["overall_score"]
+            })
+        else:
+            yield sse("autopilot_complete", {"message": "Content performing at peak levels. No pivot required."})
+
+        yield sse("stream_done", {})
+
+    except asyncio.CancelledError:
+        logger.info("Autopilot stream cancelled.")
+    except Exception as e:
+        logger.error(f"Autopilot stream error: {str(e)}", exc_info=True)
+        yield f"data: {json.dumps({'event': 'error', 'data': {'message': str(e)}})}\n\n"
+
+# Add finalize formatting / imports if needed
+
+
+# Pull import json to top
 if __name__ == "__main__":
     async def test_full():
         result = await run_forge_workflow(

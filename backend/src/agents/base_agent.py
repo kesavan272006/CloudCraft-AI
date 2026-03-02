@@ -49,9 +49,9 @@ class BaseAgent:
 
         # Build prompt template once (reusable)
         self.prompt_template = ChatPromptTemplate.from_messages([
-            SystemMessage(content=self.role_prompt),
+            ("system", self.role_prompt),
             MessagesPlaceholder(variable_name="history", optional=True),
-            HumanMessage(content="{task}"),
+            ("human", "{task}"),
         ])
 
         logger.info(f"Initialized {self.name} agent")
@@ -99,6 +99,47 @@ class BaseAgent:
                 needs_more_info=True,
             )
 
+    async def stream_run(
+        self,
+        task: str,
+        context: Optional[Dict[str, Any]] = None,
+        history: Optional[List[Any]] = None,
+    ):
+        """
+        Main async entry point for agents as a stream.
+        Yields chunks of the response.
+        """
+        context = context or {}
+        history = history or []
+
+        try:
+            # Build full prompt
+            full_prompt = self.prompt_template.format_messages(
+                task=task,
+                **context
+            ) + history
+
+            # Call LLM with stream
+            async for chunk in self.llm.astream(full_prompt):
+                content = chunk.content
+                
+                # Handle Bedrock/multimodal blocks (list of dicts)
+                if isinstance(content, list):
+                    text = ""
+                    for block in content:
+                        if isinstance(block, dict) and block.get("type") == "text":
+                            text += block.get("text", "")
+                        elif isinstance(block, str):
+                            text += block
+                    content = text
+                
+                if content and isinstance(content, str):
+                    yield content
+
+        except Exception as e:
+            logger.error(f"{self.name} stream failed on task '{task}': {str(e)}")
+            yield f"Error occurred: {str(e)}"
+
     def _parse_thought_and_output(self, raw: str) -> tuple[str, str]:
         """
         Simple parser for MVP: assumes agent outputs in format:
@@ -132,10 +173,16 @@ class ExampleResearcherAgent(BaseAgent):
     name = "Researcher"
     description = "Gathers facts, trends, and background information"
     role_prompt = """
-You are a world-class researcher agent.
-Your job is to find accurate, up-to-date information and insights.
-Always be factual, cite sources when possible, and summarize clearly.
-Never invent facts.
-    """
+You are an expert Research Agent.
+Your role is to provide accurate, relevant, up-to-date background information, trends, statistics, and insights.
+
+Rules:
+- Always be factual — automatically use web search, extract, or crawl if info is recent, uncertain, or needs specific sources.
+- Answer concisely yet completely: aim for 100–250 words max, use bullet points or short paragraphs.
+- Never cut answers short, say "not enough", or clip — always give full useful answer in medium length.
+- Focus on recent trends and cultural relevance.
+- Summarize clearly with key takeaways for Copywriter/Designer.
+- If using tools, mention sources briefly (e.g., "Recent reports show...").
+"""
 
     # You can override async_run if needed for custom tools/behavior

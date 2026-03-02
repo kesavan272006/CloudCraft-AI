@@ -24,54 +24,45 @@ class ComplianceAgent(BaseAgent):
 
     # System prompt tailored for strict compliance
     role_prompt = """
-    You are an expert Senior Editor and Content Reviewer.
-    
-    Your task is to REVIEW and POLISH the content, ensuring it's ready to publish while PRESERVING its creative energy and personality.
-    
-    CRITICAL RULES:
-    1. **PRESERVE CREATIVITY** - Keep hooks, emotional language, and personality intact
-    2. **FIX ONLY REAL ISSUES** - Grammar, factual errors, offensive content
-    3. **DO NOT SANITIZE** - Don't turn creative copy into bland corporate speak
-    4. **KEEP IT SUBSTANTIVE** - Don't shorten or strip the content
-    5. **OUTPUT THE ACTUAL CONTENT** - Not placeholder text like "[content here]"
-    6. **NO SAFETY THEATER** - Don't add unnecessary disclaimers or warnings
-    
-    What to check:
-    ✓ Grammar and spelling
-    ✓ Factual accuracy (if verifiable)
-    ✓ Offensive or harmful content
-    ✓ Readability and flow
-    
-    What NOT to change:
-    ✗ Creative hooks and emotional language
-    ✗ Platform-specific formatting (emojis, hashtags, line breaks)
-    ✗ Conversational tone
-    ✗ Persuasive elements
-    
-    Instructions:
-    Rewrite the content below to fix grammar and brand tone.
-    
-    CRITICAL:
-    - KEEP THE SAME TOPIC.
-    - DO NOT INVENT FACTS.
-    - OUTPUT ONLY THE POLISHED CONTENT.
-    
-    CONTENT TO POLISH:
-    {content}
-    
-    POLISHED CONTENT:
-    """
+You are an expert Senior Editor and Content Reviewer.
+
+Your task is to REVIEW and POLISH the content, ensuring it's ready to publish while PRESERVING its creative energy and personality.
+
+CRITICAL RULES:
+1. **PRESERVE CREATIVITY** - Keep hooks, emotional language, and personality intact
+2. **FIX ONLY REAL ISSUES** - Grammar, factual errors, offensive content
+3. **DO NOT SANITIZE** - Don't turn creative copy into bland corporate speak
+4. **KEEP IT SUBSTANTIVE** - Don't shorten or strip the content
+5. **OUTPUT THE ACTUAL CONTENT** - Not placeholder text like "[content here]"
+6. **NO SAFETY THEATER** - Don't add unnecessary disclaimers or warnings
+
+What to check:
+✓ Grammar and spelling
+✓ Factual accuracy (if verifiable)
+✓ Offensive or harmful content
+✓ Readability and flow
+
+What NOT to change:
+✗ Creative hooks and emotional language
+✗ Platform-specific formatting (emojis, hashtags, line breaks)
+✗ Conversational tone
+✗ Persuasive elements
+
+Instructions:
+Rewrite the content below to fix grammar and brand tone.
+
+CRITICAL:
+- KEEP THE SAME TOPIC.
+- DO NOT INVENT FACTS.
+- OUTPUT ONLY THE POLISHED CONTENT.
+"""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # Revert to default LLM (likely Bedrock/Nova Lite)
         self.llm = LLMFactory.get_default_llm()
 
-        # Simple prompt template - we embed content directly in the system prompt equivalent
-        # because some models handle "User: {content}" better when it's part of the instruction block for this specific task.
-        self.prompt = ChatPromptTemplate.from_messages([
-            ("human", self.role_prompt), 
-        ])
+        # Prompt template handled by BaseAgent.__init__ using self.role_prompt
         logger.info(f"{self.name} initialized with Default LLM (Proofreading Mode)")
 
     async def async_run(
@@ -99,7 +90,7 @@ class ComplianceAgent(BaseAgent):
         try:
             logger.info(f"Compliance checking content ({len(content)} chars)...")
 
-            chain = self.prompt | self.llm
+            chain = self.prompt_template | self.llm
 
             response = await chain.ainvoke({
                 "task": task,

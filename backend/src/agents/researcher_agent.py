@@ -4,6 +4,7 @@ import os
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import HumanMessage
 from tavily import TavilyClient
+from fastapi.concurrency import run_in_threadpool
 
 from src.core.llm_factory import LLMFactory
 from .base_agent import BaseAgent, AgentResponse
@@ -33,11 +34,9 @@ Rules:
 - Always be factual — automatically use web search, extract, or crawl if info is recent, uncertain, or needs specific sources.
 - Answer concisely yet completely: aim for 100–250 words max, use bullet points or short paragraphs.
 - Never cut answers short, say "not enough", or clip — always give full useful answer in medium length.
-- Focus on recent trends, cultural relevance (especially India/Kerala context when applicable).
+- Focus on recent trends and cultural relevance.
 - Summarize clearly with key takeaways for Copywriter/Designer.
 - If using tools, mention sources briefly (e.g., "Recent reports show...").
-
-Task: {task}
 """
 
     def __init__(self, **kwargs):
@@ -45,11 +44,8 @@ Task: {task}
         # Use default LLM (Bedrock preferred)
         self.llm = LLMFactory.get_default_llm()
 
-        # Prompt template
-        self.prompt = ChatPromptTemplate.from_messages([
-            ("system", self.role_prompt),
-            HumanMessage(content="{task}"),
-        ])
+        # Prompt template is handled by BaseAgent.__init__ using self.role_prompt
+        # No need to set self.prompt here
 
         logger.info(f"{self.name} initialized with real-time Tavily tools enabled")
 
@@ -115,7 +111,8 @@ Task: {task}
             # DEBUG: Log the exact task being sent to LLM
             logger.info(f"[DEBUG] Full task being sent to Researcher LLM:\n{full_task[:500]}")
 
-            chain = self.prompt | self.llm
+            # Use prompt_template from BaseAgent
+            chain = self.prompt_template | self.llm
 
             response = await chain.ainvoke({
                 "task": full_task,
@@ -141,6 +138,36 @@ Task: {task}
                 confidence=0.0,
                 needs_more_info=True,
             )
+
+    async def stream_run(
+        self,
+        task: str,
+        context: Optional[Dict[str, Any]] = None,
+        history: Optional[list] = None,
+    ):
+        """
+        Streaming version with tools.
+        """
+        context = context or {}
+        history = history or []
+        
+        # 1. Run tools synchronously before streaming (fast)
+        tool_output = ""
+        task_lower = task.lower()
+        if any(word in task_lower for word in ["current", "recent", "trend", "now", "latest", "today", "2025"]):
+            try:
+                # Run sync search in threadpool to avoid blocking async loop
+                response = await run_in_threadpool(tavily_client.search, query=task, search_depth="advanced")
+                if response and response.get("results"):
+                    tool_output += "\n".join([r.get("content", "")[:300] for r in response.get("results", [])])
+            except Exception as e:
+                logger.warning(f"Live search failed in stream: {str(e)}")
+            
+        full_task = f"{task}\n\nTool results (if any):\n{tool_output}"
+        
+        # 2. Use base stream logic with enriched prompt
+        async for chunk in super().stream_run(full_task, context, history):
+            yield chunk
 
     def _parse_research_output(self, raw: str) -> tuple[str, str]:
         """
