@@ -11,6 +11,7 @@ import {
   HelpCircle,
   Radio,
   Layers,
+  Languages,
 } from 'lucide-react'
 import { type SidebarData } from '../types'
 
@@ -46,6 +47,11 @@ export const sidebarData: SidebarData = {
           title: 'The Forge',
           url: '/forge',
           icon: Hammer,
+        },
+        {
+          title: 'Vernacular',
+          url: '/vernacular',
+          icon: Languages,
         },
         {
           title: 'Vision Lab',
