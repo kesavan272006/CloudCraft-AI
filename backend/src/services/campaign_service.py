@@ -273,7 +273,7 @@ class CampaignIntelligenceService:
 You do not give generic advice. You design hyper-specific, technically actionable, and devastatingly effective marketing warfare strategies.
 
 == CAMPAIGN OBJECTIVE ==
-Name: {name}
+Name: {campaign_name}
 Goal: {goal}
 Duration: {duration}
 Budget: {budget}
