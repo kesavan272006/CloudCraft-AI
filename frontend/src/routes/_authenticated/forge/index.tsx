@@ -1,5 +1,5 @@
 ﻿import { useState, useEffect, useRef } from 'react';
-
+import { motion } from 'framer-motion';
 
 import { useSessionState } from '@/hooks/useSessionState';
 
@@ -256,36 +256,111 @@ export default function ForgePage() {
         </div>
       </Header>
 
-      <Main className="px-4 py-8 md:px-8 max-w-7xl mx-auto space-y-8 relative w-full">
-        {/* Background grid - matches Dashboard */}
+      <Main className="px-4 py-8 md:px-8 max-w-7xl mx-auto space-y-8 relative w-full overflow-hidden">
+        {/* Premium dot-matrix background grid */}
         <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.03] dark:opacity-[0.05]"
           style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)', backgroundSize: '32px 32px' }} />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[200px] bg-primary/5 blur-[80px] rounded-full pointer-events-none hidden dark:block" />
+        
+        {/* Premium gradient mesh overlay */}
+        <div className="absolute inset-0 z-0 pointer-events-none opacity-20 dark:opacity-30"
+          style={{ 
+            background: 'radial-gradient(circle at 30% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 50%), radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.1) 0%, transparent 50%)'
+          }}>
+        </div>
 
-        {/* Page Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
-          <div className="space-y-1">
-            <div className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-primary/20 bg-primary/10 text-primary text-xs font-semibold mb-2 uppercase tracking-widest gap-2">
+        {/* Floating orbs background */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            className="absolute w-[500px] h-[500px] rounded-full bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 blur-3xl"
+            animate={{
+              x: [0, 100, 0],
+              y: [0, -80, 0],
+              scale: [1, 1.2, 1],
+            }}
+            transition={{
+              duration: 20,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            style={{ top: '10%', left: '5%' }}
+          />
+          <motion.div
+            className="absolute w-[400px] h-[400px] rounded-full bg-gradient-to-r from-purple-500/20 via-indigo-500/20 to-pink-500/20 blur-3xl"
+            animate={{
+              x: [0, -60, 0],
+              y: [0, 60, 0],
+              scale: [1, 1.15, 1],
+            }}
+            transition={{
+              duration: 18,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 3
+            }}
+            style={{ bottom: '15%', right: '10%' }}
+          />
+        </div>
+
+        {/* Page Header with Premium Animations */}
+        <motion.div 
+          className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="space-y-2">
+            <motion.div 
+              className="inline-flex items-center px-3 py-1 rounded-full border border-indigo-500/30 bg-gradient-to-r from-indigo-500/15 via-indigo-500/10 to-indigo-500/15 text-indigo-500 text-xs font-bold mb-2 shadow-lg shadow-indigo-500/20 uppercase tracking-widest gap-2 backdrop-blur-xl"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+            >
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500 shadow-lg shadow-indigo-500/50" />
               </span>
               Swarm Engine Online
-            </div>
-            <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground">The Forge</h1>
-            <p className="text-sm text-muted-foreground">Deploy a parallel AI agent swarm to research, synthesize, and generate high-conversion content.</p>
+            </motion.div>
+            <motion.h1 
+              className="text-3xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 bg-clip-text text-transparent flex items-center gap-3"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              The Forge
+              <Hammer className="h-8 w-8 md:h-10 md:w-10 text-indigo-500 animate-pulse" />
+            </motion.h1>
+            <motion.p 
+              className="text-sm md:text-base text-muted-foreground font-medium leading-relaxed"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+            >
+              Deploy a parallel AI agent swarm to research, synthesize, and generate high-conversion content.
+            </motion.p>
           </div>
           {result && (
-            <Button variant="outline" className="h-9 font-medium self-start" onClick={handleNewSession}>
-              <RefreshCcw className="w-4 h-4 mr-2" />New Session
-            </Button>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <Button variant="outline" className="h-10 font-semibold shadow-lg shadow-black/5 transition-all hover:bg-secondary hover:scale-105 hover:shadow-xl border-border/50 backdrop-blur-xl" onClick={handleNewSession}>
+                <RefreshCcw className="w-4 h-4 mr-2" />New Session
+              </Button>
+            </motion.div>
           )}
-        </div>
+        </motion.div>
 
         <div className="relative z-10 space-y-6">
           {/* INPUT SECTION */}
           {!result && (
-            <div className="animate-in fade-in duration-500 space-y-6">
+            <motion.div 
+              className="space-y-6"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.6 }}
+            >
               {isLiveMode ? (
                 <LiveSwarmCanvas
                   prompt={prompt}
@@ -296,8 +371,10 @@ export default function ForgePage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   {/* Command Input */}
                   <div className="lg:col-span-2 space-y-4">
-                    <Card className="border-border bg-card/60 rounded-xl overflow-hidden shadow-sm">
-                      <div className="flex items-center justify-between px-4 py-3 border-b border-border/50 bg-secondary/20">
+                    <Card className="relative border border-border/40 shadow-xl shadow-black/5 hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500 bg-gradient-to-br from-card via-card/98 to-card/95 backdrop-blur-2xl rounded-xl overflow-hidden before:absolute before:inset-0 before:rounded-xl before:p-[1px] before:bg-gradient-to-br before:from-indigo-500/10 before:via-transparent before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:-z-10">
+                      {/* Premium outer glow */}
+                      <div className="absolute -inset-1 bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-transparent opacity-0 hover:opacity-100 blur-xl rounded-xl transition-opacity duration-500 pointer-events-none" />
+                      <div className="flex items-center justify-between px-4 py-3 border-b border-border/50 bg-gradient-to-r from-muted/20 via-muted/10 to-transparent relative z-10">
                         <div className="flex items-center gap-2">
                           <div className="flex gap-1.5">
                             <div className="w-2.5 h-2.5 rounded-full bg-red-400/60" />
@@ -324,8 +401,15 @@ export default function ForgePage() {
                               <kbd className="px-1.5 py-0.5 bg-secondary border border-border rounded text-[10px] font-mono">Ctrl</kbd>+<kbd className="px-1.5 py-0.5 bg-secondary border border-border rounded text-[10px] font-mono ml-1">↵</kbd>
                             </span>
                           </div>
-                          <Button className="h-8 px-4 text-xs font-semibold" onClick={(e) => handleForge(e)} disabled={!prompt.trim() || loading}>
-                            <Sparkles className="h-3.5 w-3.5 mr-1.5" />Deploy Swarm
+                          <Button className="h-8 px-4 text-xs font-bold shadow-lg shadow-indigo-500/25 transition-all bg-gradient-to-r from-indigo-500 via-indigo-600 to-indigo-500/90 text-white hover:shadow-xl hover:shadow-indigo-500/40 hover:scale-105 border-0 relative overflow-hidden group" onClick={(e) => handleForge(e)} disabled={!prompt.trim() || loading}>
+                            <motion.div
+                              className="absolute inset-0 bg-gradient-to-r from-white/30 via-white/10 to-transparent"
+                              initial={{ x: '-100%' }}
+                              whileHover={{ x: '100%' }}
+                              transition={{ duration: 0.5 }}
+                            />
+                            <Sparkles className="h-3.5 w-3.5 mr-1.5 relative z-10" />
+                            <span className="relative z-10">Deploy Swarm</span>
                           </Button>
                         </div>
                       </CardContent>
@@ -363,8 +447,8 @@ export default function ForgePage() {
                       ))}
                     </div>
 
-                    <Card className="border-border bg-card/60 rounded-xl shadow-sm">
-                      <CardContent className="p-4 space-y-3">
+                    <Card className="relative border border-border/40 shadow-lg shadow-black/5 hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-500 bg-gradient-to-br from-card via-card/98 to-card/95 backdrop-blur-xl rounded-xl overflow-hidden before:absolute before:inset-0 before:rounded-xl before:p-[1px] before:bg-gradient-to-br before:from-indigo-500/10 before:via-transparent before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:-z-10">
+                      <CardContent className="p-4 space-y-3 relative z-10">
                         <p className="text-xs font-semibold flex items-center gap-2">
                           <Hammer className="w-3.5 h-3.5 text-primary" />Pipeline Capabilities
                         </p>
@@ -382,18 +466,31 @@ export default function ForgePage() {
               )}
 
               {error && (
-                <Alert variant="destructive" className="border-red-500/30 bg-red-500/5 rounded-xl">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertTitle className="font-semibold">Orchestration Failure</AlertTitle>
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <Alert variant="destructive" className="relative z-10 border-red-500/30 bg-gradient-to-r from-red-500/10 via-red-500/5 to-transparent backdrop-blur-xl shadow-xl shadow-red-500/10 before:absolute before:inset-0 before:rounded-lg before:p-[1px] before:bg-gradient-to-r before:from-red-500/20 before:via-transparent before:to-transparent before:opacity-50 before:-z-10">
+                    {/* Premium glow */}
+                    <div className="absolute -inset-1 bg-gradient-to-r from-red-500/10 to-transparent opacity-50 blur-lg rounded-lg pointer-events-none" />
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle className="font-bold">Orchestration Failure</AlertTitle>
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                </motion.div>
               )}
-            </div>
+            </motion.div>
           )}
 
           {/* RESULTS SECTION */}
           {result && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <motion.div 
+              className="space-y-6"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
               <style>{prose}</style>
 
               {/* Tab Bar */}
@@ -438,9 +535,11 @@ export default function ForgePage() {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
                   {/* Main output card */}
                   <div className={cn("flex flex-col", isAutoPilotActive ? "lg:col-span-7" : "lg:col-span-8")}>
-                    <Card className="border-border bg-card rounded-xl shadow-sm overflow-hidden flex flex-col">
+                    <Card className="relative border border-border/40 shadow-xl shadow-black/5 hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500 bg-gradient-to-br from-card via-card/98 to-card/95 backdrop-blur-2xl rounded-xl overflow-hidden flex flex-col before:absolute before:inset-0 before:rounded-xl before:p-[1px] before:bg-gradient-to-br before:from-indigo-500/10 before:via-transparent before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:-z-10">
+                      {/* Premium outer glow */}
+                      <div className="absolute -inset-1 bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-transparent opacity-0 hover:opacity-100 blur-xl rounded-xl transition-opacity duration-500 pointer-events-none" />
                       {/* Compact card header */}
-                      <div className="flex items-center justify-between px-4 py-3 border-b border-border/60">
+                      <div className="flex items-center justify-between px-4 py-3 border-b border-border/60 bg-gradient-to-r from-muted/20 via-muted/10 to-transparent relative z-10">
                         <div className="flex items-center gap-2.5">
                           <div className="w-7 h-7 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
                             <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
@@ -456,7 +555,7 @@ export default function ForgePage() {
                         </Button>
                       </div>
                       {/* Content */}
-                      <CardContent className="p-5 flex-1">
+                      <CardContent className="p-5 flex-1 relative z-10">
                         <div className="fp"><ReactMarkdown>{cleanContent(result.final_content)}</ReactMarkdown></div>
                       </CardContent>
                       {/* Footer actions */}
@@ -525,10 +624,17 @@ export default function ForgePage() {
 
               {/* Performance Tab */}
               {activeResultTab === 'score' && (
-                <div className="animate-in fade-in duration-300 space-y-4">
+                <motion.div 
+                  className="space-y-4"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.4 }}
+                >
                   {!performanceResult ? (
-                    <Card className="border-border bg-card/60 rounded-xl shadow-sm">
-                      <CardContent className="p-12 flex flex-col items-center gap-5 text-center">
+                    <Card className="relative border border-yellow-500/30 shadow-xl shadow-yellow-500/10 bg-gradient-to-br from-yellow-500/10 via-yellow-500/5 to-transparent backdrop-blur-xl rounded-xl overflow-hidden before:absolute before:inset-0 before:rounded-xl before:p-[1px] before:bg-gradient-to-br before:from-yellow-500/20 before:via-transparent before:to-transparent before:opacity-50 before:-z-10">
+                      {/* Premium glow */}
+                      <div className="absolute -inset-1 bg-gradient-to-br from-yellow-500/10 to-transparent opacity-50 blur-xl rounded-xl transition-opacity duration-500 pointer-events-none" />
+                      <CardContent className="p-12 flex flex-col items-center gap-5 text-center relative z-10">
                         <div className="w-14 h-14 rounded-xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center">
                           <Zap className="w-6 h-6 text-yellow-500" />
                         </div>
@@ -536,9 +642,15 @@ export default function ForgePage() {
                           <h3 className="text-base font-semibold mb-1">Oracle Performance Score</h3>
                           <p className="text-sm text-muted-foreground max-w-sm">AI-powered engagement prediction analyzing hooks, CTAs, emotional triggers, and virality signals.</p>
                         </div>
-                        <Button className="h-10 px-8 font-semibold bg-yellow-500 hover:bg-yellow-400 text-black"
+                        <Button className="h-10 px-8 font-bold shadow-xl shadow-yellow-500/25 transition-all bg-gradient-to-r from-yellow-500 via-yellow-600 to-yellow-500/90 text-black hover:shadow-2xl hover:shadow-yellow-500/40 hover:scale-105 border-0 relative overflow-hidden group"
                           onClick={handlePredictPerformance} disabled={analyzingPerformance}>
-                          {analyzingPerformance ? <><Loader2 className="animate-spin mr-2 w-4 h-4" />Analyzing...</> : <><Zap className="mr-2 w-4 h-4" />Run Oracle Analysis</>}
+                          <motion.div
+                            className="absolute inset-0 bg-gradient-to-r from-white/30 via-white/10 to-transparent"
+                            initial={{ x: '-100%' }}
+                            whileHover={{ x: '100%' }}
+                            transition={{ duration: 0.5 }}
+                          />
+                          {analyzingPerformance ? <><Loader2 className="animate-spin mr-2 w-4 h-4 relative z-10" />Analyzing...</> : <><Zap className="mr-2 w-4 h-4 relative z-10" />Run Oracle Analysis</>}
                         </Button>
                       </CardContent>
                     </Card>
@@ -559,14 +671,21 @@ export default function ForgePage() {
                       <PerformanceCard prediction={performanceResult.prediction} platform={performanceResult.platform} persona={performanceResult.persona} />
                     </div>
                   )}
-                </div>
+                </motion.div>
               )}
 
               {/* Personas Tab */}
               {activeResultTab === 'personas' && (
-                <div className="animate-in fade-in duration-300 space-y-4">
+                <motion.div 
+                  className="space-y-4"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.4 }}
+                >
                   {!personaResult ? (
-                    <Card className="border-violet-500/20 bg-card/60 rounded-xl shadow-sm">
+                    <Card className="relative border border-violet-500/30 shadow-xl shadow-violet-500/10 bg-gradient-to-br from-violet-500/10 via-violet-500/5 to-transparent backdrop-blur-xl rounded-xl overflow-hidden before:absolute before:inset-0 before:rounded-xl before:p-[1px] before:bg-gradient-to-br before:from-violet-500/20 before:via-transparent before:to-transparent before:opacity-50 before:-z-10">
+                      {/* Premium glow */}
+                      <div className="absolute -inset-1 bg-gradient-to-br from-violet-500/10 to-transparent opacity-50 blur-xl rounded-xl transition-opacity duration-500 pointer-events-none" />
                       <div className="flex items-center gap-3 px-5 py-4 border-b border-border/50">
                         <div className="w-8 h-8 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
                           <Users className="w-4 h-4 text-violet-500" />
@@ -580,9 +699,15 @@ export default function ForgePage() {
                         <PersonaSelector personas={personas} selectedPersonas={selectedPersonas} onTogglePersona={handleTogglePersona} />
                         <div className="flex gap-3 pt-4 border-t border-border/50">
                           <Button variant="outline" size="sm" className="h-9" onClick={() => { setSelectedPersonas([]); setActiveResultTab('output'); }}>Cancel</Button>
-                          <Button className="h-9 font-semibold bg-violet-600 hover:bg-violet-500 text-white flex-1"
+                          <Button className="h-9 font-bold bg-gradient-to-r from-violet-500 via-violet-600 to-violet-500/90 hover:from-violet-600 hover:via-violet-700 hover:to-violet-600/90 text-white flex-1 shadow-lg shadow-violet-500/25 hover:shadow-xl hover:shadow-violet-500/40 transition-all hover:scale-105 relative overflow-hidden group"
                             onClick={handleGeneratePersonas} disabled={generatingPersonas || !selectedPersonas.length}>
-                            {generatingPersonas ? <><Loader2 className="animate-spin mr-2 w-4 h-4" />Generating...</> : <><Sparkles className="mr-2 w-4 h-4" />Generate {selectedPersonas.length} Variant{selectedPersonas.length !== 1 ? 's' : ''}</>}
+                            <motion.div
+                              className="absolute inset-0 bg-gradient-to-r from-white/30 via-white/10 to-transparent"
+                              initial={{ x: '-100%' }}
+                              whileHover={{ x: '100%' }}
+                              transition={{ duration: 0.5 }}
+                            />
+                            {generatingPersonas ? <><Loader2 className="animate-spin mr-2 w-4 h-4 relative z-10" />Generating...</> : <><Sparkles className="mr-2 w-4 h-4 relative z-10" />Generate {selectedPersonas.length} Variant{selectedPersonas.length !== 1 ? 's' : ''}</>}
                           </Button>
                         </div>
                         <NexusMissionStatus />
@@ -607,14 +732,21 @@ export default function ForgePage() {
                       <Card className="border-border bg-card/60 rounded-xl"><CardContent className="p-5"><PersonaVariantsDisplay variants={personaResult.variants} onSchedule={handleSchedule} /></CardContent></Card>
                     </div>
                   )}
-                </div>
+                </motion.div>
               )}
 
               {/* Transmute Tab */}
               {activeResultTab === 'transmute' && (
-                <div className="animate-in fade-in duration-300 space-y-4">
+                <motion.div 
+                  className="space-y-4"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.4 }}
+                >
                   {!transmuteResult ? (
-                    <Card className="border-sky-500/20 bg-card/60 rounded-xl shadow-sm">
+                    <Card className="relative border border-sky-500/30 shadow-xl shadow-sky-500/10 bg-gradient-to-br from-sky-500/10 via-sky-500/5 to-transparent backdrop-blur-xl rounded-xl overflow-hidden before:absolute before:inset-0 before:rounded-xl before:p-[1px] before:bg-gradient-to-br before:from-sky-500/20 before:via-transparent before:to-transparent before:opacity-50 before:-z-10">
+                      {/* Premium glow */}
+                      <div className="absolute -inset-1 bg-gradient-to-br from-sky-500/10 to-transparent opacity-50 blur-xl rounded-xl transition-opacity duration-500 pointer-events-none" />
                       <div className="flex items-center gap-3 px-5 py-4 border-b border-border/50">
                         <div className="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
                           <Globe className="w-4 h-4 text-sky-500" />
@@ -652,9 +784,15 @@ export default function ForgePage() {
                         </div>
                         <div className="flex gap-3 pt-4 border-t border-border/50">
                           <Button variant="outline" size="sm" className="h-9" onClick={() => setActiveResultTab('output')}>Cancel</Button>
-                          <Button className="h-9 font-semibold bg-sky-600 hover:bg-sky-500 text-white flex-1"
+                          <Button className="h-9 font-bold bg-gradient-to-r from-sky-500 via-sky-600 to-sky-500/90 hover:from-sky-600 hover:via-sky-700 hover:to-sky-600/90 text-white flex-1 shadow-lg shadow-sky-500/25 hover:shadow-xl hover:shadow-sky-500/40 transition-all hover:scale-105 relative overflow-hidden group"
                             onClick={handleTransmute} disabled={transmuting}>
-                            {transmuting ? <><Loader2 className="animate-spin mr-2 w-4 h-4" />Transmuting...</> : <><Zap className="mr-2 w-4 h-4" />Transmute</>}
+                            <motion.div
+                              className="absolute inset-0 bg-gradient-to-r from-white/30 via-white/10 to-transparent"
+                              initial={{ x: '-100%' }}
+                              whileHover={{ x: '100%' }}
+                              transition={{ duration: 0.5 }}
+                            />
+                            {transmuting ? <><Loader2 className="animate-spin mr-2 w-4 h-4 relative z-10" />Transmuting...</> : <><Zap className="mr-2 w-4 h-4 relative z-10" />Transmute</>}
                           </Button>
                         </div>
                       </CardContent>
@@ -703,9 +841,9 @@ export default function ForgePage() {
                       </Card>
                     </div>
                   )}
-                </div>
+                </motion.div>
               )}
-            </div>
+            </motion.div>
           )}
 
           {/* Schedule Dialog */}
