@@ -242,3 +242,108 @@
 .scout-hot-banner {
   animation: hot-signal-pulse 1.5s ease-in-out infinite;
 }
+
+/* ── Panopticon Strategic War Room ── */
+
+@keyframes panopticon-pulse {
+  0% {
+    transform: scale(0.98);
+    opacity: 0.8;
+  }
+
+  50% {
+    transform: scale(1.02);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(0.98);
+    opacity: 0.8;
+  }
+}
+
+@keyframes panopticon-scanline {
+  0% {
+    top: -100%;
+  }
+
+  100% {
+    top: 100%;
+  }
+}
+
+@keyframes panopticon-float {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes panopticon-glow-red {
+
+  0%,
+  100% {
+    filter: drop-shadow(0 0 5px rgba(239, 68, 68, 0.4));
+  }
+
+  50% {
+    filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.8));
+  }
+}
+
+@keyframes panopticon-dash {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+
+@keyframes panopticon-reveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.panopticon-grid {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.panopticon-glass {
+  background: rgba(9, 9, 11, 0.6);
+  backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.panopticon-card-active {
+  background: radial-gradient(circle at top left, rgba(239, 68, 68, 0.15), transparent 60%);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.animate-panopticon-scan {
+  animation: panopticon-scanline 6s linear infinite;
+}
+
+.animate-panopticon-float {
+  animation: panopticon-float 4s ease-in-out infinite;
+}
+
+.animate-panopticon-reveal {
+  animation: panopticon-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-panopticon-dash {
+  animation: panopticon-dash 1s linear infinite;
+}

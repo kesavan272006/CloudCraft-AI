@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { toast } from 'sonner'
 import {
@@ -20,7 +19,14 @@ import {
   Network,
   Rocket,
   ShieldAlert,
-  Fingerprint
+  Fingerprint,
+  ChevronRight,
+  Target,
+  AlertTriangle,
+  Flame,
+  Globe,
+  Cpu,
+  Lock
 } from "lucide-react"
 
 export default function CompetitorPulsePage() {
@@ -29,418 +35,438 @@ export default function CompetitorPulsePage() {
   const [result, setResult] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
   const [deploying, setDeploying] = useState(false)
+  const [terminalIndex, setTerminalIndex] = useState(0)
 
-  // Terminal animation state
-  const [logs, setLogs] = useState<string[]>([])
   const bootSequence = [
-    "INITIATING AWS STEP FUNCTIONS ORCHESTRATOR...",
-    "SPINNING UP AMAZON REKOGNITION VISION AGENTS...",
-    "EXTRACTING COMPETITOR COMPLAINTS VIA AWS COMPREHEND...",
-    "DEPLOYING RED TEAM BEDROCK SWARM...",
-    "MAPPING THREAT GRAPH IN AMAZON NEPTUNE...",
-    "SYNTHESIZING ZERO-DAY EXPLOIT PLAN..."
+    { label: "INITIATING AWS STEP FUNCTIONS", icon: <Cpu className="h-3 w-3" />, color: "text-blue-400" },
+    { label: "SPINNING UP REKOGNITION AGENTS", icon: <Eye className="h-3 w-3" />, color: "text-indigo-400" },
+    { label: "MINING BRAND DNA VIA COMPREHEND", icon: <BrainCircuit className="h-3 w-3" />, color: "text-orange-400" },
+    { label: "ORCHESTRATING RED TEAM BEDROCK SWARM", icon: <ShieldAlert className="h-3 w-3" />, color: "text-red-400" },
+    { label: "MAPPING THREAT GRAPH IN NEPTUNE", icon: <Network className="h-3 w-3" />, color: "text-emerald-400" },
+    { label: "LOCKING ON TARGET PARAMETERS", icon: <Target className="h-3 w-3" />, color: "text-zinc-400" }
   ]
 
   useEffect(() => {
     if (loading) {
-      let currentLogIndex = 0;
-      setLogs([]);
+      setTerminalIndex(0)
       const interval = setInterval(() => {
-        if (currentLogIndex < bootSequence.length) {
-          setLogs(prev => [...prev, `[${new Date().toISOString().split('T')[1].slice(0, 8)}] ${bootSequence[currentLogIndex]}`]);
-          currentLogIndex++;
-        } else {
-          clearInterval(interval);
-        }
-      }, 1000);
-      return () => clearInterval(interval);
+        setTerminalIndex(prev => (prev < bootSequence.length ? prev + 1 : prev))
+      }, 800)
+      return () => clearInterval(interval)
     }
-  }, [loading]);
+  }, [loading])
 
   const handleSearch = async () => {
     if (!query.trim()) return
-
     setLoading(true)
     setError(null)
     setResult(null)
-
     try {
       const response = await fetch('http://localhost:8000/api/v1/competitor/pulse', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query }),
       })
-
-      if (!response.ok) throw new Error("Failed to fetch competitor pulse")
-
+      if (!response.ok) throw new Error("Intelligence link severed by remote host")
       const data = await response.json()
       setResult(data)
     } catch (err: any) {
-      setError(err.message || "Engine error during web search")
+      setError(err.message)
     } finally {
-      setTimeout(() => setLoading(false), 500)
+      setTimeout(() => setLoading(false), 800)
     }
   }
 
   const handleDeploy = () => {
     setDeploying(true)
-    toast.success("COUNTER-STRIKE INITIATED", {
-      description: "Intelligence successfully transferred. Bedrock agents are drafting your retaliation campaign...",
-      icon: <Rocket className="h-5 w-5 text-white" />,
-      style: { backgroundColor: '#dc2626', color: 'white', border: '1px solid #f87171' }
-    });
-    setTimeout(() => {
-      setDeploying(false)
-    }, 3000)
+    toast.success("WAR ROOM DEPLOYMENT INITIATED", {
+      description: "Asymmetric directives transferred to Architect core.",
+      icon: <Rocket className="h-4 w-4" />,
+      className: "bg-red-600 border-red-500 text-white font-bold"
+    })
+    setTimeout(() => setDeploying(false), 2000)
   }
 
   return (
-    <div className="flex-1 p-4 md:p-10 text-foreground overflow-x-hidden min-h-screen relative font-sans">
-      {/* Dynamic Background Effects */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10 bg-zinc-950">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-red-900/20 blur-[120px] rounded-full mix-blend-screen" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-900/10 blur-[150px] rounded-full mix-blend-screen" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:32px_32px] opacity-20" />
+    <div className="min-h-screen bg-[#050507] text-zinc-100 font-sans selection:bg-red-500/30">
+      {/* Premium Ambient Background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-red-600/5 blur-[120px] rounded-full translate-x-1/2 -translate-y-1/2 opacity-50" />
+        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-600/5 blur-[100px] rounded-full -translate-x-1/2 translate-y-1/2 opacity-30" />
+        <div className="absolute inset-0 panopticon-grid opacity-20" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050507]/80 to-[#050507]" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto space-y-8">
+      <div className="max-w-7xl mx-auto px-6 py-12 space-y-10">
 
-        {/* Header Section */}
-        <div className="flex flex-col gap-2 md:flex-row md:items-end justify-between border-b border-white/5 pb-6">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="relative">
-                <div className="absolute -inset-1 bg-red-500 rounded-full blur opacity-30 animate-pulse" />
-                <div className="relative bg-zinc-950 border border-red-500/50 p-2 rounded-full">
-                  <Radar className="h-6 w-6 text-red-500 animate-[spin_3s_linear_infinite]" />
+        {/* Elite Header */}
+        <header className="relative flex flex-col md:flex-row md:items-end justify-between gap-6 overflow-hidden">
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="relative h-14 w-14 flex items-center justify-center">
+                <div className="absolute inset-0 bg-red-600/20 rounded-xl rotate-12 animate-pulse" />
+                <div className="absolute inset-0 border border-red-500/30 rounded-xl -rotate-6" />
+                <Radar className="h-8 w-8 text-red-500 relative z-10 animate-panopticon-pulse" />
+              </div>
+              <div>
+                <h1 className="text-5xl font-black tracking-tightest uppercase text-white lg:text-6xl">
+                  Panopticon<span className="text-red-600">.</span>
+                </h1>
+                <div className="flex items-center gap-2 text-zinc-500 font-mono text-[10px] uppercase tracking-[0.4em] mt-1">
+                  <span className="w-8 h-px bg-red-600/50" />
+                  Predictive Strategic Intelligence
                 </div>
               </div>
-              <h1 className="text-4xl font-black tracking-tighter uppercase bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent">Project Panopticon</h1>
             </div>
-            <p className="text-zinc-400 text-sm font-mono tracking-widest uppercase flex items-center gap-2">
-              <ShieldAlert className="h-4 w-4 text-red-500/80" />
-              AWS Native Threat Engine
-            </p>
           </div>
-        </div>
 
-        {/* Input Bar */}
-        <div className="relative group rounded-2xl p-1 bg-gradient-to-r from-red-500/20 via-zinc-800 to-indigo-500/20 hover:from-red-500/40 hover:to-indigo-500/40 transition-all duration-500">
-          <div className="absolute inset-0 bg-red-500/10 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <div className="relative flex flex-col sm:flex-row gap-2 bg-zinc-950 p-2 rounded-xl border border-white/10">
-            <div className="relative flex-1 flex items-center px-4">
-              <Search className="h-5 w-5 text-zinc-500" />
+          <div className="flex items-center gap-6 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-4 px-6">
+            <div className="text-right">
+              <div className="text-[10px] font-mono font-bold text-zinc-500 uppercase">System Status</div>
+              <div className="flex items-center gap-2 text-emerald-400 font-black text-xs uppercase">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Operational
+              </div>
+            </div>
+            <Separator orientation="vertical" className="h-8 bg-white/10" />
+            <div className="text-right">
+              <div className="text-[10px] font-mono font-bold text-zinc-500 uppercase">AWS Backend</div>
+              <div className="text-zinc-300 font-black text-xs uppercase tracking-widest">Nova-Lite-v1</div>
+            </div>
+          </div>
+        </header>
+
+        {/* Tactical Search Interface */}
+        <section className="relative">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-red-600 to-indigo-600 rounded-3xl blur opacity-10 group-focus-within:opacity-25 transition duration-1000" />
+          <div className="relative bg-[#09090b] border border-white/10 rounded-2xl p-2 flex flex-col md:flex-row shadow-2xl">
+            <div className="flex-1 flex items-center px-6 gap-4">
+              <Search className="h-5 w-5 text-red-500/50" />
               <Input
-                placeholder="Enter Target Handle or URI..."
-                className="flex-1 h-12 bg-transparent border-none text-lg font-mono placeholder:text-zinc-600 focus-visible:ring-0 shadow-none text-zinc-100"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 disabled={loading}
+                placeholder="Target Handle (e.g. @therundownai) or Competitive Niche..."
+                className="h-14 bg-transparent border-none text-xl font-bold placeholder:text-zinc-700 text-white focus-visible:ring-0 shadow-none px-0"
               />
             </div>
             <Button
-              size="lg"
               onClick={handleSearch}
               disabled={loading}
-              className="h-12 px-10 text-base font-black uppercase tracking-widest bg-red-600 hover:bg-red-500 text-white rounded-lg shadow-[0_0_20px_rgba(220,38,38,0.4)] transition-all hover:scale-[1.02]"
+              className="h-14 px-10 bg-red-600 hover:bg-red-500 text-white font-black uppercase tracking-widest text-sm rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_30px_rgba(220,38,38,0.3)]"
             >
-              <Zap className="mr-2 h-5 w-5" />
+              <Zap className="h-5 w-5 mr-3 fill-current" />
               Initiate Pulse
             </Button>
           </div>
-        </div>
+        </section>
 
-        {/* Terminal Loading */}
-        {loading && (
-          <div className="mx-auto max-w-3xl pt-10">
-            <div className="bg-[#0D1117] border border-green-500/30 rounded-xl overflow-hidden shadow-[0_0_30px_rgba(34,197,94,0.1)] relative">
-              <div className="flex items-center justify-between px-4 py-3 bg-[#161B22] border-b border-white/10">
-                <div className="flex items-center gap-2">
-                  <Terminal className="h-4 w-4 text-green-500" />
-                  <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-widest">AWS Step Functions.exe</span>
-                </div>
-                <div className="flex gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-zinc-600" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-zinc-600" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse" />
-                </div>
-              </div>
-              <div className="p-6 font-mono text-sm space-y-3 min-h-[250px] relative">
-                {logs.map((log, i) => (
-                  <div key={i} className="text-green-400 opacity-90 animate-in slide-in-from-bottom-2 fade-in flex items-start gap-3">
-                    <span className="text-zinc-500 select-none">❯</span>
-                    <span>{log}</span>
+        {/* Terminal / Results */}
+        <main>
+          {loading && (
+            <div className="max-w-3xl mx-auto space-y-6 pt-10">
+              <div className="panopticon-glass rounded-xl overflow-hidden border border-white/10 shadow-2xl relative">
+                <div className="absolute inset-0 bg-gradient-to-b from-green-500/5 to-transparent pointer-events-none" />
+                <div className="flex items-center justify-between px-5 py-3 bg-white/5 border-b border-white/10">
+                  <div className="flex items-center gap-2">
+                    <Terminal className="h-4 w-4 text-emerald-500" />
+                    <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-widest">AWS Step Orchestrator</span>
                   </div>
-                ))}
-                <div className="text-green-500/50 animate-pulse mt-4 flex items-center gap-3">
-                  <span className="text-zinc-500 select-none">❯</span>
-                  <span className="w-2 h-4 bg-green-500/80 inline-block" />
-                </div>
-                {/* Visual scanline effect */}
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-green-500/5 to-transparent h-20 w-full animate-[scan_3s_ease-in-out_infinite] opacity-50 pointer-events-none" />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Error State */}
-        {error && (
-          <div className="rounded-xl border border-red-500/50 bg-red-950/30 p-6 flex flex-col items-center justify-center text-center">
-            <Activity className="h-8 w-8 text-red-500 mb-3 animate-pulse" />
-            <h3 className="text-lg font-bold text-red-400 uppercase">System Malfunction</h3>
-            <p className="text-red-300/80 font-mono mt-2">{error}</p>
-          </div>
-        )}
-
-        {/* Panopticon Results Dashboard */}
-        {result && !loading && (
-          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
-
-            {/* Top Identity Bar */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="md:col-span-3 bg-white/5 border border-white/10 rounded-2xl p-6 relative overflow-hidden backdrop-blur-md group">
-                <div className="absolute -right-10 -top-10 opacity-5 group-hover:opacity-10 transition-opacity duration-700 pointer-events-none">
-                  <Fingerprint className="h-64 w-64 text-red-500" />
-                </div>
-                <div className="relative z-10 flex flex-col justify-between h-full">
-                  <div className="flex items-center gap-3 mb-6">
-                    <Badge className="bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30">VULNERABILITY DETECTED</Badge>
-                    <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mt-1">Intelligence Target</span>
+                  <div className="flex gap-1">
+                    <div className="h-2 w-2 rounded-full bg-zinc-800" />
+                    <div className="h-2 w-2 rounded-full bg-zinc-800" />
+                    <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                   </div>
-                  <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-white uppercase">{result.competitor_handle}</h2>
                 </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 border border-red-500/30 rounded-2xl p-6 flex flex-col items-center justify-center relative shadow-[0_0_30px_rgba(220,38,38,0.15)]">
-                <div className="absolute inset-0 bg-red-500/5 pulse-bg rounded-2xl pointer-events-none" />
-                <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest mb-3">Threat Level</span>
-                <div className="relative flex items-center justify-center w-32 h-32">
-                  <svg className="absolute w-full h-full -rotate-90">
-                    <circle cx="64" cy="64" r="60" stroke="currentColor" strokeWidth="4" fill="transparent" className="text-zinc-800" />
-                    <circle cx="64" cy="64" r="60" stroke="currentColor" strokeWidth="4" fill="transparent"
-                      strokeDasharray="377"
-                      strokeDashoffset={377 - (377 * result.threat_level) / 100}
-                      className="text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]"
-                      strokeLinecap="round" />
-                  </svg>
-                  <span className="text-4xl font-black text-white">{result.threat_level}<span className="text-lg text-zinc-500">%</span></span>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-
-              {/* SENSORY INTERCEPTS COLUMN */}
-              <div className="space-y-6">
-                <div className="flex items-center gap-3 border-b border-white/10 pb-3">
-                  <Activity className="h-5 w-5 text-indigo-400" />
-                  <h3 className="text-sm font-black uppercase tracking-widest text-zinc-200">Sensory Intercepts</h3>
-                </div>
-
-                <div className="grid gap-4">
-                  {/* Rekognition */}
-                  <div className="bg-white/5 border border-indigo-500/30 rounded-xl p-5 hover:bg-white/10 transition-colors relative overflow-hidden">
-                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]" />
-                    <div className="flex items-center gap-2 mb-4">
-                      <Eye className="h-4 w-4 text-indigo-400" />
-                      <span className="text-xs font-mono font-bold text-indigo-400 uppercase tracking-widest">Amazon Rekognition</span>
+                <div className="p-8 font-mono text-xs md:text-sm space-y-4 min-h-[300px]">
+                  {bootSequence.slice(0, terminalIndex).map((step, i) => (
+                    <div key={i} className="flex items-center gap-4 animate-panopticon-reveal">
+                      <span className="text-zinc-600 font-bold">[{new Date().toISOString().split('T')[1].slice(0, 8)}]</span>
+                      <span className={step.color + " font-black uppercase flex items-center gap-2"}>
+                        {step.icon} {step.label}
+                      </span>
+                      <span className="ml-auto text-emerald-500 font-black">ACTIVE</span>
                     </div>
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-[10px] text-zinc-500 uppercase font-mono mb-1">Visual Palette</p>
-                        <p className="text-sm text-zinc-200 font-medium">{result.sensory_layer.rekognition.color_palette}</p>
+                  ))}
+                  {terminalIndex < bootSequence.length && (
+                    <div className="flex items-center gap-4 animate-pulse">
+                      <span className="text-zinc-600 font-bold">[{new Date().toISOString().split('T')[1].slice(0, 8)}]</span>
+                      <div className="h-4 w-2 bg-zinc-700" />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {error && (
+            <div className="max-w-2xl mx-auto bg-red-950/20 border-2 border-red-600/50 rounded-2xl p-8 text-center space-y-4">
+              <AlertTriangle className="h-12 w-12 text-red-500 mx-auto animate-bounce" />
+              <h3 className="text-2xl font-black uppercase text-red-100">Intelligence Link severed</h3>
+              <p className="text-red-400/80 font-mono text-sm">{error}</p>
+            </div>
+          )}
+
+          {result && !loading && (
+            <div className="space-y-12 animate-in fade-in slide-in-from-bottom-12 duration-1000">
+
+              {/* Strategic Overview Meta */}
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div className="lg:col-span-3 bg-white/5 border border-white/10 rounded-3xl p-8 relative overflow-hidden group">
+                  <div className="absolute -right-12 -top-12 opacity-5 scale-150 rotate-12 group-hover:opacity-10 transition-opacity pointer-events-none">
+                    <Fingerprint className="h-64 w-64 text-red-600" />
+                  </div>
+                  <div className="relative z-10 flex flex-col justify-between h-full space-y-8">
+                    <div className="flex items-center gap-3">
+                      <Badge className="bg-red-500 text-white font-black rounded text-[10px]">THREAT LEVEL: CRITICAL</Badge>
+                      <span className="h-px w-20 bg-white/10" />
+                      <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Protocol Panopticon Active</span>
+                    </div>
+                    <h2 className="text-6xl md:text-8xl font-black tracking-tightest uppercase leading-none text-white break-words">
+                      {result.competitor_handle}
+                    </h2>
+                  </div>
+                </div>
+
+                <Card className="bg-[#0c0c0e] border border-red-500/30 rounded-3xl p-8 flex flex-col items-center justify-center text-center shadow-[0_20px_60px_-15px_rgba(220,38,38,0.2)]">
+                  <div className="absolute inset-0 bg-red-500/5 pulse-bg rounded-3xl pointer-events-none" />
+                  <h4 className="text-[10px] font-mono font-black uppercase tracking-widest text-zinc-500 mb-6">Aggregate Danger</h4>
+                  <div className="relative w-40 h-40 flex items-center justify-center">
+                    <svg className="absolute w-full h-full -rotate-90">
+                      <circle cx="80" cy="80" r="74" stroke="currentColor" strokeWidth="6" fill="transparent" className="text-zinc-900" />
+                      <circle cx="80" cy="80" r="74" stroke="currentColor" strokeWidth="6" fill="transparent"
+                        strokeDasharray="465"
+                        strokeDashoffset={465 - (465 * result.threat_level) / 100}
+                        className="text-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.6)] animate-panopticon-revea"
+                        strokeLinecap="round" />
+                    </svg>
+                    <div className="text-center">
+                      <div className="text-6xl font-black text-white">{result.threat_level}</div>
+                      <div className="text-[10px] font-mono text-zinc-500 uppercase">Impact Score</div>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+
+              {/* Data Grid Layout */}
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
+
+                {/* COLUMN 1: SENSORY DATA */}
+                <div className="space-y-8">
+                  <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                    <div className="flex items-center gap-3">
+                      <Activity className="h-5 w-5 text-indigo-500" />
+                      <h3 className="text-sm font-black uppercase tracking-[.25em] text-zinc-400">Sensory Intercepts</h3>
+                    </div>
+                    <Badge variant="outline" className="border-indigo-500/30 text-indigo-400 font-mono text-[9px]">RAW AWS DATA</Badge>
+                  </div>
+
+                  <div className="space-y-4">
+                    {/* Rekognition */}
+                    <Card className="bg-white/5 border-l-4 border-l-indigo-500 border border-white/10 rounded-xl p-6 hover:bg-white/[0.07] transition-all">
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-2">
+                          <Eye className="h-4 w-4 text-indigo-400" />
+                          <span className="text-xs font-mono font-black text-indigo-400 uppercase tracking-widest">Rekognition Vision</span>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-[10px] text-zinc-500 uppercase font-mono mb-1">Target Demographic</p>
-                        <p className="text-sm text-zinc-200 font-medium">{result.sensory_layer.rekognition.target_demographic_visuals}</p>
+                      <div className="grid grid-cols-2 gap-8">
+                        <div className="space-y-4">
+                          <div className="space-y-1">
+                            <div className="text-[10px] uppercase font-mono text-zinc-500">Aesthetic Palette</div>
+                            <div className="text-sm font-bold text-white">{result.sensory_layer.rekognition.color_palette}</div>
+                          </div>
+                          <div className="space-y-1">
+                            <div className="text-[10px] uppercase font-mono text-zinc-500">Demographic Hook</div>
+                            <div className="text-sm font-bold text-white">{result.sensory_layer.rekognition.target_demographic_visuals}</div>
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap gap-2 content-start">
+                          {result.sensory_layer.rekognition.visual_themes.map((theme: string, i: number) => (
+                            <Badge key={i} className="bg-indigo-500/10 text-indigo-300 border-indigo-500/20 text-[9px] uppercase font-black">{theme}</Badge>
+                          ))}
+                        </div>
                       </div>
-                      <div className="flex flex-wrap gap-2 pt-2">
-                        {result.sensory_layer.rekognition.visual_themes.map((theme: string, i: number) => (
-                          <span key={i} className="px-2 py-1 text-[10px] uppercase font-bold bg-indigo-500/10 text-indigo-300 rounded border border-indigo-500/20">{theme}</span>
+                    </Card>
+
+                    {/* Transcribe */}
+                    <Card className="bg-white/5 border-l-4 border-l-cyan-500 border border-white/10 rounded-xl p-6 hover:bg-white/[0.07] transition-all">
+                      <div className="flex items-center gap-2 mb-6">
+                        <Headphones className="h-4 w-4 text-cyan-400" />
+                        <span className="text-xs font-mono font-black text-cyan-400 uppercase tracking-widest">Transcribe Sonic</span>
+                      </div>
+                      <div className="grid gap-3">
+                        {result.sensory_layer.transcribe.sonic_hooks.map((hook: string, i: number) => (
+                          <div key={i} className="bg-zinc-950/50 p-3 px-4 rounded-lg border border-white/5 font-mono italic text-sm text-cyan-50/70 border-l-2 border-l-cyan-500/50">
+                            "{hook}"
+                          </div>
                         ))}
                       </div>
-                    </div>
-                  </div>
+                    </Card>
 
-                  {/* Transcribe */}
-                  <div className="bg-white/5 border border-cyan-500/30 rounded-xl p-5 hover:bg-white/10 transition-colors relative overflow-hidden">
-                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.8)]" />
-                    <div className="flex items-center gap-2 mb-4">
-                      <Headphones className="h-4 w-4 text-cyan-400" />
-                      <span className="text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest">Amazon Transcribe</span>
-                    </div>
-                    <div className="space-y-3 bg-zinc-950/50 p-4 rounded-lg border border-white/5">
-                      <p className="text-[10px] text-zinc-500 uppercase font-mono mb-2">Sonic Hooks Extracted</p>
-                      {result.sensory_layer.transcribe.sonic_hooks.map((hook: string, i: number) => (
-                        <p key={i} className="text-sm text-cyan-50/90 font-mono italic">"{hook}"</p>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Comprehend */}
-                  <div className="bg-white/5 border border-orange-500/30 rounded-xl p-5 hover:bg-white/10 transition-colors relative overflow-hidden">
-                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.8)]" />
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-2">
-                        <BrainCircuit className="h-4 w-4 text-orange-400" />
-                        <span className="text-xs font-mono font-bold text-orange-400 uppercase tracking-widest">Amazon Comprehend</span>
-                      </div>
-                      <Badge className="bg-orange-600/20 text-orange-400 border border-orange-500/30 rounded uppercase text-[9px] font-black">
-                        Sentiment: NEGATIVE
-                      </Badge>
-                    </div>
-                    <p className="text-lg font-bold text-zinc-100 mb-4">{result.sensory_layer.comprehend.critical_vulnerability}</p>
-                    <div className="space-y-2">
-                      <p className="text-[10px] text-zinc-500 uppercase font-mono">User Complaints Filtered</p>
-                      {result.sensory_layer.comprehend.user_complaints.map((complaint: string, i: number) => (
-                        <div key={i} className="flex gap-2 text-sm text-zinc-400 items-start">
-                          <span className="text-orange-500 mt-1">⊛</span> <span>{complaint}</span>
+                    {/* Comprehend */}
+                    <Card className="bg-white/5 border-l-4 border-l-orange-500 border border-white/10 rounded-xl p-6 hover:bg-white/[0.07] transition-all">
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-2">
+                          <BrainCircuit className="h-4 w-4 text-orange-400" />
+                          <span className="text-xs font-mono font-black text-orange-400 uppercase tracking-widest">Comprehend NLP</span>
                         </div>
-                      ))}
+                        <div className="text-[10px] font-mono text-orange-500/80 font-black flex items-center gap-2">
+                          SENTIMENT LOSS: {result.sensory_layer.comprehend.negative_sentiment_score}%
+                        </div>
+                      </div>
+                      <div className="space-y-6">
+                        <div className="p-4 bg-orange-500/5 border border-orange-500/20 rounded-lg">
+                          <p className="text-lg font-black text-white italic leading-tight uppercase">"{result.sensory_layer.comprehend.critical_vulnerability}"</p>
+                        </div>
+                        <div className="space-y-2">
+                          {result.sensory_layer.comprehend.user_complaints.map((c: string, i: number) => (
+                            <div key={i} className="flex gap-3 text-xs text-zinc-400 items-start">
+                              <span className="text-orange-500 font-bold">»</span> <span>{c}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </Card>
+                  </div>
+                </div>
+
+                {/* COLUMN 2: STRATEGIC SWARM */}
+                <div className="space-y-8">
+                  <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                    <div className="flex items-center gap-3">
+                      <Crosshair className="h-5 w-5 text-red-500" />
+                      <h3 className="text-sm font-black uppercase tracking-[.25em] text-zinc-400">Agent Swarm Directives</h3>
                     </div>
+                    <Badge variant="outline" className="border-red-500/30 text-red-400 font-mono text-[9px] animate-pulse">BEDROCK ACTIVE</Badge>
+                  </div>
+
+                  <div className="grid gap-6">
+                    {/* Red Team Strategy */}
+                    <Card className="bg-gradient-to-br from-[#1c0a0a] to-[#050507] border border-red-500/30 rounded-2xl p-8 relative overflow-hidden group">
+                      <Flame className="absolute -right-6 -bottom-6 w-32 h-32 text-red-500 opacity-5 group-hover:opacity-10 transition-opacity" />
+                      <div className="flex items-center gap-3 mb-8">
+                        <div className="h-3 w-3 rounded-full bg-red-600 animate-pulse shadow-[0_0_12px_rgba(220,38,38,1)]" />
+                        <span className="text-xs font-mono font-black text-red-500 uppercase tracking-widest">Asymmetric Offensive</span>
+                      </div>
+                      <div className="space-y-8 relative z-10">
+                        <div className="space-y-2">
+                          <div className="text-[10px] font-mono font-black text-red-400/50 uppercase">Weakness Identification</div>
+                          <p className="text-base font-bold text-zinc-100">{result.agent_swarm.red_team.pricing_vulnerability}</p>
+                        </div>
+                        <div className="bg-red-600 border border-red-500 rounded-xl p-6 shadow-[0_10px_30px_-5px_rgba(220,38,38,0.4)] transition-transform hover:-translate-y-1">
+                          <div className="flex items-center gap-2 mb-2 text-white/70 font-mono font-black text-[9px] uppercase">Primary Directive</div>
+                          <p className="text-xl font-black text-white uppercase leading-tight">{result.agent_swarm.red_team.undercut_strategy}</p>
+                        </div>
+                      </div>
+                    </Card>
+
+                    {/* Poacher Section */}
+                    <Card className="bg-[#09090b] border border-emerald-500/20 rounded-2xl p-8 relative group">
+                      <div className="absolute top-0 right-0 p-4">
+                        <Rocket className="h-5 w-5 text-emerald-500/20" />
+                      </div>
+                      <div className="flex items-center gap-3 mb-8">
+                        <div className="h-3 w-3 rounded-full bg-emerald-600 animate-pulse shadow-[0_0_12px_rgba(16,185,129,1)]" />
+                        <span className="text-xs font-mono font-black text-emerald-500 uppercase tracking-widest">Market Poacher</span>
+                      </div>
+                      <div className="space-y-4">
+                        <div className="text-[10px] font-mono font-black text-emerald-500/50 uppercase">The Zero-Day Ad Hook</div>
+                        <div className="bg-zinc-950/80 border-2 border-dashed border-emerald-500/20 p-8 rounded-2xl text-center">
+                          <p className="text-2xl font-black italic text-emerald-400 leading-snug">"{result.agent_swarm.customer_poacher.zero_day_ad_copy}"</p>
+                        </div>
+                      </div>
+                    </Card>
+
+                    {/* Neptune Threat Graph Overlay */}
+                    <Card className="bg-[#060608] border border-white/5 rounded-2xl p-6 relative overflow-hidden shadow-2xl">
+                      <div className="absolute inset-0 bg-[#060608] panopticon-grid pointer-events-none opacity-20" />
+                      <div className="flex items-center justify-between mb-8 relative z-10">
+                        <span className="text-[10px] font-mono font-black text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+                          <Globe className="h-3.5 w-3.5" /> Neptune Infrastructure Map
+                        </span>
+                        <Lock className="h-3 w-3 text-zinc-700" />
+                      </div>
+                      <div className="relative h-48 flex items-center justify-center p-4">
+                        {/* Stylized Visual Graph Component */}
+                        <div className="w-full flex justify-around items-center relative gap-4">
+                          <div className="absolute inset-0 flex items-center justify-center -z-0">
+                            <svg className="w-full h-full stroke-zinc-800" fill="none">
+                              <path d="M 20 80 Q 50 20 80 80" className="animate-panopticon-dash" strokeDasharray="5,5" />
+                              <path d="M 20 80 Q 50 140 80 80" className="animate-panopticon-dash" strokeDasharray="5,5" />
+                            </svg>
+                          </div>
+                          {result.threat_graph.nodes.slice(0, 3).map((node: any, i: number) => (
+                            <div key={i} className="bg-zinc-900 border border-white/10 p-3 px-5 rounded-lg text-center relative z-10 hover:border-red-500/50 transition-colors cursor-crosshair">
+                              <div className="text-[9px] font-mono text-zinc-600 uppercase mb-1">{node.type}</div>
+                              <div className="text-[11px] font-black text-zinc-200 uppercase">{node.label}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </Card>
                   </div>
                 </div>
               </div>
 
-              {/* AGENT SWARM & THREAT GRAPH COLUMN */}
-              <div className="space-y-6">
-                <div className="flex items-center gap-3 border-b border-white/10 pb-3">
-                  <Crosshair className="h-5 w-5 text-rose-500" />
-                  <h3 className="text-sm font-black uppercase tracking-widest text-zinc-200">Agent Swarm Directives</h3>
-                </div>
+              {/* MASSIVE FINAL CTA */}
+              <div className="pt-20 pb-32 flex flex-col items-center">
+                <div className="relative group perspective-1000 w-full max-w-2xl px-6">
+                  <div className="absolute -inset-4 bg-gradient-to-r from-red-600 via-rose-500 to-red-600 rounded-[30px] blur-3xl opacity-20 group-hover:opacity-40 transition duration-1000 animate-pulse" />
 
-                {/* Red Team Strategy */}
-                <div className="bg-gradient-to-br from-rose-950/40 to-black border border-rose-500/30 rounded-xl p-6 relative overflow-hidden group">
-                  <div className="absolute -right-4 -top-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <ShieldAlert className="w-32 h-32 text-rose-500" />
-                  </div>
-                  <div className="flex items-center gap-2 mb-6">
-                    <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse shadow-[0_0_8px_rgba(244,63,94,1)]" />
-                    <span className="text-xs font-mono font-bold text-rose-400 uppercase tracking-widest">Red Team Offensive</span>
-                  </div>
-                  <div className="space-y-5 relative z-10">
-                    <div>
-                      <span className="text-[10px] text-rose-400/70 uppercase tracking-widest block mb-1 font-mono">Pricing Vulnerability</span>
-                      <p className="text-sm font-semibold text-zinc-200">{result.agent_swarm.red_team.pricing_vulnerability}</p>
+                  <Button
+                    onClick={handleDeploy}
+                    disabled={deploying}
+                    className="w-full h-auto py-8 rounded-[24px] bg-[#0c0c0e] border-2 border-red-600/50 hover:border-red-500 relative overflow-hidden group transition-all duration-500 flex flex-col sm:flex-row items-center justify-center gap-8 px-12"
+                  >
+                    {/* Dynamic Shimmer */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-red-500/10 to-transparent -translate-x-[200%] group-hover:translate-x-[200%] transition-transform duration-1200 ease-out" />
+
+                    <div className="relative bg-red-600 p-4 rounded-2xl transform group-hover:scale-110 group-hover:rotate-12 transition-transform duration-500">
+                      <Rocket className="w-8 h-8 text-white fill-current" />
                     </div>
-                    <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-lg">
-                      <span className="text-[10px] text-rose-400 uppercase tracking-widest block mb-1 font-mono">Undercut Execution</span>
-                      <p className="text-base font-bold text-white">{result.agent_swarm.red_team.undercut_strategy}</p>
+
+                    <div className="flex flex-col items-start text-center sm:text-left relative z-10">
+                      <span className="text-3xl font-black uppercase tracking-tighter text-white leading-none">Deploy Counter-Strike</span>
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="text-[10px] font-mono font-bold text-red-500 uppercase tracking-widest">Execute Directive #42</span>
+                        <ChevronRight className="h-3 w-3 text-red-600" />
+                      </div>
                     </div>
-                  </div>
-                </div>
 
-                {/* Poacher Segment */}
-                <div className="bg-gradient-to-br from-emerald-950/40 to-black border border-emerald-500/30 rounded-xl p-6 relative">
-                  <div className="flex items-center gap-2 mb-6">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,1)]" />
-                    <span className="text-xs font-mono font-bold text-emerald-400 uppercase tracking-widest">Customer Poacher</span>
-                  </div>
-                  <div className="bg-black/50 border border-emerald-500/20 p-5 rounded-lg">
-                    <span className="text-[9px] text-emerald-500/70 uppercase tracking-widest block mb-2 font-mono">Zero-Day Ad Copy Draft Generated</span>
-                    <p className="text-lg font-black italic text-emerald-400 leading-snug">"{result.agent_swarm.customer_poacher.zero_day_ad_copy}"</p>
-                  </div>
-                </div>
-
-                {/* Neptune Threat Graph Visualization */}
-                <div className="bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden relative shadow-2xl">
-                  <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
-                  <div className="p-4 border-b border-zinc-800 bg-black/50 relative z-10">
-                    <span className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
-                      <Network className="h-3 w-3" /> Amazon Neptune Threat Graph
-                    </span>
-                  </div>
-                  <div className="p-8 relative z-10 min-h-[220px] flex items-center justify-center">
-                    {/* Simulated Graph UI */}
-                    <div className="relative w-full max-w-sm aspect-video">
-                      {/* Center Node */}
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-950 border border-red-500 p-2 rounded z-20 shadow-[0_0_15px_rgba(239,68,68,0.4)]">
-                        <span className="text-[10px] font-mono font-bold text-white uppercase">{result.threat_graph.nodes[0]?.label.slice(0, 15)}</span>
+                    {deploying && (
+                      <div className="absolute inset-0 bg-red-600 flex flex-col items-center justify-center animate-in slide-in-from-bottom fill-current">
+                        <Activity className="h-10 w-10 text-white animate-pulse mb-2" />
+                        <span className="font-black text-xl text-white uppercase tracking-widest">Transmitting Intel...</span>
                       </div>
-
-                      {/* Left Node */}
-                      <div className="absolute top-1/4 left-0 bg-zinc-900 border border-zinc-700 p-2 rounded z-20">
-                        <span className="text-[9px] font-mono text-zinc-400 uppercase">{result.threat_graph.nodes[1]?.label.slice(0, 12)}</span>
-                      </div>
-
-                      {/* Right Node */}
-                      <div className="absolute bottom-1/4 right-0 bg-zinc-900 border border-zinc-700 p-2 rounded z-20">
-                        <span className="text-[9px] font-mono text-zinc-400 uppercase">{result.threat_graph.nodes[2]?.label.slice(0, 12)}</span>
-                      </div>
-
-                      {/* SVG Lines */}
-                      <svg className="absolute inset-0 w-full h-full z-10 overflow-visible" aria-hidden="true">
-                        <path d="M 0 25 L 50 50" stroke="rgba(239,68,68,0.3)" strokeWidth="2" strokeDasharray="4 4" className="animate-[dash_10s_linear_infinite]" fill="none" vectorEffect="non-scaling-stroke" preserveAspectRatio="none" transform="scale(3.8, 1) translate(0, 15)" />
-                        <path d="M 50 50 L 100 75" stroke="rgba(239,68,68,0.3)" strokeWidth="2" strokeDasharray="4 4" className="animate-[dash_10s_linear_infinite_reverse]" fill="none" vectorEffect="non-scaling-stroke" preserveAspectRatio="none" transform="scale(3.8, 1) translate(0, 15)" />
-                      </svg>
-                    </div>
-                  </div>
+                    )}
+                  </Button>
                 </div>
-
               </div>
+
             </div>
+          )}
 
-            {/* MASSIVE DEPLOY BUTTON */}
-            <div className="pt-10 pb-20 flex flex-col items-center justify-center animate-in fade-in zoom-in duration-1000 delay-500">
-              <div className="relative group perspective-1000">
-                {/* Glowing backdrop */}
-                <div className="absolute -inset-2 bg-gradient-to-r from-red-600 to-rose-600 rounded-2xl blur-2xl opacity-50 group-hover:opacity-100 group-active:opacity-75 transition-all duration-500 animate-pulse" />
-
-                <Button
-                  onClick={handleDeploy}
-                  disabled={deploying}
-                  className="relative flex items-center gap-4 bg-zinc-950 border-2 border-red-500/50 hover:border-red-400 hover:bg-zinc-900 h-auto py-6 px-12 rounded-xl transition-all duration-300 transform group-hover:scale-[1.03] group-active:scale-[0.98] overflow-hidden"
-                >
-                  {/* Shimmer sweep effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-[200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
-
-                  {deploying ? (
-                    <>
-                      <Activity className="w-8 h-8 text-red-500 animate-pulse" />
-                      <div className="flex flex-col items-start text-left">
-                        <span className="text-2xl font-black uppercase text-white tracking-widest leading-none">Executing...</span>
-                        <span className="text-[10px] font-mono text-red-400 uppercase tracking-widest mt-1">Transferring to Architect</span>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <Rocket className="w-8 h-8 text-red-500 group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform duration-300" />
-                      <div className="flex flex-col items-start text-left">
-                        <span className="text-2xl font-black uppercase text-white tracking-widest leading-none">Deploy Counter-Strike</span>
-                        <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest mt-1">Convert Intel into Live Campaign Draft</span>
-                      </div>
-                    </>
-                  )}
-                </Button>
+          {/* Empty State Overlay */}
+          {!result && !loading && !error && (
+            <div className="flex flex-col items-center justify-center py-32 opacity-80">
+              <div className="relative h-40 w-40 mb-10">
+                <div className="absolute inset-0 border-2 border-dashed border-white/5 rounded-full animate-[spin_20s_linear_infinite]" />
+                <div className="absolute inset-4 border border-zinc-900 border-t-red-500/20 rounded-full animate-spin" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Crosshair className="h-14 w-14 text-white/5" />
+                </div>
               </div>
+              <h3 className="text-xl font-black uppercase text-zinc-600 tracking-[0.4em]">Target Acquisition Offline</h3>
+              <p className="text-zinc-500 font-mono mt-4 max-w-xs text-center text-xs tracking-tight">
+                Authorize the system via the command bar above to initiate a deep-strike intelligence pulse.
+              </p>
             </div>
-
-          </div>
-        )}
-
-        {/* Empty State */}
-        {!result && !loading && !error && (
-          <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-            <div className="relative mb-6">
-              <div className="absolute inset-0 bg-red-500 blur-3xl opacity-10 rounded-full" />
-              <Crosshair className="h-20 w-20 text-red-500/20 relative" />
-            </div>
-            <h3 className="text-2xl font-black uppercase tracking-widest text-zinc-100">Engine Standby</h3>
-            <p className="text-zinc-500 font-mono mt-3 max-w-md text-sm">
-              Input target parameters above to authorize AWS Step Functions to orchestrate a multi-modal Panopticon intelligence sweep.
-            </p>
-          </div>
-        )}
+          )}
+        </main>
 
       </div>
-
-      <style>{`
-        @keyframes scan {
-          0% { transform: translateY(-100%); }
-          100% { transform: translateY(300%); }
-        }
-      `}</style>
     </div>
   )
 }
