@@ -13,7 +13,7 @@ import {
   Search, Cpu, Layers, Database, CheckCircle2, Circle,
   TrendingUp, TrendingDown, Minus, Target,
   Building2, Users, Eye, Clock, Activity, Rocket,
-  RefreshCw, Radar, LocateFixed, EyeOff, ScanFace
+  RefreshCw, Radar, LocateFixed, EyeOff, ScanFace, Shield, Crosshair, Terminal
 } from 'lucide-react'
 import { GenesisCanvas } from '@/features/genesis/GenesisCanvas'
 
@@ -279,58 +279,93 @@ function RivalRadarView({ campaign }: { campaign: any }) {
 
 function ArchitectBoard({ strategy }: { strategy: any }) {
   if (!strategy) return null
+
+  const vectors = strategy.attack_vectors || strategy.usps || []
+  const directive = strategy.agentic_directive || strategy.tagline || ''
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 animate-in fade-in zoom-in-95 duration-500">
-      <div className="lg:col-span-2 rounded-2xl border border-border/80 bg-gradient-to-br from-card to-card/50 p-6 space-y-4 shadow-sm relative overflow-hidden">
-        <div className="absolute top-0 right-0 p-3 opacity-10 pointer-events-none">
-          <Layers className="h-32 w-32" />
-        </div>
-        <Badge variant="outline" className="text-[10px] font-mono tracking-widest border-primary/30 text-primary uppercase">Core Campaign DNA</Badge>
-        <div>
-          <h2 className="text-2xl font-bold font-serif italic text-foreground/90 tracking-tight leading-snug">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in zoom-in-95 duration-500">
+      <div className="lg:col-span-2 space-y-6">
+        {/* Main Directive Card */}
+        <div className="rounded-2xl border border-primary/20 bg-gradient-to-br from-card to-primary/5 p-8 shadow-lg relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+            <Layers className="h-40 w-40" />
+          </div>
+
+          <Badge className="bg-primary/20 text-primary hover:bg-primary/20 border-primary/30 text-[10px] font-mono tracking-widest uppercase mb-5">
+            Core Thesis
+          </Badge>
+
+          <h2 className="text-3xl font-bold font-serif text-foreground tracking-tight leading-snug mb-6">
             "{strategy.core_concept}"
           </h2>
-        </div>
-        <div>
-          <p className="text-sm text-muted-foreground mb-1 uppercase tracking-widest font-semibold text-[10px]">Differentiated Tagline</p>
-          <p className="text-base font-semibold text-primary">{strategy.tagline}</p>
-        </div>
-        <div className="pt-4 border-t border-border/50">
-          <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-widest mb-3">Market Insight Gained</p>
-          <p className="text-sm text-foreground/80 leading-relaxed border-l-2 border-primary/50 pl-3">
-            {strategy.market_insight}
-          </p>
-        </div>
-      </div>
 
-      <div className="space-y-5">
-        <div className="rounded-xl border border-border bg-card p-5">
-          <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-widest mb-3 flex items-center gap-2">
-            <Users className="h-3 w-3" /> Target Audiences
-          </p>
-          <div className="space-y-3">
-            {strategy.target_audience?.map((aud: any, i: number) => (
-              <div key={i} className="space-y-0.5">
-                <p className="text-xs font-semibold">{aud.segment_name}</p>
-                <p className="text-[10px] text-muted-foreground line-clamp-2">{aud.pain_point}</p>
-              </div>
-            ))}
+          <div className="bg-background/50 rounded-xl p-5 border border-border/80 shadow-inner">
+            <p className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-emerald-500 mb-2">
+              <Terminal className="h-4 w-4" /> Agentic Directive
+            </p>
+            <p className="text-lg font-semibold text-foreground/90 pl-6 border-l-2 border-emerald-500/50">
+              {directive}
+            </p>
           </div>
         </div>
 
-        <div className="rounded-xl border border-border bg-card p-5">
-          <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-widest mb-3 flex items-center gap-2">
-            <Target className="h-3 w-3" /> USPs
+        {/* Market Vulnerability & Target Segments */}
+        <div className="grid sm:grid-cols-2 gap-6">
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-4 opacity-80">Market Vulnerability</p>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              {strategy.market_insight}
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mb-4 flex items-center gap-2 opacity-80">
+              <Users className="h-3 w-3" /> Target Audiences
+            </p>
+            <div className="space-y-4">
+              {strategy.target_audience?.map((aud: any, i: number) => (
+                <div key={i} className="space-y-1 bg-muted/30 p-3 rounded-lg border border-border/40">
+                  <p className="text-xs font-bold text-foreground">{aud.segment_name}</p>
+                  <p className="text-[10px] text-muted-foreground">{aud.pain_point}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Strategic Playbook (Sidebar) */}
+      <div className="space-y-6">
+        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-6 shadow-sm">
+          <p className="text-[10px] text-amber-500/80 font-bold uppercase tracking-widest mb-4 flex items-center gap-2">
+            <Crosshair className="h-4 w-4 text-amber-500" /> Attack Vectors
           </p>
-          <ul className="space-y-2">
-            {strategy.usps?.map((usp: string, i: number) => (
-              <li key={i} className="text-xs flex items-start gap-2">
-                <span className="text-primary mt-0.5">•</span>
-                <span className="text-foreground/80 leading-snug">{usp}</span>
+          <ul className="space-y-3">
+            {vectors.map((vec: string, i: number) => (
+              <li key={i} className="text-xs flex items-start gap-3 bg-card p-3 rounded-lg border border-amber-500/20 shadow-sm">
+                <Target className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
+                <span className="text-foreground/80 leading-snug">{vec}</span>
               </li>
             ))}
           </ul>
         </div>
+
+        {strategy.defensive_moats && strategy.defensive_moats.length > 0 && (
+          <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-6 shadow-sm">
+            <p className="text-[10px] text-emerald-500/80 font-bold uppercase tracking-widest mb-4 flex items-center gap-2">
+              <Shield className="h-4 w-4 text-emerald-500" /> Defensive Moats
+            </p>
+            <ul className="space-y-3">
+              {strategy.defensive_moats.map((moat: string, i: number) => (
+                <li key={i} className="text-xs flex items-start gap-3 bg-card p-3 rounded-lg border border-emerald-500/20 shadow-sm">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span className="text-foreground/80 leading-snug">{moat}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   )

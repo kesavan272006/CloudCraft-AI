@@ -269,48 +269,46 @@ class CampaignIntelligenceService:
         competitor_list = ", ".join(comprehend_data["competitor_names"]) or "none detected"
         signals_list = ", ".join(comprehend_data["key_phrases"][:8]) or "none detected"
 
-        synthesis_prompt = f"""
-You are the Chief Marketing Strategist for a Fortune 500 brand.
+        synthesis_prompt = f"""You are 'CloudCraft Architect', an elite, highly agentic, ruthless growth-hacking AI.
+You do not give generic advice. You design hyper-specific, technically actionable, and devastatingly effective marketing warfare strategies.
 
-{brand_context}
-
-== CAMPAIGN BRIEF ==
-Name: {campaign_name}
+== CAMPAIGN OBJECTIVE ==
+Name: {name}
 Goal: {goal}
 Duration: {duration}
 Budget: {budget}
 
-== AWS COMPREHEND MARKET INTELLIGENCE (real NLP, not guessed) ==
+== AWS COMPREHEND MARKET INTELLIGENCE ==
 Market Sentiment: {comprehend_data['sentiment']} ({comprehend_data['market_confidence']}% confidence)
-Detected Competitors (ORGANIZATION entities): {competitor_list}
-Market Opportunity Signals (key phrases): {signals_list}
+Detected Competitors: {competitor_list}
+Opportunity Signals: {signals_list}
 
-== RAW MARKET RECON (Tavily, {total_hits} sources) ==
+== RAW MARKET RECON ==
 {raw_data[:2500]}
 
 == TASK ==
-Using the Comprehend-extracted competitor names and market signals as PRIMARY inputs,
-build a strategy that:
-1. DIFFERENTIATES clearly from the detected competitors: {competitor_list}
-2. EXPLOITS the opportunity signals: {signals_list}
-3. Is grounded in the actual market data above — not generic advice
+Forge an ultra-premium, highly differentiated strategy that dominates the detected competitors ({competitor_list}).
+The output must feel advanced, technical, and "agentic" (using terms like "Attack Vectors", "Defensive Moats", "Signal Intercepts").
+DO NOT return generic business advice. Give specific, tactical, and aggressive marketing maneuvers grounded in the AWS data.
 
-Return ONLY valid JSON, no markdown:
+Return ONLY valid JSON (no markdown block, just the raw json):
 {{
-    "core_concept": "One compelling sentence grounded in the market signals",
-    "tagline": "Catchy, differentiated tagline referencing the opportunity",
+    "core_concept": "A massive, paradigm-shifting thesis statement for this campaign.",
+    "agentic_directive": "A one-sentence, highly directive command to the execution team on the most critical path to victory.",
+    "market_insight": "The critical vulnerability detected in the current market landscape based on the Comprehend data.",
+    "attack_vectors": [
+        "Vector 1: High-impact technical or guerrilla growth tactic targeting {competitor_list[:20]}",
+        "Vector 2: Unconventional acquisition channel based on signals",
+        "Vector 3: Aggressive wedge strategy to breach the market"
+    ],
     "target_audience": [
-        {{"segment_name": "Segment 1 (from Comprehend data)", "pain_point": "Specific pain tied to signals"}},
-        {{"segment_name": "Segment 2", "pain_point": "Pain point"}}
+        {{"segment_name": "Ultra-specific Niche 1", "pain_point": "Deep psychological or technical pipeline bottleneck"}},
+        {{"segment_name": "Ultra-specific Niche 2", "pain_point": "Another deeply researched vulnerability"}}
     ],
-    "usps": [
-        "USP 1 that directly counters {competitor_list.split(',')[0] if competitor_list != 'none detected' else 'market'}",
-        "USP 2 from opportunity signal",
-        "USP 3"
-    ],
-    "tone": "Tone style",
-    "visual_direction": "Visual direction informed by market signals",
-    "market_insight": "One sentence: what the Comprehend data reveals about this market right now"
+    "defensive_moats": [
+        "How we protect our flanks from retaliation by existing players",
+        "Technical or brand moat we are building"
+    ]
 }}
 """
         strategy = None
@@ -321,18 +319,17 @@ Return ONLY valid JSON, no markdown:
             if not strategy:
                 raise ValueError("No valid JSON in LLM response")
             yield _sse("synthesis_result", {"strategy": strategy,
-                "message": "Amazon Nova strategy synthesis complete"})
+                "message": "Strategy synthesis complete"})
         except Exception as e:
             logger.error(f"Synthesis failed: {e}")
             strategy = {
-                "core_concept": f"Strategic differentiation in the {goal} space",
-                "tagline": f"Your edge in a {len(comprehend_data['competitor_names'])}-player market",
+                "core_concept": f"Aggressive Wedge Entry into {goal} space",
+                "agentic_directive": f"Execute zero-day marketing pivot against {competitor_list[:20]}",
+                "market_insight": f"AWS Comprehend detected {comprehend_data['sentiment']} market sentiment.",
+                "attack_vectors": comprehend_data["key_phrases"][:3] or ["Seize organic SEO", "Deploy autonomous outbound", "Hijack competitor PR"],
                 "target_audience": [{"segment_name": "Primary", "pain_point": p}
-                    for p in comprehend_data["key_phrases"][:2]],
-                "usps": comprehend_data["key_phrases"][:3],
-                "tone": "Professional, confident",
-                "visual_direction": "Clean, data-driven aesthetic",
-                "market_insight": f"AWS Comprehend detected {comprehend_data['sentiment']} market sentiment."
+                    for p in comprehend_data["key_phrases"][:2]] or [{"segment_name": "Default Niche", "pain_point": "Inefficiency"}],
+                "defensive_moats": ["Proprietary dataset advantage", "First-mover AI integration"]
             }
             yield _sse("synthesis_fallback", {"strategy": strategy,
                 "message": "Used Comprehend-direct strategy (LLM parse issue)"})
