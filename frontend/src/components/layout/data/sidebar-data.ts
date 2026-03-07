@@ -12,6 +12,7 @@ import {
   Radio,
   Layers,
   Languages,
+  Timer,
 } from 'lucide-react'
 import { type SidebarData } from '../types'
 
@@ -68,6 +69,11 @@ export const sidebarData: SidebarData = {
     {
       title: 'Planning & Growth',
       items: [
+        {
+          title: 'Chronos Brief',
+          url: '/chronos-brief',
+          icon: Timer,
+        },
         {
           title: 'Campaign Architect',
           url: '/campaign-architect',

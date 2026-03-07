@@ -38,6 +38,7 @@ import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_auth
 import { Route as AuthenticatedGenesisIndexRouteImport } from './routes/_authenticated/genesis/index'
 import { Route as AuthenticatedForgeIndexRouteImport } from './routes/_authenticated/forge/index'
 import { Route as AuthenticatedCompetitorPulseIndexRouteImport } from './routes/_authenticated/competitor-pulse/index'
+import { Route as AuthenticatedChronosBriefIndexRouteImport } from './routes/_authenticated/chronos-brief/index'
 import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
 import { Route as AuthenticatedCampaignArchitectIndexRouteImport } from './routes/_authenticated/campaign-architect/index'
 import { Route as AuthenticatedCalendarIndexRouteImport } from './routes/_authenticated/calendar/index'
@@ -203,6 +204,12 @@ const AuthenticatedCompetitorPulseIndexRoute =
     path: '/competitor-pulse/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedChronosBriefIndexRoute =
+  AuthenticatedChronosBriefIndexRouteImport.update({
+    id: '/chronos-brief/',
+    path: '/chronos-brief/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedChatsIndexRoute = AuthenticatedChatsIndexRouteImport.update({
   id: '/chats/',
   path: '/chats/',
@@ -306,6 +313,7 @@ export interface FileRoutesByFullPath {
   '/calendar': typeof AuthenticatedCalendarIndexRoute
   '/campaign-architect': typeof AuthenticatedCampaignArchitectIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
+  '/chronos-brief': typeof AuthenticatedChronosBriefIndexRoute
   '/competitor-pulse': typeof AuthenticatedCompetitorPulseIndexRoute
   '/forge': typeof AuthenticatedForgeIndexRoute
   '/genesis': typeof AuthenticatedGenesisIndexRoute
@@ -346,6 +354,7 @@ export interface FileRoutesByTo {
   '/calendar': typeof AuthenticatedCalendarIndexRoute
   '/campaign-architect': typeof AuthenticatedCampaignArchitectIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
+  '/chronos-brief': typeof AuthenticatedChronosBriefIndexRoute
   '/competitor-pulse': typeof AuthenticatedCompetitorPulseIndexRoute
   '/forge': typeof AuthenticatedForgeIndexRoute
   '/genesis': typeof AuthenticatedGenesisIndexRoute
@@ -391,6 +400,7 @@ export interface FileRoutesById {
   '/_authenticated/calendar/': typeof AuthenticatedCalendarIndexRoute
   '/_authenticated/campaign-architect/': typeof AuthenticatedCampaignArchitectIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
+  '/_authenticated/chronos-brief/': typeof AuthenticatedChronosBriefIndexRoute
   '/_authenticated/competitor-pulse/': typeof AuthenticatedCompetitorPulseIndexRoute
   '/_authenticated/forge/': typeof AuthenticatedForgeIndexRoute
   '/_authenticated/genesis/': typeof AuthenticatedGenesisIndexRoute
@@ -434,6 +444,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/campaign-architect'
     | '/chats'
+    | '/chronos-brief'
     | '/competitor-pulse'
     | '/forge'
     | '/genesis'
@@ -474,6 +485,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/campaign-architect'
     | '/chats'
+    | '/chronos-brief'
     | '/competitor-pulse'
     | '/forge'
     | '/genesis'
@@ -518,6 +530,7 @@ export interface FileRouteTypes {
     | '/_authenticated/calendar/'
     | '/_authenticated/campaign-architect/'
     | '/_authenticated/chats/'
+    | '/_authenticated/chronos-brief/'
     | '/_authenticated/competitor-pulse/'
     | '/_authenticated/forge/'
     | '/_authenticated/genesis/'
@@ -753,6 +766,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCompetitorPulseIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/chronos-brief/': {
+      id: '/_authenticated/chronos-brief/'
+      path: '/chronos-brief'
+      fullPath: '/chronos-brief'
+      preLoaderRoute: typeof AuthenticatedChronosBriefIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/chats/': {
       id: '/_authenticated/chats/'
       path: '/chats'
@@ -879,6 +899,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCalendarIndexRoute: typeof AuthenticatedCalendarIndexRoute
   AuthenticatedCampaignArchitectIndexRoute: typeof AuthenticatedCampaignArchitectIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
+  AuthenticatedChronosBriefIndexRoute: typeof AuthenticatedChronosBriefIndexRoute
   AuthenticatedCompetitorPulseIndexRoute: typeof AuthenticatedCompetitorPulseIndexRoute
   AuthenticatedForgeIndexRoute: typeof AuthenticatedForgeIndexRoute
   AuthenticatedGenesisIndexRoute: typeof AuthenticatedGenesisIndexRoute
@@ -902,6 +923,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCampaignArchitectIndexRoute:
     AuthenticatedCampaignArchitectIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
+  AuthenticatedChronosBriefIndexRoute: AuthenticatedChronosBriefIndexRoute,
   AuthenticatedCompetitorPulseIndexRoute:
     AuthenticatedCompetitorPulseIndexRoute,
   AuthenticatedForgeIndexRoute: AuthenticatedForgeIndexRoute,
