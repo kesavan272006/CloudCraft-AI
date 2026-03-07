@@ -287,26 +287,35 @@ Opportunity Signals: {signals_list}
 {raw_data[:2500]}
 
 == TASK ==
-Forge an ultra-premium, highly differentiated strategy that dominates the detected competitors ({competitor_list}).
-The output must feel advanced, technical, and "agentic" (using terms like "Attack Vectors", "Defensive Moats", "Signal Intercepts").
-DO NOT return generic business advice. Give specific, tactical, and aggressive marketing maneuvers grounded in the AWS data.
+Forge an ultra-premium, highly differentiated strategy that completely obliterates the detected competitors ({competitor_list}).
+DO NOT USE GENERIC CORPORATE SPEAK LIKE "Leverage AI-driven hyper-personalization to maximize engagement". That is weak and boring.
+INSTEAD USE EXTREMELY AGGRESSIVE, HACKER-CENTRIC, AND HIGHLY SPECIFIC TACTICAL LANGUAGE. 
+
+EXAMPLE BAD CORE CONCEPT: "Leverage AI to create personalized marketing."
+EXAMPLE GOOD CORE CONCEPT: "Deploy an autonomous, hyper-targeted intercept campaign utilizing multi-agent swarms to siphon user attention directly from incumbent pipelines."
+
+EXAMPLE BAD VECTOR: "Use SEO to get more leads."
+EXAMPLE GOOD VECTOR: "Execute a zero-day semantic override on {competitor_list[:20]}'s primary organic search terms by deploying programmatic SEO trap-pages."
+
+EXAMPLE BAD MARKET INSIGHT: "The market is ready for a new AI tool."
+EXAMPLE GOOD MARKET INSIGHT: "Critical structural vulnerability detected: incumbent pipeline relies on monolithic legacy code, creating an exploitable latency wedge."
 
 Return ONLY valid JSON (no markdown block, just the raw json):
 {{
-    "core_concept": "A massive, paradigm-shifting thesis statement for this campaign.",
-    "agentic_directive": "A one-sentence, highly directive command to the execution team on the most critical path to victory.",
-    "market_insight": "The critical vulnerability detected in the current market landscape based on the Comprehend data.",
+    "core_concept": "A massive, aggressive thesis statement. No generic corporate buzzwords.",
+    "agentic_directive": "A one-sentence, highly directive command (e.g., 'INITIATE autonomous prospect scraping sequence on...').",
+    "market_insight": "A brutally honest assessment of competitor weakness based on the Comprehend data.",
     "attack_vectors": [
-        "Vector 1: High-impact technical or guerrilla growth tactic targeting {competitor_list[:20]}",
-        "Vector 2: Unconventional acquisition channel based on signals",
-        "Vector 3: Aggressive wedge strategy to breach the market"
+        "Vector 1: Specific, ruthless guerrilla growth tactic targeting {competitor_list[:20]}",
+        "Vector 2: Unconventional technical acquisition channel based on signals",
+        "Vector 3: Aggressive wedge strategy"
     ],
     "target_audience": [
-        {{"segment_name": "Ultra-specific Niche 1", "pain_point": "Deep psychological or technical pipeline bottleneck"}},
+        {{"segment_name": "Ultra-specific Niche 1", "pain_point": "Deep psychological or technical bottleneck"}},
         {{"segment_name": "Ultra-specific Niche 2", "pain_point": "Another deeply researched vulnerability"}}
     ],
     "defensive_moats": [
-        "How we protect our flanks from retaliation by existing players",
+        "How we protect our flanks from retaliation",
         "Technical or brand moat we are building"
     ]
 }}
