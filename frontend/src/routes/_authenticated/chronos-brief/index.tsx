@@ -33,6 +33,15 @@ const topNav = [
 type MissionState = 'dashboard' | 'briefing' | 'deploying' | 'active'
 type AutomationLevel = 'automate' | 'suggest'
 
+const LOCAL_MARKET_SIGNALS = [
+  "COMPETITOR 'VIVA' LAUNCHED NEW AD CAMPAIGN. SENTIMENT DROPPING.",
+  "UNEXPECTED SURGE IN TIKTOK ENGAGEMENT FOR 'SUSTAINABILITY' HASHTAG.",
+  "GLOBAL SUPPLY CHAIN DISRUPTION DETECTED. ADJUSTING INVENTORY MESSAGING.",
+  "INFLUENCER TREND SHIFTING TOWARDS MICRO-COMMUNITIES IN TARGET REGION.",
+  "BUSINESSES MUST PREPARE FOR 2026 BY ADOPTING ADVANCED TESTING STRATEGIES.",
+  "ALGORITHMIC UPDATE ON LINKEDIN PRIORITIZING LONG-FORM THOUGHT LEADERSHIP."
+]
+
 function ChronosBriefPageContent() {
   const [activeState, setActiveState] = useState<MissionState>('dashboard')
   const [missionsList, setMissionsList] = useState<any[]>([])
@@ -49,6 +58,27 @@ function ChronosBriefPageContent() {
   const [loading, setLoading] = useState(false)
   const [selectedDay, setSelectedDay] = useState(1)
   const [pushedTasks, setPushedTasks] = useState<Record<string, boolean>>({})
+
+  // Live Feed & Pivot State
+  const [liveSignalIndex, setLiveSignalIndex] = useState(0)
+  const [isPivoting, setIsPivoting] = useState(false)
+
+  // Live Feed Simulation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLiveSignalIndex(prev => (prev + 1) % LOCAL_MARKET_SIGNALS.length)
+    }, 6000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const handleGlobalPivot = () => {
+    setIsPivoting(true);
+    const toastId = toast.loading("Authorizing Global Pivot...", { description: "Re-calibrating mission parameters & engine directives." });
+    setTimeout(() => {
+      toast.success("Global Pivot Authorized.", { id: toastId, description: "Mission architecture successfully updated." });
+      setIsPivoting(false);
+    }, 2500);
+  }
 
   // Update selected day when mission loads
   useEffect(() => {
@@ -742,29 +772,41 @@ function ChronosBriefPageContent() {
               </div>
 
               <div className="space-y-6">
-                <div className="bg-black/40 border border-white/5 rounded-[1.5rem] p-6 space-y-4">
+                <div className="bg-black/40 border border-white/5 rounded-[1.5rem] p-6 space-y-4 overflow-hidden relative">
                   <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
                     <span className="flex items-center gap-2"><Globe className="h-3 w-3" /> Market Signal Intercept</span>
                     <span>JUST NOW</span>
                   </div>
-                  <p className="text-xs text-foreground/80 leading-relaxed italic border-l-[3px] border-emerald-500/40 pl-4 uppercase tracking-tight font-bold">
-                    {mission.market_signals || "Market volatility detected. Strategizing course correction..."}
+                  <p key={liveSignalIndex} className="text-xs text-foreground/80 leading-relaxed italic border-l-[3px] border-emerald-500/40 pl-4 uppercase tracking-tight font-bold animate-in fade-in slide-in-from-bottom-2 duration-500">
+                    {LOCAL_MARKET_SIGNALS[liveSignalIndex]}
                   </p>
 
-                  {isAutomated ? (
+                  {isPivoting ? (
+                    <div className="flex items-center gap-2 text-[9px] font-black text-emerald-500 uppercase p-2 bg-emerald-500/10 rounded-lg animate-in fade-in duration-300">
+                      <Activity className="h-3 w-3 animate-pulse" /> Autonomous Pivot Executing
+                    </div>
+                  ) : isAutomated ? (
                     <div className="flex items-center gap-2 text-[9px] font-black text-emerald-500 uppercase p-2 bg-emerald-500/10 rounded-lg">
                       <Activity className="h-3 w-3 animate-pulse" /> Autonomous Pivot Executing
                     </div>
                   ) : (
-                    <div className="flex items-center gap-2 text-[9px] font-black text-amber-500/60 uppercase">
+                    <div className="flex items-center gap-2 text-[9px] font-black text-amber-500/60 uppercase animate-in fade-in duration-300">
                       <div className="h-1 w-1 rounded-full bg-amber-500 animate-ping" /> Alert: Manual Pivot Recommended
                     </div>
                   )}
                 </div>
 
-                {!isAutomated && (
-                  <Button variant="outline" className="w-full h-14 rounded-2xl border-white/5 bg-white/[0.02] text-[10px] font-black uppercase tracking-[0.4em] hover:bg-primary/5 hover:text-primary hover:border-primary/20 transition-all h-16 shadow-none">
+                {(!isAutomated && !isPivoting) && (
+                  <Button
+                    onClick={handleGlobalPivot}
+                    className="w-full h-14 rounded-2xl border-white/5 bg-white/[0.02] text-[10px] font-black uppercase tracking-[0.4em] hover:bg-primary/5 hover:text-primary hover:border-primary/20 transition-all shadow-none">
                     Authorize Global Pivot <ChevronRight className="h-4 w-4 ml-2" />
+                  </Button>
+                )}
+
+                {isPivoting && (
+                  <Button disabled className="w-full h-14 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 text-[10px] font-black uppercase tracking-[0.4em] text-emerald-500 transition-all shadow-none gap-2">
+                    <Activity className="h-4 w-4 animate-spin" /> Recalibrating Architecture...
                   </Button>
                 )}
               </div>
@@ -822,9 +864,9 @@ function ChronosBriefPageContent() {
               </div>
             </Card>
           </div>
-        </div>
-      </Main>
-    </div>
+        </div >
+      </Main >
+    </div >
   )
 }
 
