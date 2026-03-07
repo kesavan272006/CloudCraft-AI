@@ -89,43 +89,43 @@ class CompetitorService:
                     "threat_level": 92,
                     "sensory_layer": {
                         "rekognition": {
-                            "visual_themes": ["High contrast typography", "Rapid cut transitions"],
-                            "color_palette": "Cyberpunk Neon / Dark Mode",
-                            "target_demographic_visuals": "Tech-savvy Gen-Z and Millennials"
+                            "visual_themes": ["High contrast typography", "Aggressive micro-animations on CTA", "Desaturated backgrounds with neon focal points"],
+                            "color_palette": "Deep Obsidian / Electric Cyan / Warning Red",
+                            "target_demographic_visuals": "High-velocity founders and elite engineers"
                         },
                         "transcribe": {
-                            "sonic_hooks": ["'Stop scrolling if you...'", "'The absolute fastest way to...'"],
-                            "frequent_keywords": ["10x", "automated", "pipeline", "frictionless"]
+                            "sonic_hooks": ["'The fatal mistake 90% of agencies make...'", "'We hacked the algorithm doing this one thing...'"],
+                            "frequent_keywords": ["Asymmetric advantage", "Zero friction", "Infinite scale", "10x ROI"]
                         },
                         "comprehend": {
-                            "critical_vulnerability": "Users consistently complain about high latency and complex onboarding.",
+                            "critical_vulnerability": "Subfidelic retention: Users churn at day 14 due to immense onboarding friction and lack of human-in-the-loop support.",
                             "negative_sentiment_score": 88,
-                            "user_complaints": ["Takes days to setup", "Customer support is a bot"]
+                            "user_complaints": ["Takes 3 weeks to configure the API", "Documentation is a maze", "Customer success ignores tickets"]
                         }
                     },
                     "agent_swarm": {
                         "red_team": {
-                            "pricing_vulnerability": "They charge per-seat, penalizing team expansion.",
-                            "undercut_strategy": "Launch a flat-tier 'Unlimited Seats' asymmetric assault."
+                            "pricing_vulnerability": "They penalize growth with aggressive per-seat pricing. As teams scale, their software becomes a massive liability.",
+                            "undercut_strategy": "Launch an 'Infinite Ops' zero-seat-tax campaign. Target their mid-market customers with a flat-fee migration tool."
                         },
                         "tech_sniffer": {
-                            "detected_stack": ["React Router", "Legacy Webpack", "Stripe Checkout"],
-                            "migration_target": "Enterprise customers fed up with Webpack build times."
+                            "detected_stack": ["React 17 (Legacy)", "Webpack (Slow Builds)", "Heavy Client-Side Rendering"],
+                            "migration_target": "Enterprise CTOs experiencing 'Core Web Vitals' ranking penalties from their bloated infrastructure."
                         },
                         "customer_poacher": {
-                            "attack_angle": "Focus on their 48-hour onboarding delay compared to our 2-minute instant deploy.",
-                            "zero_day_ad_copy": "Still waiting on [Competitor Name]'s support? We deployed while you read this."
+                            "attack_angle": "Focus exclusively on their infamous 14-day integration delay. Our Deploy Counter-Strike will promise 'From signup to production in 42 seconds.'",
+                            "zero_day_ad_copy": "Still waiting for [Competitor] to approve your API key? Our customers just deployed their 4th server while you read this."
                         }
                     },
                     "threat_graph": {
                         "nodes": [
-                            {"id": "c1", "label": f"{query.capitalize()}", "type": "Competitor"},
-                            {"id": "e1", "label": "Angel Investors", "type": "Investor"},
-                            {"id": "t1", "label": "Legacy Monolith", "type": "Tech"}
+                            {"id": "c1", "label": f"{query.capitalize()} HQ", "type": "Competitor"},
+                            {"id": "e1", "label": "Sequoia Capital", "type": "Investor"},
+                            {"id": "t1", "label": "Legacy Monolith Cluster", "type": "Tech"}
                         ],
                         "links": [
-                            {"source": "c1", "target": "e1", "relationship": "Funded By"},
-                            {"source": "c1", "target": "t1", "relationship": "Locked Into"}
+                            {"source": "c1", "target": "e1", "relationship": "Dependent Funding"},
+                            {"source": "c1", "target": "t1", "relationship": "Technical Debt Anchor"}
                         ]
                     }
                 }
