@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useCampaignStore } from '@/stores/campaign-store'
-import { Card, CardContent } from "@/components/ui/card"
+import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -19,16 +19,16 @@ import {
   Globe,
   Cpu,
   Loader2,
-  Lock,
-  ArrowRight,
   TrendingDown,
   ShieldAlert,
   Network,
   Fingerprint,
   Rocket,
   ChevronRight,
+  ShieldCheck,
+  History,
   X,
-  Search as SearchIcon
+  Lock,
 } from "lucide-react"
 
 import { Header } from '@/components/layout/header'
@@ -36,6 +36,7 @@ import { Main } from '@/components/layout/main'
 import { TopNav } from '@/components/layout/top-nav'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
+import { cn } from '@/lib/utils'
 
 const topNav = [
   { title: 'Overview', href: '/dashboard', isActive: false, disabled: false },
@@ -52,18 +53,17 @@ export default function CompetitorPulsePage() {
   const [error, setError] = useState<string | null>(null)
   const [deploying, setDeploying] = useState(false)
   const [terminalIndex, setTerminalIndex] = useState(0)
-  const [searchQuery, setSearchQuery] = useState('')
 
   const navigate = useNavigate()
   const { injectIntelligence } = useCampaignStore()
 
   const bootSequence = [
-    { label: "Initializing Intercept Pipeline", icon: <Cpu className="h-4 w-4" /> },
-    { label: "Scanning Surface Market Signals", icon: <Search className="h-4 w-4" /> },
-    { label: "Extracting Visual Brand DNA", icon: <Eye className="h-4 w-4" /> },
-    { label: "Analyzing Sentiment Clustering", icon: <BrainCircuit className="h-4 w-4" /> },
-    { label: "Synthesizing Counter-Strike Directives", icon: <ShieldAlert className="h-4 w-4" /> },
-    { label: "Finalizing Neptune Threat Topology", icon: <Network className="h-4 w-4" /> }
+    { label: "Intercept Link", icon: <Cpu className="h-3 w-3" /> },
+    { label: "Market Audit", icon: <Search className="h-3 w-3" /> },
+    { label: "Visual DNA", icon: <Eye className="h-3 w-3" /> },
+    { label: "Sentiment Scan", icon: <BrainCircuit className="h-3 w-3" /> },
+    { label: "Strike Vectors", icon: <ShieldAlert className="h-3 w-3" /> },
+    { label: "Threat Mesh", icon: <Network className="h-3 w-3" /> }
   ]
 
   useEffect(() => {
@@ -71,7 +71,7 @@ export default function CompetitorPulsePage() {
       setTerminalIndex(0)
       const interval = setInterval(() => {
         setTerminalIndex(prev => (prev < bootSequence.length ? prev + 1 : prev))
-      }, 700)
+      }, 400)
       return () => clearInterval(interval)
     }
   }, [loading])
@@ -93,7 +93,7 @@ export default function CompetitorPulsePage() {
     } catch (err: any) {
       setError(err.message)
     } finally {
-      setTimeout(() => setLoading(false), 500)
+      setTimeout(() => setLoading(false), 300)
     }
   }
 
@@ -101,374 +101,332 @@ export default function CompetitorPulsePage() {
     setDeploying(true)
     injectIntelligence(result)
     toast.success("Intelligence Link Established", {
-      description: "Asymmetric directives transferred to Architect core.",
+      description: "Directives transferred to Architect core.",
       icon: <Rocket className="h-4 w-4" />,
     })
-
-    setTimeout(() => {
-      navigate({ to: '/campaign-architect' })
-    }, 1500)
+    setTimeout(() => navigate({ to: '/campaign-architect' }), 1200)
   }
 
   return (
     <>
-      <Header className="sticky top-0 z-50 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-2 sm:px-6">
-        <div className="flex items-center gap-2 sm:gap-4">
+      <Header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl px-4 sm:px-6 h-14">
+        <div className="flex items-center gap-4">
           <TopNav links={topNav} />
         </div>
-        <div className='ms-auto flex items-center space-x-2 sm:space-x-4'>
-          <div className="relative hidden md:flex items-center">
-            <SearchIcon className="absolute left-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-9 w-64 bg-secondary/50 border-secondary rounded-lg text-sm shadow-none focus-visible:ring-1 focus-visible:ring-primary"
-            />
-            {searchQuery && <X className="absolute right-2.5 h-4 w-4 text-muted-foreground cursor-pointer" onClick={() => setSearchQuery('')} />}
-          </div>
+        <div className='ms-auto flex items-center space-x-4'>
           <ThemeSwitch />
           <ProfileDropdown />
         </div>
       </Header>
 
-      <Main className="px-4 py-8 md:px-8 max-w-[1400px] mx-auto space-y-10 relative w-full">
-        <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.03] dark:opacity-[0.05]"
-          style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)', backgroundSize: '32px 32px' }} />
+      <Main className="px-6 py-8 md:px-10 max-w-[1400px] mx-auto space-y-12 relative w-full bg-background min-h-screen">
+        {/* REFINED BACKGROUND ELEMENTS */}
+        <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.02] neural-grid" />
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 blur-[120px] rounded-full pointer-events-none -z-10" />
 
-        <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-primary/20 bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-widest gap-2">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
-              </span>
-              Panopticon Core Online
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 max-w-6xl">
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <Badge variant="outline" className="rounded-full px-3 py-0.5 text-[10px] font-bold uppercase tracking-widest text-primary border-primary/20 bg-primary/5 shadow-inner">Operational Logic</Badge>
+              <div className="h-px w-12 bg-primary/20" />
             </div>
-            <h1 className="text-4xl font-extrabold tracking-tight">Competitor Pulse</h1>
-            <p className="text-muted-foreground text-lg max-w-2xl">
-              Deep-strike market intelligence via Multi-modal Agent Swarms.
+            <h1 className="text-3xl md:text-5xl font-black tracking-tight text-foreground uppercase italic leading-[0.9]">Competitor <span className="text-primary not-italic">Pulse</span></h1>
+            <p className="text-muted-foreground text-base md:text-lg font-light max-w-2xl leading-relaxed opacity-70">
+              Analyze market signals and synthesize counter-strike directives.
             </p>
           </div>
 
-          <div className="flex items-center gap-4 bg-muted/30 backdrop-blur-sm border rounded-2xl p-4 px-6 border-border/60">
-            <div className="text-right">
-              <p className="text-[10px] font-bold text-muted-foreground uppercase opacity-70">AWS Engine</p>
-              <div className="flex items-center gap-2 text-emerald-500 font-bold text-xs uppercase">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Link Clear
+          <Card className="bg-card/40 backdrop-blur-3xl border border-white/5 p-1.5 rounded-xl shadow-xl overflow-hidden min-h-[56px] lg:w-[480px]">
+            <div className="flex items-center">
+              <div className="relative flex-1">
+                <Target className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/30" />
+                <Input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                  disabled={loading}
+                  placeholder="Intercept @Handle or URL..."
+                  className="pl-12 h-11 bg-transparent border-none text-sm font-medium focus-visible:ring-0 shadow-none placeholder:text-muted-foreground/30 py-2 sm:py-0"
+                />
               </div>
+              <Button
+                onClick={handleSearch}
+                disabled={loading || !query.trim()}
+                className="h-9 px-6 rounded-lg bg-primary hover:bg-primary/95 text-primary-foreground font-bold text-[10px] uppercase tracking-widest transition-all"
+              >
+                {loading ? <Loader2 className="h-3 w-3 animate-spin mr-2" /> : <Zap className="h-3 w-3 mr-2" />}Pulse
+              </Button>
             </div>
-            <Separator orientation="vertical" className="h-10" />
-            <div className="text-right">
-              <p className="text-[10px] font-bold text-muted-foreground uppercase opacity-70">Synthesizer</p>
-              <p className="text-xs font-black uppercase tracking-widest text-foreground">Nova-Lite-v1</p>
-            </div>
-          </div>
+          </Card>
         </div>
 
-        <div className="relative z-10">
-          <div className="flex flex-col md:flex-row gap-3">
-            <div className="relative flex-1 group">
-              <Target className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/60 group-focus-within:text-primary transition-colors" />
-              <Input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                disabled={loading}
-                placeholder="Target Handle (@Nike) or Niche Sector..."
-                className="pl-12 h-14 bg-card border-border/80 text-lg font-medium rounded-2xl focus-visible:ring-1 focus-visible:ring-primary/20 shadow-sm"
-              />
-            </div>
-            <Button
-              onClick={handleSearch}
-              disabled={loading || !query.trim()}
-              className="h-14 px-10 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm uppercase tracking-widest shadow-xl shadow-primary/10 transition-all hover:scale-[1.01]"
-            >
-              {loading ? <Loader2 className="h-5 w-5 animate-spin mr-3" /> : <Zap className="h-5 w-5 mr-3 fill-current" />}
-              Initiate Pulse
-            </Button>
-          </div>
-        </div>
-
-        <div className="relative z-10 min-h-[400px]">
+        <div className="relative min-h-[500px]">
           {loading && (
-            <div className="animate-in fade-in duration-500 flex flex-col items-center justify-center pt-20">
-              <Card className="w-full max-w-lg shadow-2xl border-primary/20 overflow-hidden">
-                <div className="bg-muted/50 border-b p-4 px-6 flex items-center justify-between">
+            <div className="flex flex-col items-center justify-center pt-20 animate-in fade-in duration-500">
+              <div className="w-full max-w-md space-y-6 glass-dark p-8 rounded-3xl border border-white/5 shadow-2xl">
+                <div className="flex items-center justify-between pb-4 border-b border-white/5">
                   <div className="flex items-center gap-3">
-                    <Terminal className="h-4 w-4 text-primary" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Intercept Sequence</span>
-                  </div>
-                  <div className="flex gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/50 animate-pulse" />
-                  </div>
-                </div>
-                <CardContent className="p-8 space-y-6">
-                  <div className="space-y-4">
-                    {bootSequence.slice(0, terminalIndex).map((step, i) => (
-                      <div key={i} className="flex items-center gap-6 animate-in slide-in-from-left-4 duration-500">
-                        <span className="text-muted-foreground text-[10px] font-mono opacity-50">[{i + 1}]</span>
-                        <div className="text-primary">{step.icon}</div>
-                        <span className="text-sm font-semibold text-foreground/80">{step.label}</span>
-                        <div className="flex-1 h-px bg-border/40" />
-                        <span className="text-emerald-500 text-[10px] font-black tracking-widest uppercase">ACTIVE</span>
-                      </div>
-                    ))}
-                  </div>
-                  {terminalIndex < bootSequence.length && (
-                    <div className="flex justify-center pt-4">
-                      <Loader2 className="h-6 w-6 animate-spin text-primary/30" />
+                    <div className="h-10 w-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary border border-primary/10">
+                      <Terminal className="h-5 w-5" />
                     </div>
-                  )}
-                </CardContent>
-              </Card>
+                    <h4 className="text-xs font-bold tracking-widest uppercase opacity-80">Intercept Stream</h4>
+                  </div>
+                  <Loader2 className="h-4 w-4 animate-spin text-primary/40" />
+                </div>
+
+                <div className="space-y-2">
+                  {bootSequence.map((step, i) => (
+                    <div
+                      key={i}
+                      className={cn(
+                        "flex items-center gap-4 p-3 rounded-xl transition-all duration-300",
+                        i < terminalIndex
+                          ? "bg-emerald-500/[0.03] text-emerald-500/80"
+                          : i === terminalIndex ? "bg-primary/5 text-primary" : "opacity-10"
+                      )}
+                    >
+                      <div className="h-7 w-7 rounded-lg bg-current/5 flex items-center justify-center">
+                        {i < terminalIndex ? <ShieldCheck className="h-3.5 w-3.5" /> : step.icon}
+                      </div>
+                      <p className="text-[10px] font-bold uppercase tracking-widest">{step.label}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 
           {error && (
-            <div className="p-16 text-center bg-destructive/[0.03] border border-destructive/20 rounded-[2rem] space-y-6 animate-in zoom-in-95 duration-500">
-              <div className="h-20 w-20 rounded-full bg-destructive/10 border border-destructive/20 flex items-center justify-center mx-auto">
-                <AlertTriangle className="h-10 w-10 text-destructive" />
+            <div className="max-w-md mx-auto p-12 text-center glass-dark rounded-[2rem] space-y-6 animate-in zoom-in-95 mt-20 shadow-2xl">
+              <div className="h-16 w-16 bg-destructive/10 rounded-2xl flex items-center justify-center text-destructive mx-auto shadow-inner">
+                <AlertTriangle className="h-8 w-8" />
               </div>
               <div className="space-y-2">
-                <h3 className="text-2xl font-extrabold uppercase tracking-tight text-foreground">Intercept Severed</h3>
-                <p className="text-muted-foreground text-sm font-mono">{error}</p>
+                <h3 className="text-xl font-black italic uppercase tracking-tighter text-destructive">Signal Lost</h3>
+                <p className="text-muted-foreground text-xs font-light max-w-xs mx-auto opacity-70">{error}</p>
               </div>
-              <Button variant="outline" onClick={() => setError(null)} className="rounded-full px-8">Refresh Link</Button>
+              <Button onClick={() => setError(null)} size="sm" className="rounded-lg px-8 uppercase font-bold text-[10px] tracking-widest bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-all">Retry Link</Button>
             </div>
           )}
 
           {result && !loading && (
-            <div className="space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-700 ease-out">
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700 ease-out pb-32">
+              {/* COMPACT HERO PANEL */}
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                <Card className="lg:col-span-3 border-border/80 bg-card rounded-[2rem] p-10 flex flex-col justify-end min-h-[250px] relative overflow-hidden group shadow-sm transition-shadow hover:shadow-md">
-                  <div className="absolute top-0 right-0 p-10 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-1000">
-                    <Fingerprint className="h-48 w-48 text-primary" />
-                  </div>
-                  <div className="space-y-6 relative z-10">
+                <Card className="lg:col-span-3 glass-dark p-10 min-h-[300px] relative overflow-hidden flex flex-col justify-center rounded-[2rem] border-none shadow-xl">
+                  <Fingerprint className="absolute -right-8 -top-8 h-80 w-80 text-primary opacity-[0.02] -z-10" />
+                  <div className="space-y-8 relative z-10 w-full">
                     <div className="flex items-center gap-4">
-                      <Badge className="bg-primary text-primary-foreground font-black px-4 py-1.5 text-[10px] tracking-widest rounded-full uppercase">Target: Identified</Badge>
-                      <Separator orientation="vertical" className="h-4" />
-                      <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Protocol Panopticon Active</span>
+                      <Badge className="bg-primary/10 text-primary border-primary/20 font-bold px-4 py-1 text-[10px] tracking-widest rounded-full uppercase">Target Identity</Badge>
+                      <div className="flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse" />
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest opacity-40 italic">Panopticon Sync: 99.8%</span>
+                      </div>
                     </div>
-                    <h2 className="text-7xl font-[1000] tracking-tighter uppercase leading-[0.85] text-foreground break-all">
-                      {result.competitor_handle}
-                    </h2>
+                    <div className="space-y-3">
+                      <h2 className="text-4xl sm:text-6xl font-black tracking-tighter text-foreground leading-[1.0] break-all uppercase italic">
+                        {result.competitor_handle}
+                      </h2>
+                      <p className="text-muted-foreground text-lg italic max-w-xl opacity-60">
+                        "Market audit complete. Extraction of high-fidelity sensory and strategic vectors is finalized."
+                      </p>
+                    </div>
                   </div>
                 </Card>
 
-                <Card className="border-primary/20 bg-card rounded-[2rem] p-10 flex flex-col items-center justify-center text-center shadow-lg relative overflow-hidden group">
-                  <div className="absolute inset-0 bg-primary/[0.01] transition-opacity group-hover:opacity-100 opacity-50 pointer-events-none" />
-                  <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-10">Aggregate Threat</div>
-                  <div className="relative h-44 w-44 flex items-center justify-center">
+                <Card className="lg:col-span-1 glass-dark p-8 flex flex-col items-center justify-center gap-8 rounded-[2rem] border-none shadow-xl bg-primary/[0.02]">
+                  <div className="text-center space-y-1">
+                    <p className="text-[10px] font-bold text-primary uppercase tracking-[0.3em]">Hazard Coefficient</p>
+                  </div>
+                  <div className="relative h-40 w-40 flex items-center justify-center">
                     <svg className="absolute w-full h-full -rotate-90">
-                      <circle cx="88" cy="88" r="82" stroke="currentColor" strokeWidth="2" fill="transparent" className="text-muted/20" />
-                      <circle cx="88" cy="88" r="82" stroke="currentColor" strokeWidth="4" fill="transparent"
-                        strokeDasharray="515"
-                        strokeDashoffset={515 - (515 * result.threat_level) / 100}
-                        className="text-primary drop-shadow-[0_0_15px_rgba(var(--primary),0.5)] transition-all duration-1000 ease-in-out"
+                      <circle cx="80" cy="80" r="72" stroke="currentColor" strokeWidth="4" fill="transparent" className="text-white/5" />
+                      <circle cx="80" cy="80" r="72" stroke="currentColor" strokeWidth="10" fill="transparent"
+                        strokeDasharray="452"
+                        strokeDashoffset={452 - (452 * result.threat_level) / 100}
+                        className="text-primary drop-shadow-[0_0_12px_rgba(var(--primary),0.5)] transition-all duration-2000 ease-out"
                         strokeLinecap="round" />
                     </svg>
-                    <div className="text-center">
-                      <div className="text-6xl font-[1000] text-foreground leading-none">{result.threat_level}</div>
-                      <div className="text-[10px] font-mono text-muted-foreground uppercase font-bold tracking-widest mt-1">Global Danger</div>
-                    </div>
+                    <span className="text-6xl font-black text-foreground tracking-tighter italic">{result.threat_level}</span>
                   </div>
+                  <Badge className="text-[9px] bg-primary/15 text-primary border-primary/20 px-4 py-1.5 rounded-full font-bold uppercase tracking-[0.2em]">Priority: High</Badge>
                 </Card>
               </div>
 
+              {/* REFINED INTELLIGENCE GRID */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <Card className="rounded-[2rem] border-border/80 bg-card p-10 space-y-10 hover:shadow-lg transition-all border-l-4 border-l-indigo-500/40">
+                {/* Visual DNA */}
+                <Card className="glass-dark p-8 space-y-10 rounded-[2rem] border-t-2 border-t-indigo-500/20 shadow-sm flex flex-col">
                   <div className="flex items-center justify-between">
-                    <div className="p-3 bg-indigo-500/10 rounded-2xl">
-                      <Eye className="h-5 w-5 text-indigo-500" />
+                    <div className="h-10 w-10 bg-indigo-500/10 rounded-xl flex items-center justify-center text-indigo-500 border border-indigo-500/10 shadow-inner">
+                      <Eye className="h-5 w-5" />
                     </div>
-                    <Badge variant="outline" className="text-[9px] uppercase border-indigo-500/20 text-indigo-500">Visual DNA</Badge>
+                    <Badge variant="outline" className="text-[9px] border-indigo-500/20 text-indigo-400 px-4 py-1 font-bold uppercase tracking-widest rounded-full">Visual DNA</Badge>
                   </div>
-                  <div className="space-y-6">
-                    <div className="space-y-1">
-                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Brand Aesthetic</p>
-                      <p className="text-lg font-extrabold leading-tight text-foreground">{result.sensory_layer.rekognition.color_palette}</p>
+                  <div className="space-y-8 flex-1">
+                    <div className="space-y-3">
+                      <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest opacity-40">Core Aesthetic</p>
+                      <p className="text-xl font-black text-foreground leading-none uppercase tracking-tight italic">{result.sensory_layer.rekognition.color_palette}</p>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {result.sensory_layer.rekognition.visual_themes.map((t: string, i: number) => (
-                        <Badge key={i} variant="secondary" className="bg-indigo-500/5 text-indigo-700 dark:text-indigo-300 font-bold px-3">{t}</Badge>
+                        <div key={i} className="px-4 py-2 bg-white/5 rounded-xl text-[10px] font-bold uppercase tracking-widest text-foreground/80 border border-white/5">{t}</div>
                       ))}
                     </div>
-                  </div>
-                  <div className="pt-6 border-t">
-                    <p className="text-[10px] font-black text-muted-foreground uppercase mb-2">Psychological Visual Target</p>
-                    <p className="text-sm font-medium text-muted-foreground leading-relaxed">{result.sensory_layer.rekognition.target_demographic_visuals}</p>
+                    <div className="space-y-3 pt-4 border-t border-white/5">
+                      <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest opacity-40">Psychological Delta</p>
+                      <p className="text-sm text-muted-foreground leading-relaxed italic font-light opacity-80">"{result.sensory_layer.rekognition.target_demographic_visuals}"</p>
+                    </div>
                   </div>
                 </Card>
 
-                <Card className="rounded-[2rem] border-border/80 bg-card p-10 space-y-10 hover:shadow-lg transition-all border-l-4 border-l-sky-500/40">
+                {/* Sonic Core */}
+                <Card className="glass-dark p-8 space-y-10 rounded-[2rem] border-t-2 border-t-sky-500/20 shadow-sm flex flex-col">
                   <div className="flex items-center justify-between">
-                    <div className="p-3 bg-sky-500/10 rounded-2xl">
-                      <Headphones className="h-5 w-5 text-sky-500" />
+                    <div className="h-10 w-10 bg-sky-500/10 rounded-xl flex items-center justify-center text-sky-500 border border-sky-500/10 shadow-inner">
+                      <Headphones className="h-5 w-5" />
                     </div>
-                    <Badge variant="outline" className="text-[9px] uppercase border-sky-500/20 text-sky-500">Sonic Core</Badge>
+                    <Badge variant="outline" className="text-[9px] border-sky-500/20 text-sky-400 px-4 py-1 font-bold uppercase tracking-widest rounded-full">Sonic Core</Badge>
                   </div>
-                  <div className="space-y-5">
-                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">High-CTR Conversion Loops</p>
+                  <div className="space-y-6 flex-1">
+                    <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest opacity-40">Auditory Conversion Loops</p>
                     <div className="space-y-3">
                       {result.sensory_layer.transcribe.sonic_hooks.map((hook: string, i: number) => (
-                        <div key={i} className="bg-muted/30 p-5 rounded-2xl border italic text-sm text-foreground/80 leading-relaxed group">
-                          <span className="text-sky-500 mr-2 font-bold select-none">"</span>
-                          {hook}
-                          <span className="text-sky-500 ml-1 font-bold select-none">"</span>
+                        <div key={i} className="bg-white/5 p-5 rounded-2xl border border-white/5 text-sm italic font-light leading-relaxed relative overflow-hidden group/hook">
+                          <div className="absolute top-0 left-0 w-1 h-full bg-sky-500/30 group-hover/hook:bg-sky-500/60 transition-colors" />
+                          "{hook}"
                         </div>
                       ))}
                     </div>
                   </div>
                 </Card>
 
-                <Card className="rounded-[2.5rem] border-primary/30 bg-gradient-to-br from-primary/[0.03] to-transparent p-10 flex flex-col justify-between group shadow-xl transition-all hover:scale-[1.01] lg:row-span-2">
-                  <div className="space-y-10">
-                    <div className="flex items-center gap-4">
-                      <div className="h-3.5 w-3.5 rounded-full bg-primary animate-pulse" />
-                      <span className="text-sm font-black uppercase tracking-widest text-primary">Red Team Offensive</span>
-                    </div>
-                    <div className="space-y-2">
-                      <p className="text-[10px] font-black text-primary/60 uppercase tracking-widest">Market Vulnerability</p>
-                      <p className="text-2xl font-[1000] leading-none text-foreground uppercase tracking-tight">{result.agent_swarm.red_team.pricing_vulnerability}</p>
-                    </div>
-                    <div className="bg-primary p-8 rounded-[2rem] text-primary-foreground shadow-2xl relative overflow-hidden">
-                      <Rocket className="absolute -right-4 -bottom-4 h-24 w-24 opacity-10" />
-                      <p className="text-[10px] font-black uppercase tracking-widest opacity-60 mb-2">Primary Strike Directive</p>
-                      <p className="text-3xl font-[1000] uppercase leading-tight tracking-tighter">{result.agent_swarm.red_team.undercut_strategy}</p>
-                    </div>
-                  </div>
-                  <div className="pt-10 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <TrendingDown className="h-5 w-5 text-primary" />
-                      <span className="text-[11px] font-bold uppercase text-primary">Asymmetric Delta Detected</span>
-                    </div>
-                    <ArrowRight className="h-6 w-6 text-primary animate-in fade-in slide-in-from-left-4 repeat-infinite duration-1000" />
-                  </div>
-                </Card>
-
-                <Card className="rounded-[2rem] border-border/80 bg-card p-10 space-y-10 border-l-4 border-l-orange-500/40">
-                  <div className="flex items-center justify-between">
-                    <div className="p-3 bg-orange-500/10 rounded-2xl">
-                      <BrainCircuit className="h-5 w-5 text-orange-500" />
-                    </div>
-                    <div className="text-[11px] font-black text-orange-600 flex items-center gap-2 uppercase tracking-tighter">
-                      <ShieldAlert className="h-3.5 w-3.5" /> {result.sensory_layer.comprehend.negative_sentiment_score}% Market Erosion
-                    </div>
-                  </div>
-                  <div className="space-y-6">
-                    <div className="bg-orange-500/5 p-6 rounded-2xl border border-orange-500/10">
-                      <p className="text-xl font-black text-foreground uppercase tracking-tight leading-none">"{result.sensory_layer.comprehend.critical_vulnerability}"</p>
-                    </div>
+                {/* Red Team Offensive */}
+                <Card className="p-8 space-y-10 rounded-[2rem] bg-card/60 backdrop-blur-3xl border-l-[3px] border-l-primary relative flex flex-col justify-between shadow-xl overflow-hidden border-y border-r border-white/5">
+                  <Rocket className="absolute -right-8 -bottom-8 h-48 w-48 text-primary opacity-[0.03] rotate-12 -z-10" />
+                  <div className="space-y-10 relative z-10">
+                    <Badge className="bg-primary/20 text-primary border-primary/30 text-[9px] font-bold px-4 py-1.5 uppercase tracking-widest rounded-full">Strike Objective</Badge>
                     <div className="space-y-3">
-                      {result.sensory_layer.comprehend.user_complaints.map((c: string, i: number) => (
-                        <div key={i} className="flex gap-4 text-sm text-muted-foreground items-start">
-                          <div className="h-1.5 w-1.5 rounded-full bg-orange-500 mt-1.5 shrink-0" />
-                          <span>{c}</span>
-                        </div>
-                      ))}
+                      <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest opacity-40">System Vulnerability</p>
+                      <h3 className="text-2xl font-black text-foreground leading-tight italic uppercase tracking-tighter">{result.agent_swarm.red_team.pricing_vulnerability}</h3>
                     </div>
                   </div>
-                </Card>
 
-                <Card className="rounded-[2rem] border-emerald-500/20 bg-emerald-500/[0.02] p-10 space-y-10 border-l-4 border-l-emerald-500/40 group hover:bg-emerald-500/[0.04] transition-all">
-                  <div className="flex items-center justify-between">
-                    <div className="p-3 bg-emerald-500/10 rounded-2xl">
-                      <Target className="h-5 w-5 text-emerald-500" />
+                  <div className="bg-primary p-8 rounded-2xl text-primary-foreground shadow-2xl relative overflow-hidden group/strike transition-transform hover:scale-[1.02]">
+                    <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity animate-shimmer-subtle" />
+                    <div className="space-y-4 relative z-10">
+                      <p className="text-[9px] font-bold uppercase tracking-[0.4em] opacity-60">Execution Directive</p>
+                      <p className="text-xl font-black italic leading-[1.0] uppercase tracking-tighter">{result.agent_swarm.red_team.undercut_strategy}</p>
                     </div>
-                    <span className="text-[9px] font-black uppercase text-emerald-600 tracking-widest">Market Poacher v2</span>
-                  </div>
-                  <div className="space-y-6">
-                    <p className="text-[10px] font-black text-emerald-500/60 uppercase tracking-widest">Exploitative Zero-Day Hook</p>
-                    <div className="bg-card border-2 border-dashed border-emerald-500/20 p-8 rounded-2xl shadow-inner">
-                      <p className="text-2xl font-[1000] italic text-emerald-600 dark:text-emerald-400 leading-snug tracking-tighter font-serif uppercase">"{result.agent_swarm.customer_poacher.zero_day_ad_copy}"</p>
-                    </div>
-                  </div>
-                </Card>
-
-                <Card className="lg:col-span-2 rounded-[2.5rem] bg-muted/20 border-border/60 p-10 relative overflow-hidden">
-                  <div className="absolute inset-0 z-0 opacity-[0.05]" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)', backgroundSize: '24px 24px' }} />
-                  <div className="flex items-center justify-between relative z-10 mb-10">
-                    <span className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.4em] flex items-center gap-3">
-                      <Globe className="h-4 w-4" /> Neptune Threat Topology
-                    </span>
-                    <Lock className="h-4 w-4 text-muted-foreground opacity-30" />
-                  </div>
-                  <div className="relative z-10 py-4 flex flex-wrap justify-center gap-12 sm:gap-24 items-center">
-                    {result.threat_graph.nodes.slice(0, 3).map((node: any, i: number) => (
-                      <div key={i} className="text-center space-y-4 group/node">
-                        <div className={`relative h-24 w-40 rounded-[2rem] border transition-all duration-500 flex flex-col items-center justify-center p-6 bg-card group-hover/node:shadow-xl group-hover/node:-translate-y-2 cursor-pointer ${i === 0 ? 'border-primary border-2 shadow-lg scale-110' : 'border-border/60'}`}>
-                          <p className="text-[8px] font-bold text-muted-foreground uppercase opacity-40 mb-1">{node.type}</p>
-                          <p className="text-xs font-black uppercase text-foreground text-center tracking-tighter line-clamp-2 leading-none">{node.label}</p>
-                          {i === 0 && <div className="absolute -top-2 px-3 py-0.5 bg-primary text-primary-foreground text-[8px] font-black rounded-full uppercase">Primary</div>}
-                        </div>
-                      </div>
-                    ))}
-                    <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-border to-transparent -translate-y-1/2 -z-1" />
                   </div>
                 </Card>
               </div>
 
-              <div className="pt-24 pb-48 flex flex-col items-center text-center space-y-12 relative z-10">
-                <div className="space-y-4">
-                  <h3 className="text-5xl font-[1000] tracking-tighter uppercase leading-none text-foreground">Launch Market Strike</h3>
-                  <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
-                    Convert this intelligence pulse into an operational directive.
-                    Redirect to the <strong>Campaign Architect</strong> to weaponize these insights.
-                  </p>
+              {/* TOPOLOGY: Ecosystem mapping */}
+              <Card className="glass-dark p-10 rounded-[2.5rem] relative overflow-hidden shadow-sm group border-none bg-card/20 min-h-[300px] flex flex-col justify-center">
+                <div className="flex items-center justify-between mb-12 relative z-10">
+                  <div className="flex items-center gap-4">
+                    <Globe className="h-5 w-5 text-primary/40" />
+                    <h4 className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-[0.5em] block leading-none">Neptune Threat Topology</h4>
+                  </div>
                 </div>
 
-                <div className="relative group w-full max-w-3xl">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-primary/50 to-primary/20 rounded-[3rem] blur-2xl opacity-10 group-hover:opacity-30 transition duration-1000" />
-                  <Button
-                    onClick={handleDeploy}
-                    disabled={deploying}
-                    className="h-28 w-full rounded-[3rem] bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_30px_70px_-15px_rgba(var(--primary),0.4)] flex items-center justify-between px-16 group transition-all duration-500 hover:scale-[1.01] active:scale-[0.99] border-none"
-                  >
-                    <div className="flex items-center gap-10">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-white/20 rounded-2xl blur-lg opacity-0 group-hover:opacity-100 transition duration-500" />
-                        <div className="h-14 w-14 bg-white/10 rounded-2xl flex items-center justify-center relative z-10">
-                          <Rocket className="h-8 w-8 fill-current" />
-                        </div>
+                <div className="relative flex flex-col lg:flex-row justify-center gap-8 lg:gap-16 items-center px-4 relative z-10">
+                  {result.threat_graph.nodes.slice(0, 3).map((node: any, i: number) => (
+                    <div key={i} className="relative group/node text-center w-full lg:w-56">
+                      <div className={cn(
+                        "h-24 w-full rounded-2xl border flex flex-col items-center justify-center bg-background/50 shadow-lg transition-all duration-700",
+                        i === 0 ? "border-primary/50 shadow-primary/5" : "border-white/5"
+                      )}>
+                        {i === 0 && (
+                          <div className="absolute -top-3 px-4 py-1 bg-primary text-primary-foreground text-[8px] font-bold rounded-full uppercase tracking-widest shadow-lg">Primary</div>
+                        )}
+                        <span className="text-[8px] font-bold text-muted-foreground uppercase mb-1.5 tracking-widest opacity-40">{node.type}</span>
+                        <h5 className="text-base font-black text-foreground px-6 leading-tight italic uppercase tracking-tighter">{node.label}</h5>
                       </div>
-                      <div className="text-left">
-                        <span className="text-4xl font-[1000] uppercase tracking-[-0.03em] leading-none block">Deploy Counter-Strike</span>
-                        <span className="text-[11px] font-bold tracking-[0.4em] opacity-60 uppercase mt-2 block">Direct-to-Architect Override</span>
-                      </div>
+                      {i < 2 && (
+                        <div className="hidden lg:block absolute top-1/2 -right-12 w-8 h-[1px] bg-white/10 -translate-y-1/2" />
+                      )}
                     </div>
-                    <ChevronRight className="h-10 w-10 opacity-30 group-hover:opacity-80 transition-all group-hover:translate-x-3" />
+                  ))}
+                </div>
+              </Card>
 
-                    {deploying && (
-                      <div className="absolute inset-0 bg-primary flex flex-col items-center justify-center rounded-[3rem] animate-in slide-in-from-bottom-full duration-500">
-                        <Loader2 className="h-10 w-10 animate-spin mb-4" />
-                        <span className="text-2xl font-black uppercase tracking-widest">Piping Intelligence...</span>
-                      </div>
-                    )}
-                  </Button>
+              {/* ACTION CENTER */}
+              <div className="pt-16 relative">
+                <div className="max-w-3xl mx-auto text-center space-y-10">
+                  <div className="space-y-4">
+                    <h2 className="text-4xl md:text-6xl font-black text-foreground italic uppercase tracking-tighter leading-none select-none">
+                      Weaponize <span className="text-primary not-italic">Directives</span>
+                    </h2>
+                    <p className="text-muted-foreground text-lg font-light leading-relaxed max-w-2xl mx-auto opacity-70">
+                      Transfer these tactical interceptions to the <span className="text-foreground font-black">Campaign Architect</span> to operationalize the counter-strike.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col items-center gap-8 relative">
+                    <Button
+                      onClick={handleDeploy}
+                      disabled={deploying}
+                      className="h-16 px-12 rounded-2xl bg-primary text-primary-foreground text-xl font-black italic uppercase tracking-[0.05em] shadow-2xl premium-button-glow hover:translate-y-[-4px] transition-all duration-500 group relative overflow-hidden w-full max-w-md"
+                    >
+                      <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity animate-shimmer-subtle" />
+                      <span className="relative z-10 flex items-center justify-center gap-6">
+                        {deploying ? (
+                          <>
+                            <Loader2 className="h-6 w-6 animate-spin" />
+                            <span>Injecting Directives...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Rocket className="h-6 w-6 group-hover:rotate-12 transition-transform duration-500" />
+                            <span>Deploy Counter-Strike</span>
+                            <ChevronRight className="h-6 w-6 opacity-40 group-hover:translate-x-2 transition-transform duration-500" />
+                          </>
+                        )}
+                      </span>
+                    </Button>
+                    <div className="flex items-center gap-4 px-8 py-3 bg-card/40 backdrop-blur-xl border border-white/5 rounded-2xl shadow-inner">
+                      <ShieldCheck className="h-5 w-5 text-emerald-500" />
+                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.4em] leading-none">Architect Pipeline: Secured <Lock className="h-3 w-3 inline ml-1.5 opacity-30" /></p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
           {!result && !loading && !error && (
-            <div className="flex flex-col items-center justify-center py-40 animate-in fade-in duration-1000">
-              <div className="relative h-64 w-64 mb-16 flex items-center justify-center">
-                <div className="absolute inset-0 border-2 border-dashed border-primary/10 rounded-full animate-[spin_50s_linear_infinite]" />
-                <div className="absolute inset-10 border border-primary/5 rounded-full" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="h-20 w-20 rounded-[2rem] bg-card border shadow-xl flex items-center justify-center">
-                    <Target className="h-8 w-8 text-primary opacity-20" />
+            <div className="h-[550px] flex flex-col items-center justify-center relative overflow-hidden rounded-[3rem] border border-white/5 bg-card/5 backdrop-blur-md animate-in fade-in duration-2000 mt-4 mb-20 group shadow-inner">
+              {/* NEURAL DRIFT BACKGROUND */}
+              <div className="absolute inset-0 -z-10 bg-[#020202]/50">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 blur-[160px] rounded-full animate-pulse transition-all duration-3000" />
+                <div className="absolute inset-0 neural-grid opacity-20" />
+              </div>
+
+              <div className="text-center space-y-12 relative z-10 p-16 max-w-4xl px-8">
+                <div className="relative inline-block mb-8">
+                  <div className="h-24 w-24 bg-background/50 border border-white/10 rounded-[2rem] flex items-center justify-center mx-auto shadow-2xl relative group-hover:border-primary/40 transition-all duration-700">
+                    <History className="h-10 w-10 text-primary opacity-20 animate-pulse group-hover:opacity-80" />
                   </div>
                 </div>
-              </div>
-              <div className="text-center space-y-6">
-                <h2 className="text-3xl font-[1000] uppercase tracking-[0.5em] text-muted-foreground/30 leading-none px-4">Intercept Link Inactive</h2>
-                <p className="text-muted-foreground text-sm font-mono tracking-widest uppercase max-w-sm mx-auto leading-relaxed">
-                  Input target identity and authenticate via the command bar above to authorize the multi-modal pulse sequence.
-                </p>
+                <div className="space-y-8">
+                  <div className="flex items-center justify-center gap-4 text-primary/30 text-[10px] font-bold uppercase tracking-[0.6em] mb-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-primary/40" />
+                    Intercept Active
+                  </div>
+                  <h3 className="text-5xl md:text-7xl font-black tracking-tighter text-foreground/90 leading-[0.9] italic select-none uppercase">
+                    Pulse <span className="text-primary not-italic">Sequence</span> <br /> Required
+                  </h3>
+                  <p className="text-lg font-light text-muted-foreground/60 max-w-xl mx-auto leading-relaxed px-4">
+                    Identify a target market identity to authorize a real-time intelligence sweep.
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center justify-center gap-4 pt-8">
+                  <button onClick={() => setQuery('@Nike')} className="px-8 py-3.5 rounded-xl border border-white/5 bg-white/[0.02] text-muted-foreground/40 hover:text-primary hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer text-[10px] tracking-[0.4em] font-black uppercase italic">@Nike</button>
+                  <button onClick={() => setQuery('@TheRundownAI')} className="px-8 py-3.5 rounded-xl border border-white/5 bg-white/[0.02] text-muted-foreground/40 hover:text-primary hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer text-[10px] tracking-[0.4em] font-black uppercase italic">@TheRundownAI</button>
+                  <button onClick={() => setQuery('@Anthropic')} className="px-8 py-3.5 rounded-xl border border-white/5 bg-white/[0.02] text-muted-foreground/40 hover:text-primary hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer text-[10px] tracking-[0.4em] font-black uppercase italic">@Anthropic</button>
+                </div>
               </div>
             </div>
           )}
