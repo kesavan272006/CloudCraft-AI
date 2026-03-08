@@ -124,7 +124,7 @@ export function Dashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/v1/dashboard/stats`)
+        const res = await fetch(`${API_BASE_URL}/api/v1/dashboard/stats/`)
         if (res.ok) {
           const data = await res.json()
           setStats(data)
@@ -161,7 +161,7 @@ export function Dashboard() {
     return (
       <div className="flex h-screen items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 relative overflow-hidden">
         <FloatingOrbs />
-        <motion.div 
+        <motion.div
           className="relative z-10 flex flex-col items-center gap-6"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -213,7 +213,7 @@ export function Dashboard() {
       </Header>
 
       <Main className="px-4 py-8 md:px-8 max-w-7xl mx-auto space-y-10 relative overflow-hidden">
-        
+
         {/* ANIMATED FLOATING ORBS BACKGROUND */}
         <FloatingOrbs />
 
@@ -224,20 +224,20 @@ export function Dashboard() {
 
         {/* PREMIUM GRADIENT MESH OVERLAY */}
         <div className="absolute inset-0 z-0 pointer-events-none opacity-20 dark:opacity-30"
-          style={{ 
+          style={{
             background: 'radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 50%), radial-gradient(circle at 40% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)'
           }}>
         </div>
 
         {/* HERO SECTION - SLEEK & MODERN WITH ANIMATION */}
-        <motion.div 
+        <motion.div
           className='flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10'
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
           <div className="space-y-2">
-            <motion.div 
+            <motion.div
               className="inline-flex items-center px-3 py-1 rounded-full border border-primary/30 bg-gradient-to-r from-primary/15 via-primary/10 to-primary/15 text-primary text-xs font-bold mb-2 shadow-lg shadow-primary/20 uppercase tracking-widest gap-2 backdrop-blur-xl"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -249,7 +249,7 @@ export function Dashboard() {
               </span>
               System Online
             </motion.div>
-            <motion.h1 
+            <motion.h1
               className='text-3xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 bg-clip-text text-transparent flex items-center gap-2'
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -258,7 +258,7 @@ export function Dashboard() {
               Orchestration Center
               <Zap className="h-8 w-8 md:h-10 md:w-10 text-primary animate-pulse" />
             </motion.h1>
-            <motion.p 
+            <motion.p
               className="text-muted-foreground text-sm md:text-base font-medium"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -268,7 +268,7 @@ export function Dashboard() {
             </motion.p>
           </div>
 
-          <motion.div 
+          <motion.div
             className='flex items-center space-x-3'
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -296,7 +296,7 @@ export function Dashboard() {
         </motion.div>
 
         {/* QUICK JUMP CARDS (Linear/Stripe Style) WITH STAGGER ANIMATION */}
-        <motion.div 
+        <motion.div
           className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10"
           initial="hidden"
           animate="visible"
@@ -323,44 +323,44 @@ export function Dashboard() {
             <Link to="/forge" className="block h-full">
               <Card className="group relative overflow-hidden border border-border/40 bg-gradient-to-br from-card via-card to-card/90 hover:border-indigo-500/60 transition-all duration-500 cursor-pointer shadow-lg shadow-black/5 hover:shadow-2xl hover:shadow-indigo-500/20 h-full rounded-2xl backdrop-blur-2xl before:absolute before:inset-0 before:rounded-2xl before:p-[1px] before:bg-gradient-to-br before:from-indigo-500/20 before:via-purple-500/20 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:-z-10">
                 <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <motion.div 
+                <motion.div
                   className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100"
                   initial={false}
-                  animate={{ 
+                  animate={{
                     backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
                   }}
                   transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
                 />
                 {/* Premium glow effect */}
                 <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 rounded-2xl blur-xl opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
-              <CardContent className="p-6 flex items-start gap-4 relative z-10">
-                <motion.div 
-                  className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500/20 to-indigo-600/20 border border-indigo-500/30 flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/10"
-                  whileHover={{ rotate: 360, scale: 1.1 }}
-                  transition={{ duration: 0.6, type: "spring" }}
-                >
-                  <Blocks className="w-6 h-6 text-indigo-500 dark:text-indigo-400" />
-                </motion.div>
-                <div className="space-y-1.5 flex-1">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-bold text-lg tracking-tight text-foreground group-hover:text-indigo-500 transition-colors duration-300 flex items-center gap-2">
-                      The Forge Engine
-                      <span className="inline-block">
-                        <Sparkles className="w-4 h-4 text-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </span>
-                    </h3>
-                    <motion.div 
-                      className="w-8 h-8 rounded-full bg-gradient-to-br from-secondary/60 to-secondary/40 flex items-center justify-center group-hover:bg-indigo-500/20 transition-colors border border-border/30 group-hover:border-indigo-500/40 shadow-sm"
-                      whileHover={{ x: 4, scale: 1.1 }}
-                    >
-                      <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-indigo-500 transition-colors" />
-                    </motion.div>
+                <CardContent className="p-6 flex items-start gap-4 relative z-10">
+                  <motion.div
+                    className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500/20 to-indigo-600/20 border border-indigo-500/30 flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/10"
+                    whileHover={{ rotate: 360, scale: 1.1 }}
+                    transition={{ duration: 0.6, type: "spring" }}
+                  >
+                    <Blocks className="w-6 h-6 text-indigo-500 dark:text-indigo-400" />
+                  </motion.div>
+                  <div className="space-y-1.5 flex-1">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-bold text-lg tracking-tight text-foreground group-hover:text-indigo-500 transition-colors duration-300 flex items-center gap-2">
+                        The Forge Engine
+                        <span className="inline-block">
+                          <Sparkles className="w-4 h-4 text-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </span>
+                      </h3>
+                      <motion.div
+                        className="w-8 h-8 rounded-full bg-gradient-to-br from-secondary/60 to-secondary/40 flex items-center justify-center group-hover:bg-indigo-500/20 transition-colors border border-border/30 group-hover:border-indigo-500/40 shadow-sm"
+                        whileHover={{ x: 4, scale: 1.1 }}
+                      >
+                        <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-indigo-500 transition-colors" />
+                      </motion.div>
+                    </div>
+                    <p className="text-sm text-muted-foreground leading-relaxed font-medium">
+                      Launch a new parallel-agent pipeline. Formulate campaigns and trigger autonomous generation.
+                    </p>
                   </div>
-                  <p className="text-sm text-muted-foreground leading-relaxed font-medium">
-                    Launch a new parallel-agent pipeline. Formulate campaigns and trigger autonomous generation.
-                  </p>
-                </div>
-              </CardContent>
+                </CardContent>
               </Card>
             </Link>
           </motion.div>
@@ -376,44 +376,44 @@ export function Dashboard() {
             <Link to="/brand_brain" className="block h-full">
               <Card className="group relative overflow-hidden border border-border/40 bg-gradient-to-br from-card via-card to-card/90 hover:border-fuchsia-500/60 transition-all duration-500 cursor-pointer shadow-lg shadow-black/5 hover:shadow-2xl hover:shadow-fuchsia-500/20 h-full rounded-2xl backdrop-blur-2xl before:absolute before:inset-0 before:rounded-2xl before:p-[1px] before:bg-gradient-to-br before:from-fuchsia-500/20 before:via-pink-500/20 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:-z-10">
                 <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-500/10 via-pink-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <motion.div 
+                <motion.div
                   className="absolute inset-0 bg-gradient-to-r from-fuchsia-500/10 via-pink-500/10 to-rose-500/10 opacity-0 group-hover:opacity-100"
                   initial={false}
-                  animate={{ 
+                  animate={{
                     backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
                   }}
                   transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
                 />
                 {/* Premium glow effect */}
                 <div className="absolute -inset-1 bg-gradient-to-r from-fuchsia-500 via-pink-500 to-fuchsia-500 rounded-2xl blur-xl opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
-              <CardContent className="p-6 flex items-start gap-4 relative z-10">
-                <motion.div 
-                  className="w-12 h-12 rounded-xl bg-gradient-to-br from-fuchsia-500/20 to-fuchsia-600/20 border border-fuchsia-500/30 flex items-center justify-center shrink-0 shadow-lg shadow-fuchsia-500/10"
-                  whileHover={{ rotate: 360, scale: 1.1 }}
-                  transition={{ duration: 0.6, type: "spring" }}
-                >
-                  <Network className="w-6 h-6 text-fuchsia-500 dark:text-fuchsia-400" />
-                </motion.div>
-                <div className="space-y-1.5 flex-1">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-bold text-lg tracking-tight text-foreground group-hover:text-fuchsia-500 transition-colors duration-300 flex items-center gap-2">
-                      Brand Brain
-                      <span className="inline-block">
-                        <Sparkles className="w-4 h-4 text-fuchsia-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </span>
-                    </h3>
-                    <motion.div 
-                      className="w-8 h-8 rounded-full bg-gradient-to-br from-secondary/60 to-secondary/40 flex items-center justify-center group-hover:bg-fuchsia-500/20 transition-colors border border-border/30 group-hover:border-fuchsia-500/40 shadow-sm"
-                      whileHover={{ x: 4, scale: 1.1 }}
-                    >
-                      <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-fuchsia-500 transition-colors" />
-                    </motion.div>
+                <CardContent className="p-6 flex items-start gap-4 relative z-10">
+                  <motion.div
+                    className="w-12 h-12 rounded-xl bg-gradient-to-br from-fuchsia-500/20 to-fuchsia-600/20 border border-fuchsia-500/30 flex items-center justify-center shrink-0 shadow-lg shadow-fuchsia-500/10"
+                    whileHover={{ rotate: 360, scale: 1.1 }}
+                    transition={{ duration: 0.6, type: "spring" }}
+                  >
+                    <Network className="w-6 h-6 text-fuchsia-500 dark:text-fuchsia-400" />
+                  </motion.div>
+                  <div className="space-y-1.5 flex-1">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-bold text-lg tracking-tight text-foreground group-hover:text-fuchsia-500 transition-colors duration-300 flex items-center gap-2">
+                        Brand Brain
+                        <span className="inline-block">
+                          <Sparkles className="w-4 h-4 text-fuchsia-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </span>
+                      </h3>
+                      <motion.div
+                        className="w-8 h-8 rounded-full bg-gradient-to-br from-secondary/60 to-secondary/40 flex items-center justify-center group-hover:bg-fuchsia-500/20 transition-colors border border-border/30 group-hover:border-fuchsia-500/40 shadow-sm"
+                        whileHover={{ x: 4, scale: 1.1 }}
+                      >
+                        <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-fuchsia-500 transition-colors" />
+                      </motion.div>
+                    </div>
+                    <p className="text-sm text-muted-foreground leading-relaxed font-medium">
+                      Configure vector-embedded brand guidelines to enforce 100% compliance across all generated outputs.
+                    </p>
                   </div>
-                  <p className="text-sm text-muted-foreground leading-relaxed font-medium">
-                    Configure vector-embedded brand guidelines to enforce 100% compliance across all generated outputs.
-                  </p>
-                </div>
-              </CardContent>
+                </CardContent>
               </Card>
             </Link>
           </motion.div>
@@ -431,7 +431,7 @@ export function Dashboard() {
 
             {/* KPI GRID WITH STAGGER ANIMATION */}
             <div>
-              <motion.h3 
+              <motion.h3
                 className="text-sm font-bold mb-5 text-foreground flex items-center gap-2.5 uppercase tracking-wide"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -440,7 +440,7 @@ export function Dashboard() {
                 <Activity className="w-4 h-4 text-primary drop-shadow-lg" />
                 Network Status
               </motion.h3>
-              <motion.div 
+              <motion.div
                 className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'
                 initial="hidden"
                 animate="visible"
@@ -465,19 +465,19 @@ export function Dashboard() {
                     key={i}
                     variants={{
                       hidden: { opacity: 0, y: 30, scale: 0.8 },
-                      visible: { 
-                        opacity: 1, 
-                        y: 0, 
+                      visible: {
+                        opacity: 1,
+                        y: 0,
                         scale: 1,
-                        transition: { 
-                          duration: 0.5, 
-                          type: "spring", 
-                          bounce: 0.4 
-                        } 
+                        transition: {
+                          duration: 0.5,
+                          type: "spring",
+                          bounce: 0.4
+                        }
                       }
                     }}
-                    whileHover={{ 
-                      y: -8, 
+                    whileHover={{
+                      y: -8,
                       scale: 1.02,
                       transition: { duration: 0.2 }
                     }}
@@ -485,9 +485,9 @@ export function Dashboard() {
                     <Card className="group relative border border-border/40 shadow-lg shadow-black/5 hover:shadow-2xl hover:shadow-primary/20 transition-all duration-500 flex flex-col justify-between p-6 bg-gradient-to-br from-card via-card/95 to-card/90 rounded-2xl overflow-hidden hover:border-primary/50 backdrop-blur-2xl h-full before:absolute before:inset-0 before:rounded-2xl before:p-[1px] before:bg-gradient-to-br before:from-primary/10 before:via-transparent before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:-z-10">
                       {/* Premium outer glow */}
                       <div className={`absolute -inset-1 bg-gradient-to-br ${kpi.gradient} opacity-0 group-hover:opacity-20 blur-xl rounded-2xl transition-opacity duration-500`} />
-                      
+
                       {/* Animated gradient background */}
-                      <motion.div 
+                      <motion.div
                         className={`absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br ${kpi.gradient} opacity-0 group-hover:opacity-15 blur-3xl rounded-full`}
                         animate={{
                           scale: [1, 1.3, 1],
@@ -499,7 +499,7 @@ export function Dashboard() {
                           ease: "easeInOut"
                         }}
                       />
-                      
+
                       {/* Shimmer effect */}
                       <motion.div
                         className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100"
@@ -507,12 +507,12 @@ export function Dashboard() {
                         whileHover={{ x: '100%' }}
                         transition={{ duration: 0.6 }}
                       />
-                      
+
                       <div className='flex flex-row items-center justify-between pb-3 relative z-10'>
                         <p className='text-xs font-bold text-muted-foreground/70 uppercase tracking-widest'>
                           {kpi.label}
                         </p>
-                        <motion.div 
+                        <motion.div
                           className={`p-2.5 rounded-xl bg-gradient-to-br from-secondary/60 to-secondary/40 text-secondary-foreground group-hover:from-primary/20 group-hover:to-primary/10 group-hover:text-primary transition-all shadow-lg border border-border/30 group-hover:border-primary/30 group-hover:shadow-${kpi.color}-500/20`}
                           whileHover={{ rotate: 360, scale: 1.15 }}
                           transition={{ duration: 0.6 }}
@@ -528,7 +528,7 @@ export function Dashboard() {
                             kpi.val
                           )}
                         </div>
-                        <p className='text-[10px] font-semibold text-muted-foreground/70 flex items-center gap-1.5 uppercase tracking-widest'>
+                        <div className='text-[10px] font-semibold text-muted-foreground/70 flex items-center gap-1.5 uppercase tracking-widest'>
                           {i === 1 || i === 3 ? (
                             <motion.div
                               animate={{ y: [0, -3, 0] }}
@@ -538,7 +538,7 @@ export function Dashboard() {
                             </motion.div>
                           ) : null}
                           {kpi.sub} over 24h
-                        </p>
+                        </div>
                       </div>
                     </Card>
                   </motion.div>
@@ -546,7 +546,7 @@ export function Dashboard() {
               </motion.div>
             </div>
 
-            <motion.div 
+            <motion.div
               className='grid grid-cols-1 gap-6 lg:grid-cols-7'
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -561,7 +561,7 @@ export function Dashboard() {
                 <Card className='relative border border-border/40 shadow-xl shadow-black/5 hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 rounded-2xl overflow-hidden bg-gradient-to-br from-card via-card/98 to-card/95 backdrop-blur-2xl before:absolute before:inset-0 before:rounded-2xl before:p-[1px] before:bg-gradient-to-br before:from-primary/10 before:via-transparent before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:-z-10'>
                   {/* Premium glow */}
                   <div className="absolute -inset-1 bg-gradient-to-br from-primary/10 via-purple-500/10 to-transparent opacity-0 hover:opacity-100 blur-xl rounded-2xl transition-opacity duration-500 pointer-events-none" />
-                  
+
                   <CardHeader className="border-b border-border/30 pb-4 px-6 pt-5 relative z-10">
                     <div className="flex items-center justify-between">
                       <div>
@@ -594,7 +594,7 @@ export function Dashboard() {
                 <Card className='relative border border-border/40 shadow-xl shadow-black/5 hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 flex flex-col rounded-2xl overflow-hidden bg-gradient-to-br from-card via-card/98 to-card/95 backdrop-blur-2xl before:absolute before:inset-0 before:rounded-2xl before:p-[1px] before:bg-gradient-to-br before:from-primary/10 before:via-transparent before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:-z-10'>
                   {/* Premium glow */}
                   <div className="absolute -inset-1 bg-gradient-to-br from-primary/10 via-emerald-500/5 to-transparent opacity-0 hover:opacity-100 blur-xl rounded-2xl transition-opacity duration-500 pointer-events-none" />
-                  
+
                   <CardHeader className="border-b border-border/30 pb-4 px-6 pt-5 relative z-10">
                     <div className="flex items-center justify-between">
                       <div>

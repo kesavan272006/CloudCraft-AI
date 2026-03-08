@@ -133,7 +133,7 @@ export const useCampaignStore = create<CampaignState>()((set, get) => ({
     fetchCampaigns: async () => {
         set({ isFetching: true, error: null })
         try {
-            const res = await fetch(API_BASE)
+            const res = await fetch(`${API_BASE}/`)
             if (!res.ok) throw new Error('Failed to fetch campaigns')
             set({ campaigns: await res.json(), isFetching: false })
         } catch (err: any) {
@@ -144,7 +144,7 @@ export const useCampaignStore = create<CampaignState>()((set, get) => ({
     createCampaign: async (payload) => {
         set({ isSaving: true, error: null })
         try {
-            const res = await fetch(API_BASE, {
+            const res = await fetch(`${API_BASE}/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -276,7 +276,7 @@ export const useCampaignStore = create<CampaignState>()((set, get) => ({
             })
         }
 
-        const url = `${API_BASE}/${campaignId}/intelligence-stream`
+        const url = `${API_BASE}/${campaignId}/intelligence-stream`.replace(/([^:])\/\//g, '$1/')
         const es = new EventSource(url)
 
         es.onmessage = (e) => {
