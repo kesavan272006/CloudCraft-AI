@@ -1,8 +1,3 @@
-[AppRunner] Successfully built your application source code.
-[AppRunner] Provisioning instances and deploying image for publicly accessible service.
-[AppRunner] Performing health check on protocol `TCP` [Port: '8080'].
-[AppRunner] Your application stopped or failed to start. See logs for more information.  Container exit code: 1
-[AppRunner] Deployment with ID : 8d2d547fca434cd5a26a860c67e08a4b failed.
 [AppRunner] Deployment with ID : 8d8be2f4e4554ba6b0c7a68d3c7a5c8b started. Triggering event : SERVICE_UPDATE
 [AppRunner] Deployment Artifact: [Repo Type: Source], [Repository: https://github.com/TharunvenkateshN/CloudCraft-AI], [Branch: main], [SourceDirectory: /backend]
 [AppRunner] Creating pipeline for automatic deployments.
