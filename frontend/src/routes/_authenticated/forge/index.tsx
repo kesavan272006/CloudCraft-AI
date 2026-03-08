@@ -3,14 +3,14 @@ import { motion } from 'framer-motion';
 
 import { useSessionState } from '@/hooks/useSessionState';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Hammer, Sparkles, Loader2, AlertCircle, CheckCircle2, Copy, Globe,
   RefreshCcw, Zap, Users, Wand2, CalendarDays, Clock,
   Calendar as CalendarIcon, Search as SearchIcon, X, Cpu,
-  Activity, BarChart3, ArrowRight
+  BarChart3
 } from "lucide-react";
 import { createFileRoute } from '@tanstack/react-router';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";

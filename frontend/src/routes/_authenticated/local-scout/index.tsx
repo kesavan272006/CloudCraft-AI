@@ -4,6 +4,10 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import { Header } from '@/components/layout/header'
+import { TopNav } from '@/components/layout/top-nav'
+import { ProfileDropdown } from '@/components/profile-dropdown'
+import { ThemeSwitch } from '@/components/theme-switch'
 import {
   Satellite, MapPin, Compass, Loader2, Terminal,
   Search, Cpu, Layers, Database, Bell, CheckCircle2,
@@ -340,6 +344,13 @@ function AgentTerminal({ lines, loading }: { lines: LogLine[]; loading: boolean 
 }
 
 // ── Main Page Component ────────────────────────────────────────────────
+const topNav = [
+  { title: 'Overview', href: '/dashboard', isActive: false },
+  { title: 'Local Scout', href: '/local-scout', isActive: true },
+  { title: 'Competitor Pulse', href: '/competitor-pulse', isActive: false },
+  { title: 'Campaign Architect', href: '/campaign-architect', isActive: false },
+]
+
 export default function LocalScoutPage() {
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [city, setCity] = useState('Locating…')
@@ -514,7 +525,17 @@ export default function LocalScoutPage() {
       : <Minus className="h-3.5 w-3.5 text-muted-foreground" />
 
   return (
-    <div className="flex-1 min-h-screen relative overflow-hidden">
+    <>
+      <Header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl px-4 sm:px-6 h-14">
+        <div className="flex items-center gap-4">
+          <TopNav links={topNav} />
+        </div>
+        <div className="ms-auto flex items-center space-x-4">
+          <ThemeSwitch />
+          <ProfileDropdown />
+        </div>
+      </Header>
+      <div className="flex-1 min-h-screen relative overflow-hidden">
 
       {/* ── Background: dot-matrix grid ── */}
       <div
@@ -1082,6 +1103,7 @@ export default function LocalScoutPage() {
         </div>
       </div>
     </div>
+    </>
   )
 }
 

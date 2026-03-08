@@ -46,17 +46,17 @@ export function NavUser({ user }: NavUserProps) {
             <DropdownMenuTrigger asChild>
               <SidebarMenuButton
                 size='lg'
-                className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
+                className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground rounded-xl border border-transparent hover:border-sidebar-border/40 transition-all duration-200 group/user-btn'
               >
-                <Avatar className='h-8 w-8 rounded-lg'>
+                <Avatar className='h-8 w-8 rounded-lg ring-2 ring-primary/20 transition-all duration-200 group-hover/user-btn:ring-primary/40'>
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className='rounded-lg'>SN</AvatarFallback>
+                  <AvatarFallback className='rounded-lg bg-linear-to-br from-violet-500 to-indigo-600 text-white text-xs font-bold'>{user.name.slice(0,2).toUpperCase()}</AvatarFallback>
                 </Avatar>
                 <div className='grid flex-1 text-start text-sm leading-tight'>
                   <span className='truncate font-semibold'>{user.name}</span>
-                  <span className='truncate text-xs'>{user.email}</span>
+                  <span className='truncate text-xs opacity-60'>{user.email}</span>
                 </div>
-                <ChevronsUpDown className='ms-auto size-4' />
+                <ChevronsUpDown className='ms-auto size-4 opacity-50' />
               </SidebarMenuButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent

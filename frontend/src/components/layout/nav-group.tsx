@@ -1,6 +1,7 @@
 import { type ReactNode } from 'react'
 import { Link, useLocation } from '@tanstack/react-router'
 import { ChevronRight } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import {
   Collapsible,
   CollapsibleContent,
@@ -64,16 +65,25 @@ function NavBadge({ children }: { children: ReactNode }) {
 
 function SidebarMenuLink({ item, href }: { item: NavLink; href: string }) {
   const { setOpenMobile } = useSidebar()
+  const isActive = checkIsActive(href, item)
   return (
     <SidebarMenuItem>
       <SidebarMenuButton
         asChild
-        isActive={checkIsActive(href, item)}
+        isActive={isActive}
         tooltip={item.title}
       >
         <Link to={item.url} onClick={() => setOpenMobile(false)}>
-          {item.icon && <item.icon />}
-          <span>{item.title}</span>
+          {item.icon && (
+            <item.icon className={cn(
+              'size-4 shrink-0 transition-all duration-200',
+              isActive && 'text-primary'
+            )} />
+          )}
+          <span className={cn(
+            'transition-colors duration-150',
+            isActive && 'font-semibold'
+          )}>{item.title}</span>
           {item.badge && <NavBadge>{item.badge}</NavBadge>}
         </Link>
       </SidebarMenuButton>

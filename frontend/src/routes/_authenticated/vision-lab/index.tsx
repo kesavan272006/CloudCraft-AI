@@ -76,7 +76,7 @@ export default function VisionLabPage() {
     setActiveTab('visual')
   }
 
-  const handleGenerate = async (e?: any, autoPrompt?: string) => {
+  const handleGenerate = async (_e?: any, autoPrompt?: string) => {
     const p = autoPrompt || prompt;
     if (!p.trim()) return
     if (autoPrompt) setPrompt(p);

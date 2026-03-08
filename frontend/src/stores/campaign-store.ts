@@ -203,7 +203,7 @@ export const useCampaignStore = create<CampaignState>()((set, get) => ({
 
             clearInterval(logTimer)
             // ensure all mock logs are shown before showing final result
-            set(state => ({
+            set(_state => ({
                 radarResult: data,
                 radarScanning: false,
                 radarLogs: [

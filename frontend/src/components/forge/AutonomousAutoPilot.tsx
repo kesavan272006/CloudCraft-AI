@@ -121,7 +121,7 @@ export const AutonomousAutoPilot: React.FC<AutonomousAutoPilotProps> = ({ initia
                 addLog(`Pivot: ${payload.reason}`, "warning");
                 break;
             case 'autopilot_complete':
-                if (eventSourceRef.current) { eventSourceRef.current.close(); eventSourceRef.current = null; }
+                abortRef.current?.abort(); abortRef.current = null;
                 setStatus("STABLE");
                 setIsLive(false);
                 if (payload.final_content) { setOptimizedContent(payload.final_content); onOptimize(payload.final_content); }
@@ -129,11 +129,11 @@ export const AutonomousAutoPilot: React.FC<AutonomousAutoPilotProps> = ({ initia
                 break;
             case 'stream_done':
                 // Redundant safety: ensure connection is closed after terminal signal
-                if (eventSourceRef.current) { eventSourceRef.current.close(); eventSourceRef.current = null; }
+                abortRef.current?.abort(); abortRef.current = null;
                 setIsLive(false);
                 break;
             case 'error':
-                if (eventSourceRef.current) { eventSourceRef.current.close(); eventSourceRef.current = null; }
+                abortRef.current?.abort(); abortRef.current = null;
                 setStatus("FAILED");
                 setIsLive(false);
                 addLog(`Error: ${payload.message}`, "warning");

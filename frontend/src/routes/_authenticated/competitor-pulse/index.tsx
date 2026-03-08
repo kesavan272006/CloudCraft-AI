@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useCampaignStore } from '@/stores/campaign-store'
-import { Card } from "@/components/ui/card"
+import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 import { toast } from 'sonner'
 import {
   Search,
@@ -19,7 +18,6 @@ import {
   Globe,
   Cpu,
   Loader2,
-  TrendingDown,
   ShieldAlert,
   Network,
   Fingerprint,
@@ -27,8 +25,9 @@ import {
   ChevronRight,
   ShieldCheck,
   History,
-  X,
   Lock,
+  Activity,
+  Crosshair,
 } from "lucide-react"
 
 import { Header } from '@/components/layout/header'
@@ -58,12 +57,12 @@ export default function CompetitorPulsePage() {
   const { injectIntelligence } = useCampaignStore()
 
   const bootSequence = [
-    { label: "Intercept Link", icon: <Cpu className="h-3 w-3" /> },
-    { label: "Market Audit", icon: <Search className="h-3 w-3" /> },
-    { label: "Visual DNA", icon: <Eye className="h-3 w-3" /> },
-    { label: "Sentiment Scan", icon: <BrainCircuit className="h-3 w-3" /> },
-    { label: "Strike Vectors", icon: <ShieldAlert className="h-3 w-3" /> },
-    { label: "Threat Mesh", icon: <Network className="h-3 w-3" /> }
+    { label: "Intercept Link",  icon: <Cpu className="h-3 w-3" />,       color: 'text-violet-400' },
+    { label: "Market Audit",    icon: <Search className="h-3 w-3" />,     color: 'text-indigo-400' },
+    { label: "Visual DNA",      icon: <Eye className="h-3 w-3" />,        color: 'text-sky-400'    },
+    { label: "Sentiment Scan",  icon: <BrainCircuit className="h-3 w-3" />, color: 'text-pink-400' },
+    { label: "Strike Vectors",  icon: <ShieldAlert className="h-3 w-3" />, color: 'text-amber-400' },
+    { label: "Threat Mesh",     icon: <Network className="h-3 w-3" />,    color: 'text-emerald-400' },
   ]
 
   useEffect(() => {
@@ -71,7 +70,7 @@ export default function CompetitorPulsePage() {
       setTerminalIndex(0)
       const interval = setInterval(() => {
         setTerminalIndex(prev => (prev < bootSequence.length ? prev + 1 : prev))
-      }, 400)
+      }, 500)
       return () => clearInterval(interval)
     }
   }, [loading])
@@ -113,323 +112,655 @@ export default function CompetitorPulsePage() {
         <div className="flex items-center gap-4">
           <TopNav links={topNav} />
         </div>
-        <div className='ms-auto flex items-center space-x-4'>
+        <div className="ms-auto flex items-center space-x-4">
           <ThemeSwitch />
           <ProfileDropdown />
         </div>
       </Header>
 
-      <Main className="px-6 py-8 md:px-10 max-w-[1400px] mx-auto space-y-12 relative w-full bg-background min-h-screen">
-        {/* REFINED BACKGROUND ELEMENTS */}
-        <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.02] neural-grid" />
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+      <Main className="relative w-full min-h-screen bg-background overflow-x-hidden">
 
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 max-w-6xl">
-          <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <Badge variant="outline" className="rounded-full px-3 py-0.5 text-[10px] font-bold uppercase tracking-widest text-primary border-primary/20 bg-primary/5 shadow-inner">Operational Logic</Badge>
-              <div className="h-px w-12 bg-primary/20" />
-            </div>
-            <h1 className="text-3xl md:text-5xl font-black tracking-tight text-foreground uppercase italic leading-[0.9]">Competitor <span className="text-primary not-italic">Pulse</span></h1>
-            <p className="text-muted-foreground text-base md:text-lg font-light max-w-2xl leading-relaxed opacity-70">
-              Analyze market signals and synthesize counter-strike directives.
-            </p>
-          </div>
+        {/* ── Premium dot-matrix background grid ── */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none opacity-[0.025] dark:opacity-[0.04]"
+          style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)', backgroundSize: '32px 32px' }}
+        />
 
-          <Card className="bg-card/40 backdrop-blur-3xl border border-white/5 p-1.5 rounded-xl shadow-xl overflow-hidden min-h-[56px] lg:w-[480px]">
-            <div className="flex items-center">
-              <div className="relative flex-1">
-                <Target className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/30" />
-                <Input
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                  disabled={loading}
-                  placeholder="Intercept @Handle or URL..."
-                  className="pl-12 h-11 bg-transparent border-none text-sm font-medium focus-visible:ring-0 shadow-none placeholder:text-muted-foreground/30 py-2 sm:py-0"
-                />
-              </div>
-              <Button
-                onClick={handleSearch}
-                disabled={loading || !query.trim()}
-                className="h-9 px-6 rounded-lg bg-primary hover:bg-primary/95 text-primary-foreground font-bold text-[10px] uppercase tracking-widest transition-all"
-              >
-                {loading ? <Loader2 className="h-3 w-3 animate-spin mr-2" /> : <Zap className="h-3 w-3 mr-2" />}Pulse
-              </Button>
-            </div>
-          </Card>
+        {/* ── Gradient mesh overlay ── */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{ background: 'radial-gradient(circle at 12% 18%, rgba(99,102,241,0.09) 0%, transparent 50%), radial-gradient(circle at 85% 75%, rgba(168,85,247,0.09) 0%, transparent 50%), radial-gradient(circle at 55% 42%, rgba(236,72,153,0.06) 0%, transparent 50%)' }}
+        />
+
+        {/* ── Floating ambient orbs ── */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            className="absolute w-[620px] h-[620px] rounded-full bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 blur-3xl"
+            animate={{ x: [0, 60, 0], y: [0, -40, 0], scale: [1, 1.12, 1] }}
+            transition={{ duration: 24, repeat: Infinity, ease: 'easeInOut' }}
+            style={{ top: '-10%', left: '-6%' }}
+          />
+          <motion.div
+            className="absolute w-[480px] h-[480px] rounded-full bg-gradient-to-r from-violet-500/10 via-indigo-500/10 to-cyan-500/10 blur-3xl"
+            animate={{ x: [0, -40, 0], y: [0, 55, 0], scale: [1, 1.18, 1] }}
+            transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut', delay: 5 }}
+            style={{ bottom: '5%', right: '-2%' }}
+          />
         </div>
 
-        <div className="relative min-h-[500px]">
-          {loading && (
-            <div className="flex flex-col items-center justify-center pt-20 animate-in fade-in duration-500">
-              <div className="w-full max-w-md space-y-6 glass-dark p-8 rounded-3xl border border-white/5 shadow-2xl">
-                <div className="flex items-center justify-between pb-4 border-b border-white/5">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary border border-primary/10">
-                      <Terminal className="h-5 w-5" />
-                    </div>
-                    <h4 className="text-xs font-bold tracking-widest uppercase opacity-80">Intercept Stream</h4>
-                  </div>
-                  <Loader2 className="h-4 w-4 animate-spin text-primary/40" />
-                </div>
+        <div className="relative z-10 max-w-[1400px] mx-auto px-4 md:px-8 py-10 space-y-10">
 
-                <div className="space-y-2">
-                  {bootSequence.map((step, i) => (
-                    <div
-                      key={i}
-                      className={cn(
-                        "flex items-center gap-4 p-3 rounded-xl transition-all duration-300",
-                        i < terminalIndex
-                          ? "bg-emerald-500/[0.03] text-emerald-500/80"
-                          : i === terminalIndex ? "bg-primary/5 text-primary" : "opacity-10"
-                      )}
-                    >
-                      <div className="h-7 w-7 rounded-lg bg-current/5 flex items-center justify-center">
-                        {i < terminalIndex ? <ShieldCheck className="h-3.5 w-3.5" /> : step.icon}
-                      </div>
-                      <p className="text-[10px] font-bold uppercase tracking-widest">{step.label}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
+          {/* ── PAGE HEADER ── */}
+          <motion.div
+            className="flex flex-col lg:flex-row lg:items-end justify-between gap-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="space-y-3">
+              {/* Live status pill */}
+              <motion.div
+                className="inline-flex items-center px-3 py-1 rounded-full border border-primary/30 bg-gradient-to-r from-primary/15 via-primary/10 to-primary/15 text-primary text-xs font-bold shadow-lg shadow-primary/15 uppercase tracking-widest gap-2 backdrop-blur-xl"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary shadow-lg shadow-primary/50" />
+                </span>
+                Panopticon Engine · Armed
+              </motion.div>
+
+              <motion.h1
+                className="text-3xl md:text-5xl font-bold tracking-tight flex items-center gap-3 flex-wrap"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                <span className="bg-gradient-to-r from-foreground via-foreground/90 to-foreground/60 bg-clip-text text-transparent">
+                  Competitor
+                </span>
+                <span className="italic bg-gradient-to-r from-primary via-violet-500 to-purple-500 bg-clip-text text-transparent">
+                  Pulse
+                </span>
+                <Crosshair className="h-8 w-8 md:h-10 md:w-10 text-primary shrink-0" />
+              </motion.h1>
+
+              <motion.p
+                className="text-sm md:text-base text-muted-foreground font-medium leading-relaxed"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+              >
+                Analyze market signals and synthesize counter-strike directives.
+              </motion.p>
             </div>
-          )}
 
-          {error && (
-            <div className="max-w-md mx-auto p-12 text-center glass-dark rounded-[2rem] space-y-6 animate-in zoom-in-95 mt-20 shadow-2xl">
-              <div className="h-16 w-16 bg-destructive/10 rounded-2xl flex items-center justify-center text-destructive mx-auto shadow-inner">
-                <AlertTriangle className="h-8 w-8" />
+            {/* ── Search Bar ── */}
+            <motion.div
+              className="shrink-0 lg:w-[520px]"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <div className="rounded-2xl border border-border/50 bg-gradient-to-br from-card/90 to-card/60 backdrop-blur-xl p-1.5 shadow-xl shadow-black/5 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-violet-500/5 pointer-events-none rounded-2xl" />
+                <div className="flex items-center gap-2 relative z-10">
+                  <div className="relative flex-1">
+                    <Target className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/40" />
+                    <Input
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                      disabled={loading}
+                      placeholder="Intercept @Handle or URL..."
+                      className="pl-11 h-11 bg-transparent border-none text-sm font-medium focus-visible:ring-0 shadow-none placeholder:text-muted-foreground/30"
+                    />
+                  </div>
+                  <Button
+                    onClick={handleSearch}
+                    disabled={loading || !query.trim()}
+                    className="h-9 px-6 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all hover:scale-105 shadow-lg shadow-primary/20 gap-2"
+                  >
+                    {loading
+                      ? <Loader2 className="h-3 w-3 animate-spin" />
+                      : <Zap className="h-3 w-3" />
+                    }
+                    Pulse
+                  </Button>
+                </div>
               </div>
-              <div className="space-y-2">
-                <h3 className="text-xl font-black italic uppercase tracking-tighter text-destructive">Signal Lost</h3>
-                <p className="text-muted-foreground text-xs font-light max-w-xs mx-auto opacity-70">{error}</p>
-              </div>
-              <Button onClick={() => setError(null)} size="sm" className="rounded-lg px-8 uppercase font-bold text-[10px] tracking-widest bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-all">Retry Link</Button>
-            </div>
-          )}
+            </motion.div>
+          </motion.div>
 
-          {result && !loading && (
-            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700 ease-out pb-32">
-              {/* COMPACT HERO PANEL */}
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                <Card className="lg:col-span-3 glass-dark p-10 min-h-[300px] relative overflow-hidden flex flex-col justify-center rounded-[2rem] border-none shadow-xl">
-                  <Fingerprint className="absolute -right-8 -top-8 h-80 w-80 text-primary opacity-[0.02] -z-10" />
-                  <div className="space-y-8 relative z-10 w-full">
-                    <div className="flex items-center gap-4">
-                      <Badge className="bg-primary/10 text-primary border-primary/20 font-bold px-4 py-1 text-[10px] tracking-widest rounded-full uppercase">Target Identity</Badge>
-                      <div className="flex items-center gap-2">
-                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse" />
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest opacity-40 italic">Panopticon Sync: 99.8%</span>
-                      </div>
-                    </div>
-                    <div className="space-y-3">
-                      <h2 className="text-4xl sm:text-6xl font-black tracking-tighter text-foreground leading-[1.0] break-all uppercase italic">
-                        {result.competitor_handle}
-                      </h2>
-                      <p className="text-muted-foreground text-lg italic max-w-xl opacity-60">
-                        "Market audit complete. Extraction of high-fidelity sensory and strategic vectors is finalized."
-                      </p>
-                    </div>
-                  </div>
-                </Card>
+          {/* ── CONTENT AREA ── */}
+          <div className="relative min-h-[500px]">
+            <AnimatePresence mode="wait">
 
-                <Card className="lg:col-span-1 glass-dark p-8 flex flex-col items-center justify-center gap-8 rounded-[2rem] border-none shadow-xl bg-primary/[0.02]">
-                  <div className="text-center space-y-1">
-                    <p className="text-[10px] font-bold text-primary uppercase tracking-[0.3em]">Hazard Coefficient</p>
-                  </div>
-                  <div className="relative h-40 w-40 flex items-center justify-center">
-                    <svg className="absolute w-full h-full -rotate-90">
-                      <circle cx="80" cy="80" r="72" stroke="currentColor" strokeWidth="4" fill="transparent" className="text-white/5" />
-                      <circle cx="80" cy="80" r="72" stroke="currentColor" strokeWidth="10" fill="transparent"
-                        strokeDasharray="452"
-                        strokeDashoffset={452 - (452 * result.threat_level) / 100}
-                        className="text-primary drop-shadow-[0_0_12px_rgba(var(--primary),0.5)] transition-all duration-2000 ease-out"
-                        strokeLinecap="round" />
-                    </svg>
-                    <span className="text-6xl font-black text-foreground tracking-tighter italic">{result.threat_level}</span>
-                  </div>
-                  <Badge className="text-[9px] bg-primary/15 text-primary border-primary/20 px-4 py-1.5 rounded-full font-bold uppercase tracking-[0.2em]">Priority: High</Badge>
-                </Card>
-              </div>
+              {/* ── LOADING STATE ── */}
+              {loading && (
+                <motion.div
+                  key="loading"
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.96 }}
+                  transition={{ duration: 0.4 }}
+                  className="flex flex-col items-center justify-center pt-16"
+                >
+                  <div className="w-full max-w-md rounded-2xl border border-border/50 bg-gradient-to-br from-card/90 to-card/60 backdrop-blur-xl p-8 shadow-2xl shadow-black/10 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
 
-              {/* REFINED INTELLIGENCE GRID */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {/* Visual DNA */}
-                <Card className="glass-dark p-8 space-y-10 rounded-[2rem] border-t-2 border-t-indigo-500/20 shadow-sm flex flex-col">
-                  <div className="flex items-center justify-between">
-                    <div className="h-10 w-10 bg-indigo-500/10 rounded-xl flex items-center justify-center text-indigo-500 border border-indigo-500/10 shadow-inner">
-                      <Eye className="h-5 w-5" />
-                    </div>
-                    <Badge variant="outline" className="text-[9px] border-indigo-500/20 text-indigo-400 px-4 py-1 font-bold uppercase tracking-widest rounded-full">Visual DNA</Badge>
-                  </div>
-                  <div className="space-y-8 flex-1">
-                    <div className="space-y-3">
-                      <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest opacity-40">Core Aesthetic</p>
-                      <p className="text-xl font-black text-foreground leading-none uppercase tracking-tight italic">{result.sensory_layer.rekognition.color_palette}</p>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {result.sensory_layer.rekognition.visual_themes.map((t: string, i: number) => (
-                        <div key={i} className="px-4 py-2 bg-white/5 rounded-xl text-[10px] font-bold uppercase tracking-widest text-foreground/80 border border-white/5">{t}</div>
-                      ))}
-                    </div>
-                    <div className="space-y-3 pt-4 border-t border-white/5">
-                      <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest opacity-40">Psychological Delta</p>
-                      <p className="text-sm text-muted-foreground leading-relaxed italic font-light opacity-80">"{result.sensory_layer.rekognition.target_demographic_visuals}"</p>
-                    </div>
-                  </div>
-                </Card>
-
-                {/* Sonic Core */}
-                <Card className="glass-dark p-8 space-y-10 rounded-[2rem] border-t-2 border-t-sky-500/20 shadow-sm flex flex-col">
-                  <div className="flex items-center justify-between">
-                    <div className="h-10 w-10 bg-sky-500/10 rounded-xl flex items-center justify-center text-sky-500 border border-sky-500/10 shadow-inner">
-                      <Headphones className="h-5 w-5" />
-                    </div>
-                    <Badge variant="outline" className="text-[9px] border-sky-500/20 text-sky-400 px-4 py-1 font-bold uppercase tracking-widest rounded-full">Sonic Core</Badge>
-                  </div>
-                  <div className="space-y-6 flex-1">
-                    <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest opacity-40">Auditory Conversion Loops</p>
-                    <div className="space-y-3">
-                      {result.sensory_layer.transcribe.sonic_hooks.map((hook: string, i: number) => (
-                        <div key={i} className="bg-white/5 p-5 rounded-2xl border border-white/5 text-sm italic font-light leading-relaxed relative overflow-hidden group/hook">
-                          <div className="absolute top-0 left-0 w-1 h-full bg-sky-500/30 group-hover/hook:bg-sky-500/60 transition-colors" />
-                          "{hook}"
+                    <div className="flex items-center justify-between pb-5 border-b border-border/40 mb-6">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-inner">
+                          <Terminal className="h-5 w-5" />
                         </div>
+                        <div>
+                          <p className="text-xs font-bold tracking-widest uppercase text-foreground">Intercept Stream</p>
+                          <p className="text-[10px] text-muted-foreground/50 font-mono mt-0.5">agent.panopticon.sys</p>
+                        </div>
+                      </div>
+                      <motion.div
+                        className="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(99,102,241,0.8)]"
+                        animate={{ opacity: [1, 0.3, 1] }}
+                        transition={{ duration: 1.2, repeat: Infinity }}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      {bootSequence.map((step, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 0, x: -8 }}
+                          animate={{ opacity: i <= terminalIndex ? 1 : 0.15, x: 0 }}
+                          transition={{ delay: i * 0.06, duration: 0.3 }}
+                          className={cn(
+                            "flex items-center gap-3 p-3 rounded-xl transition-all duration-500",
+                            i < terminalIndex
+                              ? "bg-emerald-500/8 border border-emerald-500/15"
+                              : i === terminalIndex
+                                ? "bg-primary/8 border border-primary/20"
+                                : "border border-transparent"
+                          )}
+                        >
+                          <div className={cn(
+                            "h-7 w-7 rounded-lg flex items-center justify-center flex-shrink-0 border",
+                            i < terminalIndex
+                              ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                              : i === terminalIndex
+                                ? "bg-primary/10 border-primary/20 text-primary"
+                                : "bg-muted/30 border-border/30 text-muted-foreground/30"
+                          )}>
+                            {i < terminalIndex
+                              ? <ShieldCheck className="h-3.5 w-3.5" />
+                              : step.icon
+                            }
+                          </div>
+                          <p className={cn(
+                            "text-[10px] font-bold uppercase tracking-widest",
+                            i < terminalIndex ? "text-emerald-400"
+                              : i === terminalIndex ? "text-primary"
+                              : "text-muted-foreground/25"
+                          )}>
+                            {step.label}
+                          </p>
+                          {i === terminalIndex && (
+                            <motion.span
+                              className="ml-auto text-[9px] font-mono text-primary/50"
+                              animate={{ opacity: [1, 0.3, 1] }}
+                              transition={{ duration: 1, repeat: Infinity }}
+                            >
+                              compiling…
+                            </motion.span>
+                          )}
+                          {i < terminalIndex && (
+                            <span className="ml-auto text-[9px] font-mono text-emerald-500/60">done</span>
+                          )}
+                        </motion.div>
                       ))}
                     </div>
                   </div>
-                </Card>
+                </motion.div>
+              )}
 
-                {/* Red Team Offensive */}
-                <Card className="p-8 space-y-10 rounded-[2rem] bg-card/60 backdrop-blur-3xl border-l-[3px] border-l-primary relative flex flex-col justify-between shadow-xl overflow-hidden border-y border-r border-white/5">
-                  <Rocket className="absolute -right-8 -bottom-8 h-48 w-48 text-primary opacity-[0.03] rotate-12 -z-10" />
-                  <div className="space-y-10 relative z-10">
-                    <Badge className="bg-primary/20 text-primary border-primary/30 text-[9px] font-bold px-4 py-1.5 uppercase tracking-widest rounded-full">Strike Objective</Badge>
-                    <div className="space-y-3">
-                      <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest opacity-40">System Vulnerability</p>
-                      <h3 className="text-2xl font-black text-foreground leading-tight italic uppercase tracking-tighter">{result.agent_swarm.red_team.pricing_vulnerability}</h3>
+              {/* ── ERROR STATE ── */}
+              {error && !loading && (
+                <motion.div
+                  key="error"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.4 }}
+                  className="max-w-md mx-auto rounded-2xl border border-destructive/20 bg-gradient-to-br from-destructive/8 to-destructive/3 backdrop-blur-xl p-12 text-center shadow-xl shadow-destructive/5 mt-16 space-y-6"
+                >
+                  <motion.div
+                    animate={{ y: [0, -4, 0] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                  >
+                    <div className="h-16 w-16 bg-destructive/10 rounded-2xl border border-destructive/20 flex items-center justify-center text-destructive mx-auto shadow-inner">
+                      <AlertTriangle className="h-8 w-8" />
                     </div>
+                  </motion.div>
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-bold italic uppercase tracking-tight text-destructive">Signal Lost</h3>
+                    <p className="text-muted-foreground text-xs max-w-xs mx-auto leading-relaxed">{error}</p>
                   </div>
+                  <Button
+                    onClick={() => setError(null)}
+                    size="sm"
+                    variant="destructive"
+                    className="rounded-xl px-8 uppercase font-bold text-[10px] tracking-widest hover:scale-105 transition-all"
+                  >
+                    Retry Link
+                  </Button>
+                </motion.div>
+              )}
 
-                  <div className="bg-primary p-8 rounded-2xl text-primary-foreground shadow-2xl relative overflow-hidden group/strike transition-transform hover:scale-[1.02]">
-                    <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity animate-shimmer-subtle" />
-                    <div className="space-y-4 relative z-10">
-                      <p className="text-[9px] font-bold uppercase tracking-[0.4em] opacity-60">Execution Directive</p>
-                      <p className="text-xl font-black italic leading-[1.0] uppercase tracking-tighter">{result.agent_swarm.red_team.undercut_strategy}</p>
-                    </div>
-                  </div>
-                </Card>
-              </div>
-
-              {/* TOPOLOGY: Ecosystem mapping */}
-              <Card className="glass-dark p-10 rounded-[2.5rem] relative overflow-hidden shadow-sm group border-none bg-card/20 min-h-[300px] flex flex-col justify-center">
-                <div className="flex items-center justify-between mb-12 relative z-10">
-                  <div className="flex items-center gap-4">
-                    <Globe className="h-5 w-5 text-primary/40" />
-                    <h4 className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-[0.5em] block leading-none">Neptune Threat Topology</h4>
-                  </div>
-                </div>
-
-                <div className="relative flex flex-col lg:flex-row justify-center gap-8 lg:gap-16 items-center px-4 relative z-10">
-                  {result.threat_graph.nodes.slice(0, 3).map((node: any, i: number) => (
-                    <div key={i} className="relative group/node text-center w-full lg:w-56">
-                      <div className={cn(
-                        "h-24 w-full rounded-2xl border flex flex-col items-center justify-center bg-background/50 shadow-lg transition-all duration-700",
-                        i === 0 ? "border-primary/50 shadow-primary/5" : "border-white/5"
-                      )}>
-                        {i === 0 && (
-                          <div className="absolute -top-3 px-4 py-1 bg-primary text-primary-foreground text-[8px] font-bold rounded-full uppercase tracking-widest shadow-lg">Primary</div>
-                        )}
-                        <span className="text-[8px] font-bold text-muted-foreground uppercase mb-1.5 tracking-widest opacity-40">{node.type}</span>
-                        <h5 className="text-base font-black text-foreground px-6 leading-tight italic uppercase tracking-tighter">{node.label}</h5>
-                      </div>
-                      {i < 2 && (
-                        <div className="hidden lg:block absolute top-1/2 -right-12 w-8 h-[1px] bg-white/10 -translate-y-1/2" />
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </Card>
-
-              {/* ACTION CENTER */}
-              <div className="pt-16 relative">
-                <div className="max-w-3xl mx-auto text-center space-y-10">
-                  <div className="space-y-4">
-                    <h2 className="text-4xl md:text-6xl font-black text-foreground italic uppercase tracking-tighter leading-none select-none">
-                      Weaponize <span className="text-primary not-italic">Directives</span>
-                    </h2>
-                    <p className="text-muted-foreground text-lg font-light leading-relaxed max-w-2xl mx-auto opacity-70">
-                      Transfer these tactical interceptions to the <span className="text-foreground font-black">Campaign Architect</span> to operationalize the counter-strike.
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col items-center gap-8 relative">
-                    <Button
-                      onClick={handleDeploy}
-                      disabled={deploying}
-                      className="h-16 px-12 rounded-2xl bg-primary text-primary-foreground text-xl font-black italic uppercase tracking-[0.05em] shadow-2xl premium-button-glow hover:translate-y-[-4px] transition-all duration-500 group relative overflow-hidden w-full max-w-md"
+              {/* ── RESULTS ── */}
+              {result && !loading && (
+                <motion.div
+                  key="results"
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.5 }}
+                  className="space-y-8 pb-20"
+                >
+                  {/* ── Hero Panel ── */}
+                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    {/* Target Identity Card */}
+                    <motion.div
+                      initial={{ opacity: 0, x: -24 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.1, duration: 0.5 }}
+                      className="lg:col-span-3 rounded-2xl border border-border/50 bg-gradient-to-br from-card/90 via-card/70 to-primary/5 backdrop-blur-xl p-10 min-h-[280px] relative overflow-hidden flex flex-col justify-center shadow-2xl shadow-primary/5"
                     >
-                      <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity animate-shimmer-subtle" />
-                      <span className="relative z-10 flex items-center justify-center gap-6">
-                        {deploying ? (
-                          <>
-                            <Loader2 className="h-6 w-6 animate-spin" />
-                            <span>Injecting Directives...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Rocket className="h-6 w-6 group-hover:rotate-12 transition-transform duration-500" />
-                            <span>Deploy Counter-Strike</span>
-                            <ChevronRight className="h-6 w-6 opacity-40 group-hover:translate-x-2 transition-transform duration-500" />
-                          </>
-                        )}
-                      </span>
-                    </Button>
-                    <div className="flex items-center gap-4 px-8 py-3 bg-card/40 backdrop-blur-xl border border-white/5 rounded-2xl shadow-inner">
-                      <ShieldCheck className="h-5 w-5 text-emerald-500" />
-                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.4em] leading-none">Architect Pipeline: Secured <Lock className="h-3 w-3 inline ml-1.5 opacity-30" /></p>
+                      <Fingerprint className="absolute -right-12 -top-12 h-80 w-80 text-primary opacity-[0.025] pointer-events-none" />
+                      <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+                      <div
+                        className="absolute inset-0 opacity-[0.02] pointer-events-none"
+                        style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)', backgroundSize: '24px 24px' }}
+                      />
+
+                      <div className="space-y-6 relative z-10 w-full">
+                        <div className="flex items-center gap-4 flex-wrap">
+                          <Badge className="bg-primary/15 text-primary hover:bg-primary/15 border border-primary/30 text-[10px] font-mono tracking-widest uppercase shadow-lg shadow-primary/10 backdrop-blur-xl">
+                            <span className="mr-1.5 w-1.5 h-1.5 rounded-full bg-primary inline-block" />
+                            Target Identity
+                          </Badge>
+                          <div className="flex items-center gap-2">
+                            <motion.span
+                              className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]"
+                              animate={{ opacity: [1, 0.4, 1] }}
+                              transition={{ duration: 1.5, repeat: Infinity }}
+                            />
+                            <span className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-widest">Panopticon Sync: 99.8%</span>
+                          </div>
+                        </div>
+                        <div className="space-y-3">
+                          <motion.h2
+                            className="text-4xl sm:text-6xl font-bold tracking-tighter bg-gradient-to-r from-foreground via-foreground/90 to-foreground/60 bg-clip-text text-transparent leading-[1.0] break-all uppercase"
+                            initial={{ opacity: 0, y: 12 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2, duration: 0.5 }}
+                          >
+                            {result.competitor_handle}
+                          </motion.h2>
+                          <p className="text-muted-foreground text-base italic max-w-xl leading-relaxed">
+                            "Market audit complete. Extraction of high-fidelity sensory and strategic vectors is finalized."
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
+
+                    {/* Hazard Coefficient */}
+                    <motion.div
+                      initial={{ opacity: 0, x: 24 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.2, duration: 0.5 }}
+                      className="rounded-2xl border border-border/50 bg-gradient-to-br from-card/90 to-card/60 backdrop-blur-xl p-8 flex flex-col items-center justify-center gap-6 shadow-xl shadow-black/5 relative overflow-hidden"
+                    >
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
+                      <p className="text-[10px] font-bold text-primary uppercase tracking-[0.3em] z-10">Hazard Coefficient</p>
+                      <div className="relative h-40 w-40 flex items-center justify-center z-10">
+                        <svg className="absolute w-full h-full -rotate-90">
+                          <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-border/30" />
+                          <motion.circle
+                            cx="80" cy="80" r="70"
+                            stroke="url(#threatGrad)" strokeWidth="8" fill="transparent"
+                            strokeDasharray="440"
+                            initial={{ strokeDashoffset: 440 }}
+                            animate={{ strokeDashoffset: 440 - (440 * result.threat_level) / 100 }}
+                            transition={{ duration: 1.5, ease: 'easeOut', delay: 0.4 }}
+                            strokeLinecap="round"
+                          />
+                          <defs>
+                            <linearGradient id="threatGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                              <stop offset="0%" stopColor="hsl(var(--primary))" />
+                              <stop offset="100%" stopColor="rgb(168,85,247)" />
+                            </linearGradient>
+                          </defs>
+                        </svg>
+                        <motion.span
+                          className="text-5xl font-black text-foreground tracking-tighter"
+                          initial={{ opacity: 0, scale: 0.5 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.6, type: 'spring', stiffness: 200 }}
+                        >
+                          {result.threat_level}
+                        </motion.span>
+                      </div>
+                      <Badge className="text-[9px] bg-primary/15 text-primary border border-primary/25 px-4 py-1.5 rounded-full font-bold uppercase tracking-[0.2em] z-10">
+                        Priority: High
+                      </Badge>
+                    </motion.div>
+                  </div>
+
+                  {/* ── Intelligence Grid ── */}
+                  <motion.div
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                    initial="hidden"
+                    animate="visible"
+                    variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }}
+                  >
+                    {/* Visual DNA */}
+                    <motion.div
+                      variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } }}
+                      transition={{ duration: 0.5 }}
+                      className="rounded-2xl border border-indigo-500/20 bg-gradient-to-br from-card/90 to-indigo-500/5 backdrop-blur-xl p-8 flex flex-col shadow-xl shadow-indigo-500/5 relative overflow-hidden"
+                    >
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/8 rounded-full blur-2xl pointer-events-none" />
+                      <div className="flex items-center justify-between mb-8 z-10">
+                        <div className="h-10 w-10 bg-indigo-500/10 rounded-xl border border-indigo-500/20 flex items-center justify-center text-indigo-400 shadow-inner">
+                          <Eye className="h-5 w-5" />
+                        </div>
+                        <Badge variant="outline" className="text-[9px] border-indigo-500/25 text-indigo-400 px-3 py-1 font-bold uppercase tracking-widest rounded-full bg-indigo-500/5">
+                          Visual DNA
+                        </Badge>
+                      </div>
+                      <div className="space-y-6 flex-1 relative z-10">
+                        <div className="space-y-2">
+                          <p className="text-[9px] font-bold text-muted-foreground/40 uppercase tracking-widest">Core Aesthetic</p>
+                          <p className="text-xl font-bold text-foreground leading-none uppercase tracking-tight italic">{result.sensory_layer.rekognition.color_palette}</p>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {result.sensory_layer.rekognition.visual_themes.map((t: string, i: number) => (
+                            <motion.div
+                              key={i}
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ delay: 0.4 + i * 0.06 }}
+                              className="px-3 py-1.5 bg-indigo-500/10 rounded-lg text-[10px] font-bold uppercase tracking-wider text-indigo-300 border border-indigo-500/15"
+                            >
+                              {t}
+                            </motion.div>
+                          ))}
+                        </div>
+                        <div className="space-y-2 pt-4 border-t border-border/40">
+                          <p className="text-[9px] font-bold text-muted-foreground/40 uppercase tracking-widest">Psychological Delta</p>
+                          <p className="text-sm text-muted-foreground leading-relaxed italic">"{result.sensory_layer.rekognition.target_demographic_visuals}"</p>
+                        </div>
+                      </div>
+                    </motion.div>
+
+                    {/* Sonic Core */}
+                    <motion.div
+                      variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } }}
+                      transition={{ duration: 0.5 }}
+                      className="rounded-2xl border border-sky-500/20 bg-gradient-to-br from-card/90 to-sky-500/5 backdrop-blur-xl p-8 flex flex-col shadow-xl shadow-sky-500/5 relative overflow-hidden"
+                    >
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/8 rounded-full blur-2xl pointer-events-none" />
+                      <div className="flex items-center justify-between mb-8 z-10">
+                        <div className="h-10 w-10 bg-sky-500/10 rounded-xl border border-sky-500/20 flex items-center justify-center text-sky-400 shadow-inner">
+                          <Headphones className="h-5 w-5" />
+                        </div>
+                        <Badge variant="outline" className="text-[9px] border-sky-500/25 text-sky-400 px-3 py-1 font-bold uppercase tracking-widest rounded-full bg-sky-500/5">
+                          Sonic Core
+                        </Badge>
+                      </div>
+                      <div className="space-y-4 flex-1 relative z-10">
+                        <p className="text-[9px] font-bold text-muted-foreground/40 uppercase tracking-widest">Auditory Conversion Loops</p>
+                        <div className="space-y-3">
+                          {result.sensory_layer.transcribe.sonic_hooks.map((hook: string, i: number) => (
+                            <motion.div
+                              key={i}
+                              initial={{ opacity: 0, x: -8 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: 0.5 + i * 0.08 }}
+                              className="bg-sky-500/5 p-4 rounded-xl border border-sky-500/15 text-sm italic font-light leading-relaxed relative overflow-hidden group/hook"
+                            >
+                              <div className="absolute top-0 left-0 w-[2px] h-full bg-sky-500/40 group-hover/hook:bg-sky-500/70 transition-colors rounded-l-xl" />
+                              <span className="pl-2">"{hook}"</span>
+                            </motion.div>
+                          ))}
+                        </div>
+                      </div>
+                    </motion.div>
+
+                    {/* Red Team Strike */}
+                    <motion.div
+                      variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } }}
+                      transition={{ duration: 0.5 }}
+                      className="rounded-2xl border border-primary/20 bg-gradient-to-br from-card/90 via-card/70 to-primary/5 backdrop-blur-xl p-8 flex flex-col justify-between shadow-xl shadow-primary/5 relative overflow-hidden"
+                    >
+                      <Rocket className="absolute -right-6 -bottom-6 h-40 w-40 text-primary opacity-[0.04] rotate-12 pointer-events-none" />
+                      <div className="absolute top-0 right-0 w-28 h-28 bg-primary/8 rounded-full blur-2xl pointer-events-none" />
+                      <div className="space-y-6 relative z-10">
+                        <Badge className="bg-primary/15 text-primary hover:bg-primary/15 border border-primary/25 text-[9px] font-bold px-3 py-1 uppercase tracking-widest rounded-full w-fit">
+                          Strike Objective
+                        </Badge>
+                        <div className="space-y-2">
+                          <p className="text-[9px] font-bold text-muted-foreground/40 uppercase tracking-widest">System Vulnerability</p>
+                          <h3 className="text-xl font-bold text-foreground leading-tight italic">{result.agent_swarm.red_team.pricing_vulnerability}</h3>
+                        </div>
+                      </div>
+                      <motion.div
+                        className="bg-gradient-to-br from-primary to-violet-600 p-6 rounded-xl text-primary-foreground shadow-2xl shadow-primary/25 relative overflow-hidden group/strike mt-6 z-10"
+                        whileHover={{ scale: 1.02 }}
+                        transition={{ type: 'spring', stiffness: 300 }}
+                      >
+                        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover/strike:opacity-100 transition-opacity" />
+                        <div className="space-y-3 relative z-10">
+                          <p className="text-[9px] font-bold uppercase tracking-[0.4em] opacity-60">Execution Directive</p>
+                          <p className="text-base font-bold italic leading-snug">{result.agent_swarm.red_team.undercut_strategy}</p>
+                        </div>
+                      </motion.div>
+                    </motion.div>
+                  </motion.div>
+
+                  {/* ── Neptune Threat Topology ── */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 24 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4, duration: 0.5 }}
+                    className="rounded-2xl border border-border/50 bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-xl p-10 relative overflow-hidden shadow-xl shadow-black/5"
+                  >
+                    <div className="absolute inset-0 opacity-[0.02] pointer-events-none"
+                      style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)', backgroundSize: '24px 24px' }}
+                    />
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+
+                    <div className="flex items-center gap-3 mb-10 relative z-10">
+                      <Globe className="h-4 w-4 text-primary/60" />
+                      <h4 className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-[0.5em]">Neptune Threat Topology</h4>
+                    </div>
+
+                    <div className="flex flex-col lg:flex-row justify-center gap-8 lg:gap-16 items-center px-4 relative z-10">
+                      {result.threat_graph.nodes.slice(0, 3).map((node: any, i: number) => (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.5 + i * 0.12, type: 'spring', stiffness: 200 }}
+                          className="relative text-center w-full lg:w-56 group/node"
+                        >
+                          <div className={cn(
+                            "h-24 w-full rounded-2xl border flex flex-col items-center justify-center backdrop-blur-sm shadow-lg transition-all duration-500 bg-card/60",
+                            i === 0
+                              ? "border-primary/40 shadow-primary/10 hover:border-primary/60 hover:shadow-primary/20"
+                              : "border-border/50 hover:border-border"
+                          )}>
+                            {i === 0 && (
+                              <div className="absolute -top-3 px-3 py-1 bg-gradient-to-r from-primary to-violet-500 text-primary-foreground text-[8px] font-bold rounded-full uppercase tracking-widest shadow-lg shadow-primary/30">
+                                Primary
+                              </div>
+                            )}
+                            <span className="text-[8px] font-bold text-muted-foreground/40 uppercase mb-1.5 tracking-widest">{node.type}</span>
+                            <h5 className="text-sm font-bold text-foreground px-4 leading-tight italic uppercase">{node.label}</h5>
+                          </div>
+                          {i < 2 && (
+                            <div className="hidden lg:flex absolute top-1/2 -right-12 items-center gap-1 -translate-y-1/2">
+                              <div className="w-4 h-[1px] bg-border/30" />
+                              <Activity className="h-3 w-3 text-border/30" />
+                              <div className="w-4 h-[1px] bg-border/30" />
+                            </div>
+                          )}
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+
+                  {/* ── Action Center ── */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 24 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.55, duration: 0.5 }}
+                    className="pt-8 relative"
+                  >
+                    <div className="max-w-3xl mx-auto text-center space-y-8">
+                      <div className="space-y-3">
+                        <motion.h2
+                          className="text-4xl md:text-6xl font-bold text-foreground italic uppercase tracking-tight leading-none select-none"
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.65, type: 'spring', stiffness: 150 }}
+                        >
+                          <span className="bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">Weaponize</span>{' '}
+                          <span className="bg-gradient-to-r from-primary via-violet-500 to-purple-500 bg-clip-text text-transparent not-italic">Directives</span>
+                        </motion.h2>
+                        <p className="text-muted-foreground text-base font-medium leading-relaxed max-w-2xl mx-auto">
+                          Transfer these tactical interceptions to the{' '}
+                          <span className="text-foreground font-bold">Campaign Architect</span>{' '}
+                          to operationalize the counter-strike.
+                        </p>
+                      </div>
+
+                      <div className="flex flex-col items-center gap-5">
+                        <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }} className="w-full max-w-md">
+                          <Button
+                            onClick={handleDeploy}
+                            disabled={deploying}
+                            className="h-16 w-full rounded-2xl text-lg font-bold italic uppercase tracking-wide shadow-2xl shadow-primary/25 gap-4 transition-all group relative overflow-hidden"
+                          >
+                            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-violet-500/20 to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <span className="relative z-10 flex items-center justify-center gap-4">
+                              {deploying ? (
+                                <>
+                                  <Loader2 className="h-6 w-6 animate-spin" />
+                                  <span>Injecting Directives…</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Rocket className="h-5 w-5 group-hover:rotate-12 transition-transform duration-500" />
+                                  <span>Deploy Counter-Strike</span>
+                                  <ChevronRight className="h-5 w-5 opacity-50 group-hover:translate-x-1 transition-transform duration-300" />
+                                </>
+                              )}
+                            </span>
+                          </Button>
+                        </motion.div>
+
+                        <div className="flex items-center gap-3 px-6 py-3 bg-card/60 backdrop-blur-xl border border-border/40 rounded-xl shadow-inner">
+                          <ShieldCheck className="h-4 w-4 text-emerald-500 shrink-0" />
+                          <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest leading-none">
+                            Architect Pipeline: Secured
+                            <Lock className="h-3 w-3 inline ml-1.5 opacity-30" />
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
+
+              {/* ── IDLE STATE ── */}
+              {!result && !loading && !error && (
+                <motion.div
+                  key="idle"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="mt-4 mb-16 relative"
+                >
+                  <div className="h-[540px] flex flex-col items-center justify-center relative overflow-hidden rounded-2xl border border-border/30 bg-gradient-to-br from-card/50 to-card/20 backdrop-blur-md shadow-inner group">
+                    {/* Inner ambience */}
+                    <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">
+                      <motion.div
+                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/6 blur-[120px] rounded-full"
+                        animate={{ scale: [1, 1.08, 1] }}
+                        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+                      />
+                      <div
+                        className="absolute inset-0 opacity-[0.025]"
+                        style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)', backgroundSize: '28px 28px' }}
+                      />
+                    </div>
+
+                    <div className="text-center space-y-8 relative z-10 px-8 max-w-4xl">
+                      <motion.div
+                        animate={{ y: [0, -8, 0] }}
+                        transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
+                      >
+                        <div className="h-24 w-24 bg-card/80 border border-border/40 rounded-2xl flex items-center justify-center mx-auto shadow-2xl group-hover:border-primary/30 transition-all duration-700">
+                          <History className="h-10 w-10 text-primary/25 group-hover:text-primary/60 transition-colors duration-700" />
+                        </div>
+                      </motion.div>
+
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-center gap-3 text-[10px] font-bold uppercase tracking-[0.5em] text-muted-foreground/30">
+                          <span className="h-1.5 w-1.5 rounded-full bg-primary/40" />
+                          Intercept Active
+                          <span className="h-1.5 w-1.5 rounded-full bg-primary/40" />
+                        </div>
+                        <h3 className="text-4xl md:text-6xl font-bold tracking-tight text-foreground/80 leading-[1.0] italic select-none uppercase">
+                          Pulse{' '}
+                          <span className="bg-gradient-to-r from-primary via-violet-500 to-purple-500 bg-clip-text text-transparent not-italic">Sequence</span>
+                          <br />
+                          Required
+                        </h3>
+                        <p className="text-base font-medium text-muted-foreground/50 max-w-md mx-auto leading-relaxed">
+                          Identify a target market identity to authorize a real-time intelligence sweep.
+                        </p>
+                      </div>
+
+                      <motion.div
+                        className="flex flex-wrap items-center justify-center gap-3 pt-2"
+                        initial="hidden"
+                        animate="visible"
+                        variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }}
+                      >
+                        {['@Nike', '@TheRundownAI', '@Anthropic'].map((handle) => (
+                          <motion.button
+                            key={handle}
+                            variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0 } }}
+                            whileHover={{ scale: 1.06 }}
+                            whileTap={{ scale: 0.97 }}
+                            onClick={() => setQuery(handle)}
+                            className="px-6 py-3 rounded-xl border border-border/40 bg-card/50 backdrop-blur-sm text-muted-foreground/40 hover:text-primary hover:border-primary/30 hover:bg-primary/8 transition-all text-[10px] tracking-[0.35em] font-bold uppercase italic shadow-sm"
+                          >
+                            {handle}
+                          </motion.button>
+                        ))}
+                      </motion.div>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-          )}
+                </motion.div>
+              )}
 
-          {!result && !loading && !error && (
-            <div className="h-[550px] flex flex-col items-center justify-center relative overflow-hidden rounded-[3rem] border border-white/5 bg-card/5 backdrop-blur-md animate-in fade-in duration-2000 mt-4 mb-20 group shadow-inner">
-              {/* NEURAL DRIFT BACKGROUND */}
-              <div className="absolute inset-0 -z-10 bg-[#020202]/50">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 blur-[160px] rounded-full animate-pulse transition-all duration-3000" />
-                <div className="absolute inset-0 neural-grid opacity-20" />
-              </div>
-
-              <div className="text-center space-y-12 relative z-10 p-16 max-w-4xl px-8">
-                <div className="relative inline-block mb-8">
-                  <div className="h-24 w-24 bg-background/50 border border-white/10 rounded-[2rem] flex items-center justify-center mx-auto shadow-2xl relative group-hover:border-primary/40 transition-all duration-700">
-                    <History className="h-10 w-10 text-primary opacity-20 animate-pulse group-hover:opacity-80" />
-                  </div>
-                </div>
-                <div className="space-y-8">
-                  <div className="flex items-center justify-center gap-4 text-primary/30 text-[10px] font-bold uppercase tracking-[0.6em] mb-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-primary/40" />
-                    Intercept Active
-                  </div>
-                  <h3 className="text-5xl md:text-7xl font-black tracking-tighter text-foreground/90 leading-[0.9] italic select-none uppercase">
-                    Pulse <span className="text-primary not-italic">Sequence</span> <br /> Required
-                  </h3>
-                  <p className="text-lg font-light text-muted-foreground/60 max-w-xl mx-auto leading-relaxed px-4">
-                    Identify a target market identity to authorize a real-time intelligence sweep.
-                  </p>
-                </div>
-                <div className="flex flex-wrap items-center justify-center gap-4 pt-8">
-                  <button onClick={() => setQuery('@Nike')} className="px-8 py-3.5 rounded-xl border border-white/5 bg-white/[0.02] text-muted-foreground/40 hover:text-primary hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer text-[10px] tracking-[0.4em] font-black uppercase italic">@Nike</button>
-                  <button onClick={() => setQuery('@TheRundownAI')} className="px-8 py-3.5 rounded-xl border border-white/5 bg-white/[0.02] text-muted-foreground/40 hover:text-primary hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer text-[10px] tracking-[0.4em] font-black uppercase italic">@TheRundownAI</button>
-                  <button onClick={() => setQuery('@Anthropic')} className="px-8 py-3.5 rounded-xl border border-white/5 bg-white/[0.02] text-muted-foreground/40 hover:text-primary hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer text-[10px] tracking-[0.4em] font-black uppercase italic">@Anthropic</button>
-                </div>
-              </div>
-            </div>
-          )}
+            </AnimatePresence>
+          </div>
         </div>
       </Main>
     </>
