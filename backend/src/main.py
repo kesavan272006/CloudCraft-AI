@@ -9,7 +9,12 @@ except ImportError:
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.api.v1.endpoints import forge, vision, genesis, competitor, oracle, scout, brand, campaign, persona, performance, calendar, nexus, dashboard, vernacular, chronos
+# Import all routers from your project structure
+from src.api.v1.endpoints import (
+    forge, vision, genesis, competitor, oracle, scout, 
+    brand, campaign, persona, performance, calendar, 
+    nexus, dashboard, vernacular, chronos
+)
 
 app = FastAPI(
     title="CloudCraft AI Backend",
@@ -17,7 +22,7 @@ app = FastAPI(
     version="0.1.0",
 )
 
-# Allow frontend (Vite on port 5173, 5174)
+# Allow frontend access (Localhost and any other origin via "*")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174", "*"],
@@ -26,7 +31,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
+# --- Include all your API routers ---
 app.include_router(forge.router, prefix="/api/v1", tags=["Forge"])
 app.include_router(vision.router, prefix="/api/v1/vision", tags=["Vision Lab"])
 app.include_router(genesis.router, prefix="/api/v1/genesis", tags=["Genesis Engine"])
@@ -42,6 +47,16 @@ app.include_router(nexus.router, prefix="/api/v1/nexus", tags=["Nexus Alpha"])
 app.include_router(dashboard.router, prefix="/api/v1/dashboard", tags=["Mission Control"])
 app.include_router(vernacular.router, prefix="/api/v1/vernacular", tags=["Project Vernacular"])
 app.include_router(chronos.router, prefix="/api/v1/chronos", tags=["Chronos Brief"])
+
+# --- NEW: Added Root Route to fix the 404 error ---
+@app.get("/")
+async def root():
+    return {
+        "status": "online",
+        "message": "CloudCraft AI Backend is Online!",
+        "documentation": "/docs",
+        "health_check": "/health"
+    }
 
 @app.get("/health")
 async def health_check():
