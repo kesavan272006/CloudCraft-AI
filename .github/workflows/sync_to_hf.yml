@@ -11,8 +11,17 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          lfs: true
-      - name: Push to hub
+      
+      - name: Push Backend only to HF
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: git push --force https://Kesavan2006:$HF_TOKEN@huggingface.co/spaces/Kesavan2006/CloudCraft-Backend main
+        run: |
+          # 1. Create a temporary branch that only contains the backend folder
+          git config --global user.email "sync-bot@example.com"
+          git config --global user.name "Sync Bot"
+          
+          # 2. Use subtree to split the backend folder into its own branch
+          git subtree split --prefix=backend -b hf-deploy
+          
+          # 3. Push only that specific branch to Hugging Face
+          git push --force https://Kesavan2006:$HF_TOKEN@huggingface.co/spaces/Kesavan2006/CloudCraft-Backend hf-deploy:main
