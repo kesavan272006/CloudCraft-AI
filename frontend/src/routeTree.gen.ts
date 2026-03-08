@@ -38,6 +38,7 @@ import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_auth
 import { Route as AuthenticatedGenesisIndexRouteImport } from './routes/_authenticated/genesis/index'
 import { Route as AuthenticatedForgeIndexRouteImport } from './routes/_authenticated/forge/index'
 import { Route as AuthenticatedCompetitorPulseIndexRouteImport } from './routes/_authenticated/competitor-pulse/index'
+import { Route as AuthenticatedChronosBriefIndexRouteImport } from './routes/_authenticated/chronos-brief/index'
 import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
 import { Route as AuthenticatedCampaignArchitectIndexRouteImport } from './routes/_authenticated/campaign-architect/index'
 import { Route as AuthenticatedCalendarIndexRouteImport } from './routes/_authenticated/calendar/index'
@@ -203,6 +204,12 @@ const AuthenticatedCompetitorPulseIndexRoute =
     path: '/competitor-pulse/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedChronosBriefIndexRoute =
+  AuthenticatedChronosBriefIndexRouteImport.update({
+    id: '/chronos-brief/',
+    path: '/chronos-brief/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedChatsIndexRoute = AuthenticatedChatsIndexRouteImport.update({
   id: '/chats/',
   path: '/chats/',
@@ -301,23 +308,24 @@ export interface FileRoutesByFullPath {
   '/clerk/sign-in': typeof ClerkauthSignInRoute
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
-  '/apps/': typeof AuthenticatedAppsIndexRoute
-  '/brand_brain/': typeof AuthenticatedBrand_brainIndexRoute
-  '/calendar/': typeof AuthenticatedCalendarIndexRoute
-  '/campaign-architect/': typeof AuthenticatedCampaignArchitectIndexRoute
-  '/chats/': typeof AuthenticatedChatsIndexRoute
-  '/competitor-pulse/': typeof AuthenticatedCompetitorPulseIndexRoute
-  '/forge/': typeof AuthenticatedForgeIndexRoute
-  '/genesis/': typeof AuthenticatedGenesisIndexRoute
-  '/help-center/': typeof AuthenticatedHelpCenterIndexRoute
-  '/local-scout/': typeof AuthenticatedLocalScoutIndexRoute
-  '/performance-oracle/': typeof AuthenticatedPerformanceOracleIndexRoute
+  '/apps': typeof AuthenticatedAppsIndexRoute
+  '/brand_brain': typeof AuthenticatedBrand_brainIndexRoute
+  '/calendar': typeof AuthenticatedCalendarIndexRoute
+  '/campaign-architect': typeof AuthenticatedCampaignArchitectIndexRoute
+  '/chats': typeof AuthenticatedChatsIndexRoute
+  '/chronos-brief': typeof AuthenticatedChronosBriefIndexRoute
+  '/competitor-pulse': typeof AuthenticatedCompetitorPulseIndexRoute
+  '/forge': typeof AuthenticatedForgeIndexRoute
+  '/genesis': typeof AuthenticatedGenesisIndexRoute
+  '/help-center': typeof AuthenticatedHelpCenterIndexRoute
+  '/local-scout': typeof AuthenticatedLocalScoutIndexRoute
+  '/performance-oracle': typeof AuthenticatedPerformanceOracleIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
-  '/tasks/': typeof AuthenticatedTasksIndexRoute
-  '/users/': typeof AuthenticatedUsersIndexRoute
-  '/vernacular/': typeof AuthenticatedVernacularIndexRoute
-  '/video/': typeof AuthenticatedVideoIndexRoute
-  '/vision-lab/': typeof AuthenticatedVisionLabIndexRoute
+  '/tasks': typeof AuthenticatedTasksIndexRoute
+  '/users': typeof AuthenticatedUsersIndexRoute
+  '/vernacular': typeof AuthenticatedVernacularIndexRoute
+  '/video': typeof AuthenticatedVideoIndexRoute
+  '/vision-lab': typeof AuthenticatedVisionLabIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -346,6 +354,7 @@ export interface FileRoutesByTo {
   '/calendar': typeof AuthenticatedCalendarIndexRoute
   '/campaign-architect': typeof AuthenticatedCampaignArchitectIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
+  '/chronos-brief': typeof AuthenticatedChronosBriefIndexRoute
   '/competitor-pulse': typeof AuthenticatedCompetitorPulseIndexRoute
   '/forge': typeof AuthenticatedForgeIndexRoute
   '/genesis': typeof AuthenticatedGenesisIndexRoute
@@ -391,6 +400,7 @@ export interface FileRoutesById {
   '/_authenticated/calendar/': typeof AuthenticatedCalendarIndexRoute
   '/_authenticated/campaign-architect/': typeof AuthenticatedCampaignArchitectIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
+  '/_authenticated/chronos-brief/': typeof AuthenticatedChronosBriefIndexRoute
   '/_authenticated/competitor-pulse/': typeof AuthenticatedCompetitorPulseIndexRoute
   '/_authenticated/forge/': typeof AuthenticatedForgeIndexRoute
   '/_authenticated/genesis/': typeof AuthenticatedGenesisIndexRoute
@@ -429,23 +439,24 @@ export interface FileRouteTypes {
     | '/clerk/sign-in'
     | '/clerk/sign-up'
     | '/clerk/user-management'
-    | '/apps/'
-    | '/brand_brain/'
-    | '/calendar/'
-    | '/campaign-architect/'
-    | '/chats/'
-    | '/competitor-pulse/'
-    | '/forge/'
-    | '/genesis/'
-    | '/help-center/'
-    | '/local-scout/'
-    | '/performance-oracle/'
+    | '/apps'
+    | '/brand_brain'
+    | '/calendar'
+    | '/campaign-architect'
+    | '/chats'
+    | '/chronos-brief'
+    | '/competitor-pulse'
+    | '/forge'
+    | '/genesis'
+    | '/help-center'
+    | '/local-scout'
+    | '/performance-oracle'
     | '/settings/'
-    | '/tasks/'
-    | '/users/'
-    | '/vernacular/'
-    | '/video/'
-    | '/vision-lab/'
+    | '/tasks'
+    | '/users'
+    | '/vernacular'
+    | '/video'
+    | '/vision-lab'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -474,6 +485,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/campaign-architect'
     | '/chats'
+    | '/chronos-brief'
     | '/competitor-pulse'
     | '/forge'
     | '/genesis'
@@ -518,6 +530,7 @@ export interface FileRouteTypes {
     | '/_authenticated/calendar/'
     | '/_authenticated/campaign-architect/'
     | '/_authenticated/chats/'
+    | '/_authenticated/chronos-brief/'
     | '/_authenticated/competitor-pulse/'
     | '/_authenticated/forge/'
     | '/_authenticated/genesis/'
@@ -560,7 +573,7 @@ declare module '@tanstack/react-router' {
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
-      fullPath: '/'
+      fullPath: ''
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -672,35 +685,35 @@ declare module '@tanstack/react-router' {
     '/_authenticated/vision-lab/': {
       id: '/_authenticated/vision-lab/'
       path: '/vision-lab'
-      fullPath: '/vision-lab/'
+      fullPath: '/vision-lab'
       preLoaderRoute: typeof AuthenticatedVisionLabIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/video/': {
       id: '/_authenticated/video/'
       path: '/video'
-      fullPath: '/video/'
+      fullPath: '/video'
       preLoaderRoute: typeof AuthenticatedVideoIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/vernacular/': {
       id: '/_authenticated/vernacular/'
       path: '/vernacular'
-      fullPath: '/vernacular/'
+      fullPath: '/vernacular'
       preLoaderRoute: typeof AuthenticatedVernacularIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/users/': {
       id: '/_authenticated/users/'
       path: '/users'
-      fullPath: '/users/'
+      fullPath: '/users'
       preLoaderRoute: typeof AuthenticatedUsersIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/tasks/': {
       id: '/_authenticated/tasks/'
       path: '/tasks'
-      fullPath: '/tasks/'
+      fullPath: '/tasks'
       preLoaderRoute: typeof AuthenticatedTasksIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
@@ -714,77 +727,84 @@ declare module '@tanstack/react-router' {
     '/_authenticated/performance-oracle/': {
       id: '/_authenticated/performance-oracle/'
       path: '/performance-oracle'
-      fullPath: '/performance-oracle/'
+      fullPath: '/performance-oracle'
       preLoaderRoute: typeof AuthenticatedPerformanceOracleIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/local-scout/': {
       id: '/_authenticated/local-scout/'
       path: '/local-scout'
-      fullPath: '/local-scout/'
+      fullPath: '/local-scout'
       preLoaderRoute: typeof AuthenticatedLocalScoutIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/help-center/': {
       id: '/_authenticated/help-center/'
       path: '/help-center'
-      fullPath: '/help-center/'
+      fullPath: '/help-center'
       preLoaderRoute: typeof AuthenticatedHelpCenterIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/genesis/': {
       id: '/_authenticated/genesis/'
       path: '/genesis'
-      fullPath: '/genesis/'
+      fullPath: '/genesis'
       preLoaderRoute: typeof AuthenticatedGenesisIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/forge/': {
       id: '/_authenticated/forge/'
       path: '/forge'
-      fullPath: '/forge/'
+      fullPath: '/forge'
       preLoaderRoute: typeof AuthenticatedForgeIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/competitor-pulse/': {
       id: '/_authenticated/competitor-pulse/'
       path: '/competitor-pulse'
-      fullPath: '/competitor-pulse/'
+      fullPath: '/competitor-pulse'
       preLoaderRoute: typeof AuthenticatedCompetitorPulseIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/chronos-brief/': {
+      id: '/_authenticated/chronos-brief/'
+      path: '/chronos-brief'
+      fullPath: '/chronos-brief'
+      preLoaderRoute: typeof AuthenticatedChronosBriefIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/chats/': {
       id: '/_authenticated/chats/'
       path: '/chats'
-      fullPath: '/chats/'
+      fullPath: '/chats'
       preLoaderRoute: typeof AuthenticatedChatsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/campaign-architect/': {
       id: '/_authenticated/campaign-architect/'
       path: '/campaign-architect'
-      fullPath: '/campaign-architect/'
+      fullPath: '/campaign-architect'
       preLoaderRoute: typeof AuthenticatedCampaignArchitectIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/calendar/': {
       id: '/_authenticated/calendar/'
       path: '/calendar'
-      fullPath: '/calendar/'
+      fullPath: '/calendar'
       preLoaderRoute: typeof AuthenticatedCalendarIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/brand_brain/': {
       id: '/_authenticated/brand_brain/'
       path: '/brand_brain'
-      fullPath: '/brand_brain/'
+      fullPath: '/brand_brain'
       preLoaderRoute: typeof AuthenticatedBrand_brainIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/apps/': {
       id: '/_authenticated/apps/'
       path: '/apps'
-      fullPath: '/apps/'
+      fullPath: '/apps'
       preLoaderRoute: typeof AuthenticatedAppsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
@@ -879,6 +899,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCalendarIndexRoute: typeof AuthenticatedCalendarIndexRoute
   AuthenticatedCampaignArchitectIndexRoute: typeof AuthenticatedCampaignArchitectIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
+  AuthenticatedChronosBriefIndexRoute: typeof AuthenticatedChronosBriefIndexRoute
   AuthenticatedCompetitorPulseIndexRoute: typeof AuthenticatedCompetitorPulseIndexRoute
   AuthenticatedForgeIndexRoute: typeof AuthenticatedForgeIndexRoute
   AuthenticatedGenesisIndexRoute: typeof AuthenticatedGenesisIndexRoute
@@ -902,6 +923,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCampaignArchitectIndexRoute:
     AuthenticatedCampaignArchitectIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
+  AuthenticatedChronosBriefIndexRoute: AuthenticatedChronosBriefIndexRoute,
   AuthenticatedCompetitorPulseIndexRoute:
     AuthenticatedCompetitorPulseIndexRoute,
   AuthenticatedForgeIndexRoute: AuthenticatedForgeIndexRoute,

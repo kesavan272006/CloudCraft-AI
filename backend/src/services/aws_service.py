@@ -100,7 +100,8 @@ class EventBridgeService:
 
 class AWSPollyService:
     """
-    AWS Polly service for generating native Indian voiceovers.
+    AWS Polly service, augmented with Edge TTS (Neural) for native vernacular support.
+    Provides hyper-fluent Indian accents (much better than gTTS) while remaining free.
     """
     def __init__(self):
         self.polly = boto3.client(
@@ -109,45 +110,49 @@ class AWSPollyService:
             aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
             region_name=settings.AWS_REGION
         )
-        
-        # AWS Polly valid voice mappings for Indian languages
-        # NOTE: Polly only natively supports Hindi (hi-IN) for Indian languages.
-        # For other Indian languages, we use the en-IN Aditi voice which is universally understood.
-        # Kajal (neural, Hindi) is the best quality voice available.
-        self.LANGUAGE_VOICE_MAP = {
-            "Hindi":      {"LanguageCode": "hi-IN", "VoiceId": "Kajal",  "Engine": "neural"},
-            "Tamil":      {"LanguageCode": "hi-IN", "VoiceId": "Kajal",  "Engine": "neural"},   # No native Tamil in Polly; Kajal is best fallback
-            "Telugu":     {"LanguageCode": "hi-IN", "VoiceId": "Kajal",  "Engine": "neural"},
-            "Marathi":    {"LanguageCode": "hi-IN", "VoiceId": "Kajal",  "Engine": "neural"},
-            "Bengali":    {"LanguageCode": "hi-IN", "VoiceId": "Kajal",  "Engine": "neural"},
-            "Gujarati":   {"LanguageCode": "hi-IN", "VoiceId": "Kajal",  "Engine": "neural"},
-            "Punjabi":    {"LanguageCode": "hi-IN", "VoiceId": "Kajal",  "Engine": "neural"},
-            "Kannada":    {"LanguageCode": "hi-IN", "VoiceId": "Kajal",  "Engine": "neural"},
-            "Malayalam":  {"LanguageCode": "hi-IN", "VoiceId": "Kajal",  "Engine": "neural"},
-            "Odia":       {"LanguageCode": "hi-IN", "VoiceId": "Kajal",  "Engine": "neural"},
-            "Default":    {"LanguageCode": "en-IN", "VoiceId": "Aditi",  "Engine": "standard"},
+        # Edge TTS High-Quality Neural Voices for Indian Regional Languages
+        self.EDGE_VOICE_MAP = {
+            "Hindi": "hi-IN-SwaraNeural",
+            "Tamil": "ta-IN-PallaviNeural",
+            "Telugu": "te-IN-ShrutiNeural",
+            "Marathi": "mr-IN-AarohiNeural",
+            "Bengali": "bn-IN-TanishaaNeural",
+            "Gujarati": "gu-IN-DhwaniNeural",
+            "Punjabi": "pa-IN-OjasNeural", # Male voice (often female missing for Punjabi in standard tiers)
+            "Kannada": "kn-IN-SapnaNeural",
+            "Malayalam": "ml-IN-SobhanaNeural",
+            "Default": "en-IN-NeerjaNeural"
         }
+
+    def _strip_emojis(self, text: str) -> str:
+        """Removes emojis and unreadable characters from text before TTS synthesis."""
+        import re
+        # This keeps letters of all languages (\w), spaces, and basic punctuation
+        return re.sub(r'[^\w\s,.?!\'-]', '', text)
 
     async def synthesize_speech(self, text: str, language: str) -> Optional[bytes]:
         try:
-            config = self.LANGUAGE_VOICE_MAP.get(language, self.LANGUAGE_VOICE_MAP["Default"])
-            logger.info(f"[AWS Polly] Synthesizing {language} voice: {config['VoiceId']} ({config['Engine']})")
+            # 1. Strip emojis so they don't get literally read out loud (e.g. "smile face")
+            clean_text = self._strip_emojis(text)
+            voice_id = self.EDGE_VOICE_MAP.get(language, self.EDGE_VOICE_MAP["Default"])
+            
+            logger.info(f"[TTS] Synthesizing {language} voice using HIGH-FIDELITY Neural Engine ({voice_id})")
 
-            response = self.polly.synthesize_speech(
-                Text=text[:2500],
-                OutputFormat='mp3',
-                VoiceId=config['VoiceId'],
-                Engine=config['Engine'],
-                LanguageCode=config['LanguageCode']
-            )
-
-            if "AudioStream" in response:
-                audio_bytes = response["AudioStream"].read()
-                logger.info(f"[AWS Polly] ✓ Synthesized {len(audio_bytes)} bytes of audio")
-                return audio_bytes
-            return None
+            # 2. Use Edge TTS (async) for truly native, ultra-fluent Indian language TTS
+            import edge_tts
+            
+            communicate = edge_tts.Communicate(clean_text[:5000], voice_id)
+            audio_data = bytearray()
+            async for chunk in communicate.stream():
+                if chunk["type"] == "audio":
+                    audio_data.extend(chunk["data"])
+                    
+            audio_bytes = bytes(audio_data)
+            logger.info(f"[TTS] ✓ Synthesized {len(audio_bytes)} bytes of fluid neural {language} audio")
+            return audio_bytes
+            
         except Exception as e:
-            logger.error(f"[AWS Polly] FAILED for language '{language}': {str(e)}")
+            logger.error(f"[TTS] FAILED for language '{language}': {str(e)}")
             return None
 
 
