@@ -547,6 +547,24 @@ export default function CampaignArchitectPage() {
 
   useEffect(() => { fetchCampaigns() }, [])
 
+  // ── Param Autofill from Chronos ──
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('autofill') === 'true') {
+      const taskTheme = params.get('task') || ''
+      const taskDesc = params.get('desc') || ''
+      setFormData({
+        name: `Mission Task: ${taskTheme}`,
+        goal: `Execute Task Objectives:\n${taskDesc.split(' | ').join('\n')}`,
+        duration: '1 Week',
+        budget: 'Allocated'
+      })
+      setIsCreating(true)
+      // Clear URL to prevent re-triggering
+      window.history.replaceState({}, '', '/campaign-architect')
+    }
+  }, [])
+
   useEffect(() => {
     if (intelligencePayload) {
       const competitor    = intelligencePayload.competitor_handle || 'Target'

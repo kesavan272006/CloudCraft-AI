@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { createFileRoute } from '@tanstack/react-router'
 import { Button } from "@/components/ui/button"
@@ -76,12 +76,14 @@ export default function VisionLabPage() {
     setActiveTab('visual')
   }
 
-  const handleGenerate = async () => {
-    if (!prompt.trim()) return
+  const handleGenerate = async (e?: any, autoPrompt?: string) => {
+    const p = autoPrompt || prompt;
+    if (!p.trim()) return
+    if (autoPrompt) setPrompt(p);
     setLoading(true); setResult(null)
     try {
       const res = await fetch('http://127.0.0.1:8000/api/v1/vision/generate-image', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt }),
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: p }),
       })
       setResult(await res.json()); toast.success("Visual developed")
     } catch { toast.error("Generation failed") }
@@ -126,6 +128,20 @@ export default function VisionLabPage() {
       document.body.appendChild(a); a.click(); URL.revokeObjectURL(a.href)
     } catch { console.error("Download failed") }
   }
+
+  // Param Autofill from Chronos
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('autofill') === 'true' && params.get('prompt')) {
+      const p = params.get('prompt') || '';
+      setMode('generate');
+      setPrompt(p);
+      setTimeout(() => {
+        handleGenerate(undefined, p);
+      }, 500);
+      window.history.replaceState({}, '', '/vision-lab');
+    }
+  }, []);
 
   return (
     <>

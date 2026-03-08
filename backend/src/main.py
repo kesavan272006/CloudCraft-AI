@@ -9,7 +9,7 @@ except ImportError:
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.api.v1.endpoints import forge, vision, genesis, competitor, oracle, scout, brand, campaign, persona, performance, calendar, nexus, dashboard, vernacular
+from src.api.v1.endpoints import forge, vision, genesis, competitor, oracle, scout, brand, campaign, persona, performance, calendar, nexus, dashboard, vernacular, chronos
 
 app = FastAPI(
     title="CloudCraft AI Backend",
@@ -20,7 +20,7 @@ app = FastAPI(
 # Allow frontend (Vite on port 5173, 5174)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174"],
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174", "*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -41,7 +41,12 @@ app.include_router(calendar.router, prefix="/api/v1/calendar", tags=["Content Ca
 app.include_router(nexus.router, prefix="/api/v1/nexus", tags=["Nexus Alpha"])
 app.include_router(dashboard.router, prefix="/api/v1/dashboard", tags=["Mission Control"])
 app.include_router(vernacular.router, prefix="/api/v1/vernacular", tags=["Project Vernacular"])
+app.include_router(chronos.router, prefix="/api/v1/chronos", tags=["Chronos Brief"])
 
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "agents": ["Researcher", "Copywriter", "Designer", "Compliance"]}
+
+# Serverless handler for AWS Lambda / API Gateway
+from mangum import Mangum
+handler = Mangum(app)

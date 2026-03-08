@@ -61,6 +61,7 @@ huggingface-hub>=0.19.0             # HuggingFace model hub client (CRITICAL)
 # SEARCH & RESEARCH TOOLS
 # ─────────────────────────────────────────────────────────────────────────
 tavily-python>=0.3.0                # Tavily search API (CRITICAL for ResearcherAgent)
+edge-tts>=7.0.0                     # Extremely fluent native neural TTS fallback
 
 # ─────────────────────────────────────────────────────────────────────────
 # HTTP & ASYNC CLIENTS

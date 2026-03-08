@@ -119,9 +119,11 @@ export default function ForgePage() {
   }
   const frozenContent = frozenResultRef.current ?? '';
 
-  const handleForge = async (e?: React.MouseEvent | React.KeyboardEvent) => {
+  const handleForge = async (e?: React.MouseEvent | React.KeyboardEvent, autoPrompt?: string) => {
     if (e) { e.preventDefault(); e.stopPropagation(); }
-    if (!prompt.trim()) { setError("Please enter a prompt first"); return; }
+    const inputPrompt = autoPrompt || prompt;
+    if (!inputPrompt.trim()) { setError("Please enter a prompt first"); return; }
+    if (autoPrompt) setPrompt(autoPrompt);
     setLoading(true); setError(null); setResult(null);
     setTransmuteResult(null); setPersonaResult(null); setPerformanceResult(null);
     setActiveResultTab('output');
@@ -189,6 +191,17 @@ export default function ForgePage() {
   useEffect(() => {
     fetch('http://127.0.0.1:8000/api/v1/persona/list')
       .then(r => r.ok && r.json()).then(d => d && setPersonas(d)).catch(() => { });
+
+    // Param Autofill from Chronos
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('autofill') === 'true' && params.get('prompt')) {
+      const p = params.get('prompt') || '';
+      setPrompt(p);
+      setTimeout(() => {
+        handleForge(undefined, p);
+      }, 500);
+      window.history.replaceState({}, '', '/forge');
+    }
   }, []);
 
   const handleTogglePersona = (id: string) =>
