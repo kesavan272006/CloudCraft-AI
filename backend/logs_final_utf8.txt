@@ -1,0 +1,249 @@
+﻿/aws/apprunner/CloudCraftBackend/4361d5bb97d345c6a51ed93d6cb9d147/application
+/usr/local/bin/python3: No module named uvicorn
+runc create failed: unable to start container process: error during container init: exec: "python": executable file not found in $PATH
+/aws/apprunner/CloudCraftBackend/4361d5bb97d345c6a51ed93d6cb9d147/service
+[AppRunner] Starting to deploy your application source code.
+[AppRunner] Starting to build your application source code.
+[PreBuild] Sending build context to Docker daemon   6.95MB
+[PreBuild] Step 1/3 : FROM 082388193175.dkr.ecr.us-east-1.amazonaws.com/awsfusionruntime-python311-build:uuid-python311-20251118-203652-107 AS pre-build-stage
+[PreBuild] uuid-python311-20251118-203652-107: Pulling from awsfusionruntime-python311-build
+[PreBuild] 1c7de4eb5ced: Pulling fs layer
+[PreBuild] d3b7d4d31418: Pulling fs layer
+[PreBuild] 2f655a6c5b63: Pulling fs layer
+[PreBuild] 2f655a6c5b63: Verifying Checksum
+[PreBuild] 2f655a6c5b63: Download complete
+[PreBuild] 1c7de4eb5ced: Verifying Checksum
+[PreBuild] 1c7de4eb5ced: Download complete
+[PreBuild] d3b7d4d31418: Verifying Checksum
+[PreBuild] d3b7d4d31418: Download complete
+[PreBuild] 1c7de4eb5ced: Pull complete
+[PreBuild] d3b7d4d31418: Pull complete
+[PreBuild] 2f655a6c5b63: Pull complete
+[PreBuild] Digest: sha256:2b85f9a4920bd4bd86162cacdc9fb3399d0a7641b44021e02a5850529f157678
+[PreBuild] Status: Downloaded newer image for 082388193175.dkr.ecr.us-east-1.amazonaws.com/awsfusionruntime-python311-build:uuid-python311-20251118-203652-107
+[PreBuild]  ---> 6d281c3fb063
+[PreBuild] Step 2/3 : COPY . /app
+[PreBuild]  ---> 142aa4a73fb5
+[PreBuild] Step 3/3 : WORKDIR /app//backend
+[PreBuild]  ---> Running in bc77076e2a42
+[PreBuild] Removing intermediate container bc77076e2a42
+[PreBuild]  ---> f1527c4953eb
+[PreBuild] Successfully built f1527c4953eb
+
+[Build] Sending build context to Docker daemon   6.95MB
+[Build] Step 1/6 : FROM 082388193175.dkr.ecr.us-east-1.amazonaws.com/awsfusionruntime-python311-build:uuid-python311-20251118-203652-107 AS pre-build-stage
+[Build]  ---> 6d281c3fb063
+[Build] Step 2/6 : COPY . /app
+[Build]  ---> Using cache
+[Build]  ---> 142aa4a73fb5
+[Build] Step 3/6 : WORKDIR /app//backend
+[Build]  ---> Using cache
+[Build]  ---> f1527c4953eb
+[Build] Step 4/6 : FROM pre-build-stage as build-stage
+[Build]  ---> f1527c4953eb
+[Build] Step 5/6 : WORKDIR /app//backend
+[Build]  ---> Running in 845e7cfaf2c8
+[Build] Removing intermediate container 845e7cfaf2c8
+[Build]  ---> 65f0733900ae
+[Build] Step 6/6 : RUN pip install -r requirements.txt
+[Build]  ---> Running in 0f4c0a5501cb
+[Build] [91m/bin/sh: line 1: pip: command not found
+[Build] [0mThe command '/bin/sh -c pip install -r requirements.txt' returned a non-zero code: 127
+[AppRunner] Failed to build your application source code. Reason: Failed to execute 'build' command.
+[AppRunner] Failed to deploy your application source code.
+[PreRun]  ---> d37f785deb75
+[PreRun] Step 8/10 : COPY --from=build-stage /app /app
+[PreRun]  ---> c1bf96bd917b
+[PreRun] Step 9/10 : WORKDIR /app//backend
+[PreRun]  ---> Running in bf3035b0f470
+[PreRun] Removing intermediate container bf3035b0f470
+[PreRun]  ---> 7f86900b9fa9
+[PreRun] Step 10/10 : EXPOSE 8080
+[PreRun]  ---> Running in 0f843cb82ca1
+[PreRun] Removing intermediate container 0f843cb82ca1
+[PreRun]  ---> c0da8957cd71
+[PreRun] Successfully built c0da8957cd71
+[PreRun] Successfully tagged application-image:latest
+[PostBuild] Sending build context to Docker daemon  6.948MB
+[PostBuild] Step 1/12 : FROM 082388193175.dkr.ecr.us-east-1.amazonaws.com/awsfusionruntime-python311-build:uuid-python311-20251118-203652-107 AS pre-build-stage
+[PostBuild]  ---> 6d281c3fb063
+[PostBuild] Step 2/12 : COPY . /app
+[PostBuild]  ---> Using cache
+[PostBuild]  ---> 99586899c42b
+[PostBuild] Step 3/12 : WORKDIR /app//backend
+[PostBuild]  ---> Using cache
+[PostBuild]  ---> dc2de03c82af
+[PostBuild] Step 4/12 : FROM pre-build-stage as build-stage
+[PostBuild]  ---> dc2de03c82af
+[PostBuild] Step 5/12 : WORKDIR /app//backend
+[PostBuild]  ---> Using cache
+[PostBuild]  ---> 15522b3f11ef
+[PostBuild] Step 6/12 : RUN pip3 install -r requirements.txt
+[PostBuild]  ---> Using cache
+[PostBuild]  ---> 922ce41a45b5
+[PostBuild] Step 7/12 : FROM 082388193175.dkr.ecr.us-east-1.amazonaws.com/awsfusionruntime-python311:uuid-python311-20251118-203652-107 AS packaging-stage
+[PostBuild]  ---> d37f785deb75
+[PostBuild] Step 8/12 : COPY --from=build-stage /app /app
+[PostBuild]  ---> Using cache
+[PostBuild]  ---> c1bf96bd917b
+[PostBuild] Step 9/12 : WORKDIR /app//backend
+[PostBuild]  ---> Using cache
+[PostBuild]  ---> 7f86900b9fa9
+[PostBuild] Step 10/12 : EXPOSE 8080
+[PostBuild]  ---> Using cache
+[PostBuild]  ---> c0da8957cd71
+[PostBuild] Step 11/12 : FROM build-stage AS post-build-stage
+[PostBuild]  ---> 922ce41a45b5
+[PostBuild] Step 12/12 : WORKDIR /app//backend
+[PostBuild]  ---> Running in 4707707a1e34
+[PostBuild] Removing intermediate container 4707707a1e34
+[PostBuild]  ---> cd853a9afd09
+[PostBuild] Successfully built cd853a9afd09
+[AppRunner] Successfully built your application source code.
+[AppRunner] Failed to deploy your application source code.
+[AppRunner] Deployment with ID : 3944dab59522487089dd26e82cd3fda8 started. Triggering event : SERVICE_CREATE
+[AppRunner] Deployment Artifact: [Repo Type: Source], [Repository: https://github.com/TharunvenkateshN/CloudCraft-AI], [Branch: main], [SourceDirectory: /backend]
+[AppRunner] Creating pipeline for automatic deployments.
+[AppRunner] Successfully created pipeline for automatic deployments.
+[AppRunner] Pulling source code from GITHUB Repository ( https://github.com/TharunvenkateshN/CloudCraft-AI ).
+[AppRunner] Successfully pulled your application source code.
+[AppRunner] Successfully validate configuration file.
+[AppRunner] Starting source code build.
+[AppRunner] Failed to build your application source code. Reason: Failed to execute 'build' command.
+[AppRunner] Deployment with ID : 3944dab59522487089dd26e82cd3fda8 failed.
+[AppRunner] Deployment with ID : f0967a9e5fa5483b89a99843bae82e1b started. Triggering event : SERVICE_UPDATE
+[AppRunner] Deployment Artifact: [Repo Type: Source], [Repository: https://github.com/TharunvenkateshN/CloudCraft-AI], [Branch: main], [SourceDirectory: /backend]
+[AppRunner] Creating pipeline for automatic deployments.
+[AppRunner] Successfully created pipeline for automatic deployments.
+[AppRunner] Pulling source code from GITHUB Repository ( https://github.com/TharunvenkateshN/CloudCraft-AI ).
+[AppRunner] Successfully pulled your application source code.
+[AppRunner] Successfully validate configuration file.
+[AppRunner] Starting source code build.
+[AppRunner] Successfully built your application source code.
+[AppRunner] Provisioning instances and deploying image for publicly accessible service.
+[AppRunner] Performing health check on protocol `TCP` [Port: '8080'].
+[AppRunner] Invalid start command. Update the start command you provided during the App Runner service configuration and re-try. - CannotStartContainerError: ResourceInitializationError: failed to create new container runtime task: failed to create shim task: OCI runtime create failed: runc create failed: unable to start container process: error during container init: exec: "python": executable file not found in $PATH
+[AppRunner] Deployment with ID : f0967a9e5fa5483b89a99843bae82e1b failed.
+[AppRunner] Deployment with ID : 8d2d547fca434cd5a26a860c67e08a4b started. Triggering event : SERVICE_UPDATE
+[AppRunner] Deployment Artifact: [Repo Type: Source], [Repository: https://github.com/TharunvenkateshN/CloudCraft-AI], [Branch: main], [SourceDirectory: /backend]
+[AppRunner] Creating pipeline for automatic deployments.
+[AppRunner] Successfully created pipeline for automatic deployments.
+[AppRunner] Pulling source code from GITHUB Repository ( https://github.com/TharunvenkateshN/CloudCraft-AI ).
+[AppRunner] Successfully pulled your application source code.
+[AppRunner] Successfully validate configuration file.
+[AppRunner] Starting source code build.
+[AppRunner] Successfully built your application source code.
+[AppRunner] Provisioning instances and deploying image for publicly accessible service.
+[AppRunner] Performing health check on protocol `TCP` [Port: '8080'].
+[AppRunner] Your application stopped or failed to start. See logs for more information.  Container exit code: 1
+[AppRunner] Deployment with ID : 8d2d547fca434cd5a26a860c67e08a4b failed.
+[AppRunner] Deployment with ID : 8d8be2f4e4554ba6b0c7a68d3c7a5c8b started. Triggering event : SERVICE_UPDATE
+[AppRunner] Deployment Artifact: [Repo Type: Source], [Repository: https://github.com/TharunvenkateshN/CloudCraft-AI], [Branch: main], [SourceDirectory: /backend]
+[AppRunner] Creating pipeline for automatic deployments.
+[AppRunner] Successfully created pipeline for automatic deployments.
+[AppRunner] Pulling source code from GITHUB Repository ( https://github.com/TharunvenkateshN/CloudCraft-AI ).
+[AppRunner] Successfully pulled your application source code.
+[AppRunner] Reading apprunner.yaml config file.
+[AppRunner] Successfully validate configuration file.
+[AppRunner] Starting source code build.
+[AppRunner] Failed to build your application source code. Reason: Failed to execute 'build' command.
+[AppRunner] Deployment with ID : 8d8be2f4e4554ba6b0c7a68d3c7a5c8b failed.
+[PreRun]  ---> d37f785deb75
+[PreRun] Step 8/10 : COPY --from=build-stage /app /app
+[PreRun]  ---> b988ba35b092
+[PreRun] Step 9/10 : WORKDIR /app//backend
+[PreRun]  ---> Running in 402d930d0543
+[PreRun] Removing intermediate container 402d930d0543
+[PreRun]  ---> 4e935ca70796
+[PreRun] Step 10/10 : EXPOSE 8080
+[PreRun]  ---> Running in d01ac35736af
+[PreRun] Removing intermediate container d01ac35736af
+[PreRun]  ---> e36056ea7bf9
+[PreRun] Successfully built e36056ea7bf9
+[PreRun] Successfully tagged application-image:latest
+[PostBuild] Sending build context to Docker daemon  6.948MB
+[PostBuild] Step 1/12 : FROM 082388193175.dkr.ecr.us-east-1.amazonaws.com/awsfusionruntime-python311-build:uuid-python311-20251118-203652-107 AS pre-build-stage
+[PostBuild]  ---> 6d281c3fb063
+[PostBuild] Step 2/12 : COPY . /app
+[PostBuild]  ---> Using cache
+[PostBuild]  ---> fcefa7da7f1c
+[PostBuild] Step 3/12 : WORKDIR /app//backend
+[PostBuild]  ---> Using cache
+[PostBuild]  ---> ad314c9160c7
+[PostBuild] Step 4/12 : FROM pre-build-stage as build-stage
+[PostBuild]  ---> ad314c9160c7
+[PostBuild] Step 5/12 : WORKDIR /app//backend
+[PostBuild]  ---> Using cache
+[PostBuild]  ---> 55ef478eed33
+[PostBuild] Step 6/12 : RUN pip3 install -r requirements.txt
+[PostBuild]  ---> Using cache
+[PostBuild]  ---> 142d33be77b1
+[PostBuild] Step 7/12 : FROM 082388193175.dkr.ecr.us-east-1.amazonaws.com/awsfusionruntime-python311:uuid-python311-20251118-203652-107 AS packaging-stage
+[PostBuild]  ---> d37f785deb75
+[PostBuild] Step 8/12 : COPY --from=build-stage /app /app
+[PostBuild]  ---> Using cache
+[PostBuild]  ---> b988ba35b092
+[PostBuild] Step 9/12 : WORKDIR /app//backend
+[PostBuild]  ---> Using cache
+[PostBuild]  ---> 4e935ca70796
+[PostBuild] Step 10/12 : EXPOSE 8080
+[PostBuild]  ---> Using cache
+[PostBuild]  ---> e36056ea7bf9
+[PostBuild] Step 11/12 : FROM build-stage AS post-build-stage
+[PostBuild]  ---> 142d33be77b1
+[PostBuild] Step 12/12 : WORKDIR /app//backend
+[PostBuild]  ---> Running in 02118c947543
+[PostBuild] Removing intermediate container 02118c947543
+[PostBuild]  ---> 6d6d734266cd
+[PostBuild] Successfully built 6d6d734266cd
+[AppRunner] Successfully built your application source code.
+[AppRunner] Failed to deploy your application source code.
+[AppRunner] Starting to deploy your application source code.
+[AppRunner] Starting to build your application source code.
+[PreBuild] Sending build context to Docker daemon  6.948MB
+[PreBuild] Step 1/3 : FROM 082388193175.dkr.ecr.us-east-1.amazonaws.com/awsfusionruntime-python311-build:uuid-python311-20251118-203652-107 AS pre-build-stage
+[PreBuild] uuid-python311-20251118-203652-107: Pulling from awsfusionruntime-python311-build
+[PreBuild] 1c7de4eb5ced: Pulling fs layer
+[PreBuild] d3b7d4d31418: Pulling fs layer
+[PreBuild] 2f655a6c5b63: Pulling fs layer
+[PreBuild] 2f655a6c5b63: Verifying Checksum
+[PreBuild] 2f655a6c5b63: Download complete
+[PreBuild] 1c7de4eb5ced: Verifying Checksum
+[PreBuild] 1c7de4eb5ced: Download complete
+[PreBuild] d3b7d4d31418: Verifying Checksum
+[PreBuild] d3b7d4d31418: Download complete
+[PreBuild] 1c7de4eb5ced: Pull complete
+[PreBuild] d3b7d4d31418: Pull complete
+[PreBuild] 2f655a6c5b63: Pull complete
+[PreBuild] Digest: sha256:2b85f9a4920bd4bd86162cacdc9fb3399d0a7641b44021e02a5850529f157678
+[PreBuild] Status: Downloaded newer image for 082388193175.dkr.ecr.us-east-1.amazonaws.com/awsfusionruntime-python311-build:uuid-python311-20251118-203652-107
+[PreBuild]  ---> 6d281c3fb063
+[PreBuild] Step 2/3 : COPY . /app
+[PreBuild]  ---> c12dbc45c2ec
+[PreBuild] Step 3/3 : WORKDIR /app//backend
+[PreBuild]  ---> Running in 7e0bd2ab7ac5
+[PreBuild] Removing intermediate container 7e0bd2ab7ac5
+[PreBuild]  ---> 4b79ab319ae1
+[PreBuild] Successfully built 4b79ab319ae1
+
+[Build] Sending build context to Docker daemon  6.948MB
+[Build] Step 1/6 : FROM 082388193175.dkr.ecr.us-east-1.amazonaws.com/awsfusionruntime-python311-build:uuid-python311-20251118-203652-107 AS pre-build-stage
+[Build]  ---> 6d281c3fb063
+[Build] Step 2/6 : COPY . /app
+[Build]  ---> Using cache
+[Build]  ---> c12dbc45c2ec
+[Build] Step 3/6 : WORKDIR /app//backend
+[Build]  ---> Using cache
+[Build]  ---> 4b79ab319ae1
+[Build] Step 4/6 : FROM pre-build-stage as build-stage
+[Build]  ---> 4b79ab319ae1
+[Build] Step 5/6 : WORKDIR /app//backend
+[Build]  ---> Running in f8089bb07c80
+[Build] Removing intermediate container f8089bb07c80
+[Build]  ---> 93217c68b04a
+[Build] Step 6/6 : RUN pip install -r requirements.txt
+[Build]  ---> Running in c5e0a99e9fdc
+[Build] [91m/bin/sh: line 1: pip: command not found
+[Build] [0mThe command '/bin/sh -c pip install -r requirements.txt' returned a non-zero code: 127
+[AppRunner] Failed to build your application source code. Reason: Failed to execute 'build' command.
+[AppRunner] Failed to deploy your application source code.
