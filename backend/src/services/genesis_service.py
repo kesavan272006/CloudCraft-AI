@@ -237,51 +237,22 @@ class GenesisService:
     def _add_node(cls, process_id: str, node_id: str, type: str, label: str, content: str, parent_id: str):
         graph = cls._active_processes[process_id]
         
-        # Smart Layout Logic
+        # Positions are overridden by the frontend radial layout;
+        # these are just sensible initial fallbacks.
         x, y = 0, 0
         
         if type == "source":
-            # Root at center-left
-            x, y = 0, 200
+            x, y = -860, 0
             
         elif type == "strategy":
-            # Strategy to the right of Source
-            x, y = 400, 200
+            x, y = 0, 0
             
         else:
-            # Asset Nodes: Arrange in a vertical stack to the right of Strategy
-            # We calculate index based on existing asset nodes to position them
+            # Temporary placeholder — frontend recalculates radial positions
             asset_nodes = [n for n in graph["nodes"] if n["type"] == "asset" or n["type"] == "asset-pending"]
             index = len(asset_nodes)
-            
-            # Start x at 900
-            base_x = 900
-            # Start y at 0 and stack down with spacing
-            base_y = 0 
-            spacing_y = 500 # Height + Gap
-            
-            x = base_x
-            y = base_y + (index * spacing_y)
-            
-            # Use 'smart' stagger if needed, but grid is cleaner as requested
-            # "Index 0" -> y=0. "Index 1" -> y=500. etc. Center is y=200 roughly.
-            # Let's offset y so the middle asset is aligned with strategy (y=200)
-            # If 5 assets, indices 0,1,2,3,4.
-            # Total height = 5 * 500 = 2500. Mid point = 1250.
-            # We want center of stack to be 200.
-            # This is hard to do incrementally without knowing total count.
-            # A simple vertical stack starting from top is fine for now, or fan out.
-            
-            # Alternating top-bottom fan out?
-            # 0 -> 200
-            # 1 -> -100 (up)
-            # 2 -> 500 (down)
-            # 3 -> -400
-            # 4 -> 800
-            
-            if index == 0: y = 200
-            elif index % 2 == 1: y = 200 - ( (index + 1) // 2 * 400 )
-            else: y = 200 + ( index // 2 * 400 )
+            x = 900
+            y = index * 560 - 1400  # rough vertical stack, overridden client-side
 
         new_node = {
             "id": node_id,

@@ -4,7 +4,9 @@ import ReactFlow, {
     Background,
     Controls,
     useNodesState,
-    useEdgesState
+    useEdgesState,
+    useReactFlow,
+    ReactFlowProvider
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import axios from 'axios';
@@ -29,6 +31,56 @@ const nodeTypes = {
     strategy: AssetNode,
     asset: AssetNode,
     source: AssetNode
+};
+
+/**
+ * Radial layout: strategy at center, source at left, asset nodes in a
+ * clockwise arc spread around the right/top/bottom of the strategy.
+ */
+const applyRadialLayout = (rawNodes: any[]): any[] => {
+    const RADIUS = 900;
+    const STRATEGY_POS = { x: 0, y: 0 };
+    const SOURCE_POS   = { x: -860, y: 0 };
+
+    const assetNodes = rawNodes.filter(n => n.type === 'asset');
+    const total = assetNodes.length;
+
+    return rawNodes.map(node => {
+        if (node.type === 'source') return { ...node, position: SOURCE_POS };
+        if (node.type === 'strategy') return { ...node, position: STRATEGY_POS };
+
+        // Asset → evenly distribute in a 260° arc centred on the right (0°)
+        const idx = assetNodes.findIndex(n => n.id === node.id);
+        let angleDeg = 0;
+        if (total <= 1) {
+            angleDeg = 0;
+        } else {
+            const spreadDeg = Math.min(260, (total - 1) * 60);
+            angleDeg = -(spreadDeg / 2) + (idx / (total - 1)) * spreadDeg;
+        }
+        const rad = (angleDeg * Math.PI) / 180;
+        return {
+            ...node,
+            position: {
+                x: STRATEGY_POS.x + Math.round(RADIUS * Math.cos(rad)),
+                y: STRATEGY_POS.y + Math.round(RADIUS * Math.sin(rad))
+            }
+        };
+    });
+};
+
+/** Automatically re-fits the view whenever node count or completion status changes */
+const AutoFitView = ({ nodeCount, isComplete }: { nodeCount: number; isComplete: boolean }) => {
+    const { fitView } = useReactFlow();
+    useEffect(() => {
+        if (nodeCount > 0) {
+            const timer = setTimeout(() => {
+                fitView({ padding: 0.2, duration: 700, maxZoom: 0.9 });
+            }, 150);
+            return () => clearTimeout(timer);
+        }
+    }, [nodeCount, isComplete, fitView]);
+    return null;
 };
 
 const API_URL = "http://localhost:8000/api/v1/genesis"; // Hardcoded for hackathon speed
@@ -79,15 +131,13 @@ export const GenesisCanvas = ({ initialInput, autoStart }: GenesisCanvasProps) =
     // Sync Graph Data to React Flow
     useEffect(() => {
         if (graphData) {
-            // Basic diffing to avoid re-renders impacting drag - simplified for MVP
-            // In prod, use deeper diff or custom hooks provided by ReactFlow
-            // For now, we just overwrite nodes if count changes or status changes
             setNodes(() => {
-                const newNodes = graphData.nodes.map((n: any) => ({
+                const rawNodes = graphData.nodes.map((n: any) => ({
                     ...n,
                     type: n.type === 'root' ? 'source' : (n.type === 'strategy' ? 'strategy' : 'asset')
                 }));
-                return newNodes;
+                // Apply radial layout: strategy at center, assets fanned around it
+                return applyRadialLayout(rawNodes);
             });
 
             setEdges(graphData.edges);
@@ -179,6 +229,7 @@ export const GenesisCanvas = ({ initialInput, autoStart }: GenesisCanvasProps) =
 
             {/* Main Canvas */}
             <div className="flex-1">
+                <ReactFlowProvider>
                 <ReactFlow
                     nodes={nodes}
                     edges={edges}
@@ -186,13 +237,16 @@ export const GenesisCanvas = ({ initialInput, autoStart }: GenesisCanvasProps) =
                     onEdgesChange={onEdgesChange}
                     nodeTypes={nodeTypes}
                     fitView
+                    fitViewOptions={{ padding: 0.15, maxZoom: 1 }}
                     minZoom={0.1}
                     maxZoom={4}
                     className="bg-slate-50 dark:bg-zinc-950"
                 >
                     <Background />
                     <Controls />
+                    <AutoFitView nodeCount={nodes.length} isComplete={graphData?.status === 'complete'} />
                 </ReactFlow>
+                </ReactFlowProvider>
             </div>
 
 
