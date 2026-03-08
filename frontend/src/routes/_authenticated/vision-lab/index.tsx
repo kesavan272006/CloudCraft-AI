@@ -19,6 +19,7 @@ import { Main } from '@/components/layout/main'
 import { TopNav } from '@/components/layout/top-nav'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
+import { API_BASE_URL } from '@/lib/api-config'
 
 const topNav = [
   { title: 'Overview', href: '/dashboard', isActive: false, disabled: false },
@@ -82,7 +83,7 @@ export default function VisionLabPage() {
     if (autoPrompt) setPrompt(p);
     setLoading(true); setResult(null)
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/v1/vision/generate-image', {
+      const res = await fetch(`${API_BASE_URL}/api/v1/vision/generate-image`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: p }),
       })
       setResult(await res.json()); toast.success("Visual developed")
@@ -100,7 +101,7 @@ export default function VisionLabPage() {
   const handleAudit = async () => {
     if (!uploadedImageBase64) return; setAnalyzingImage(true)
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/v1/vision/analyze', {
+      const res = await fetch(`${API_BASE_URL}/api/v1/vision/analyze`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ image_base64: uploadedImageBase64 })
       })
       if (res.ok) { setImageAnalysis(await res.json()); toast.success("Aesthetic audit complete") }
@@ -111,7 +112,7 @@ export default function VisionLabPage() {
   const handleEnhance = async () => {
     if (!uploadedImageBase64 || !imageAnalysis) return; setEnhancing(true)
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/v1/vision/enhance', {
+      const res = await fetch(`${API_BASE_URL}/api/v1/vision/enhance`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image_base64: uploadedImageBase64, audit_results: imageAnalysis, user_prompt: prompt })
       })

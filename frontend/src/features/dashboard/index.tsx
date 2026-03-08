@@ -35,6 +35,7 @@ import { Input } from '@/components/ui/input'
 import { Link } from '@tanstack/react-router'
 import { motion, useInView, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import './dashboard-animations.css'
+import { API_BASE_URL } from '@/lib/api-config'
 
 // Animated Number Counter Component
 function AnimatedNumber({ value, suffix = '' }: { value: number | string, suffix?: string }) {
@@ -123,7 +124,7 @@ export function Dashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/v1/dashboard/stats')
+        const res = await fetch(`${API_BASE_URL}/api/v1/dashboard/stats`)
         if (res.ok) {
           const data = await res.json()
           setStats(data)

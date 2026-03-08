@@ -10,6 +10,7 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import axios from 'axios';
+import { API_BASE_URL } from '@/lib/api-config';
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -83,7 +84,7 @@ const AutoFitView = ({ nodeCount, isComplete }: { nodeCount: number; isComplete:
     return null;
 };
 
-const API_URL = "http://localhost:8000/api/v1/genesis"; // Hardcoded for hackathon speed
+const API_URL = `${API_BASE_URL}/api/v1/genesis`; // Hardcoded for hackathon speed
 
 interface GenesisCanvasProps {
     initialInput?: string;

@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
+import { API_BASE_URL } from '@/lib/api-config'
 
 interface BrandProfile {
     brandName: string
@@ -40,7 +41,7 @@ export const useBrandStore = create<BrandState>()(
             fetchBrandProfile: async () => {
                 set({ isLoading: true, error: null })
                 try {
-                    const response = await fetch('http://localhost:8000/api/v1/brand')
+                    const response = await fetch(`${API_BASE_URL}/api/v1/brand`)
                     if (response.ok) {
                         const data: BrandProfile = await response.json()
                         set({ ...data, isLoading: false })
@@ -56,7 +57,7 @@ export const useBrandStore = create<BrandState>()(
             saveBrandProfile: async (profile: BrandProfile) => {
                 set({ isLoading: true, error: null })
                 try {
-                    const response = await fetch('http://localhost:8000/api/v1/brand', {
+                    const response = await fetch(`${API_BASE_URL}/api/v1/brand`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(profile)

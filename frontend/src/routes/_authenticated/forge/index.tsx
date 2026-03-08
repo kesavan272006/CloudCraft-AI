@@ -36,6 +36,7 @@ import { TopNav } from '@/components/layout/top-nav';
 import { ProfileDropdown } from '@/components/profile-dropdown';
 import { ThemeSwitch } from '@/components/theme-switch';
 import { Input } from '@/components/ui/input';
+import { API_BASE_URL } from '@/lib/api-config';
 import { LiveSwarmCanvas } from '@/components/forge/LiveSwarmCanvas';
 import { DigitalFocusGroup } from '@/components/forge/DigitalFocusGroup';
 import { AutonomousAutoPilot } from '@/components/forge/AutonomousAutoPilot';
@@ -135,7 +136,7 @@ export default function ForgePage() {
     try {
       const content = cleanContent(result?.final_content || "");
       if (content.length < 10) throw new Error("Content too short.");
-      const res = await fetch('http://127.0.0.1:8000/api/v1/performance/predict', {
+      const res = await fetch(`${API_BASE_URL}/api/v1/performance/predict`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content, platform: "General", persona: "General Audience" }),
       });
@@ -158,7 +159,7 @@ export default function ForgePage() {
     try {
       const [h, m] = scheduleTime.split(':').map(Number);
       const d = new Date(scheduleDate); d.setHours(h, m, 0, 0);
-      const res = await fetch('http://127.0.0.1:8000/api/v1/calendar/schedule', {
+      const res = await fetch(`${API_BASE_URL}/api/v1/calendar/schedule`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           content: cleanContent(schedulingContent), platform: schedulingPlatform,
@@ -177,7 +178,7 @@ export default function ForgePage() {
     try {
       const content = cleanContent(result?.final_content || "");
       if (content.length < 10) throw new Error("Content too short.");
-      const res = await fetch('http://127.0.0.1:8000/api/v1/transmute', {
+      const res = await fetch(`${API_BASE_URL}/api/v1/transmute`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content, target_format: targetFormat, target_language: targetLanguage }),
       });
@@ -189,7 +190,7 @@ export default function ForgePage() {
   };
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/v1/persona/list')
+    fetch(`${API_BASE_URL}/api/v1/persona/list`)
       .then(r => r.ok && r.json()).then(d => d && setPersonas(d)).catch(() => { });
 
     // Param Autofill from Chronos
@@ -211,7 +212,7 @@ export default function ForgePage() {
     if (!selectedPersonas.length) { toast.error("Select at least one persona"); return; }
     setGeneratingPersonas(true);
     try {
-      const res = await fetch('http://localhost:8000/api/v1/persona/generate', {
+      const res = await fetch(`${API_BASE_URL}/api/v1/persona/generate`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: cleanContent(result?.final_content || ""), personas: selectedPersonas }),
       });

@@ -26,6 +26,7 @@ import { TopNav } from '@/components/layout/top-nav'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { cn } from "@/lib/utils"
+import { API_BASE_URL } from '@/lib/api-config'
 
 const topNav = [
   { title: 'Overview', href: '/dashboard', isActive: false, disabled: false },
@@ -68,7 +69,7 @@ export default function PerformanceOraclePage() {
   const fetchHistory = async () => {
     setHistoryLoading(true)
     try {
-      const res = await fetch('http://localhost:8000/api/v1/oracle/history')
+      const res = await fetch(`${API_BASE_URL}/api/v1/oracle/history`)
       if (res.ok) {
         const data = await res.json()
         setHistory(data)
@@ -87,7 +88,7 @@ export default function PerformanceOraclePage() {
     setResult(null)
 
     try {
-      const response = await fetch('http://localhost:8000/api/v1/oracle/predict', {
+      const response = await fetch(`${API_BASE_URL}/api/v1/oracle/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

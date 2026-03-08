@@ -36,6 +36,7 @@ import { TopNav } from '@/components/layout/top-nav'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { cn } from '@/lib/utils'
+import { API_BASE_URL } from '@/lib/api-config'
 
 const topNav = [
   { title: 'Overview', href: '/dashboard', isActive: false, disabled: false },
@@ -81,7 +82,7 @@ export default function CompetitorPulsePage() {
     setError(null)
     setResult(null)
     try {
-      const response = await fetch('http://localhost:8000/api/v1/competitor/pulse', {
+      const response = await fetch(`${API_BASE_URL}/api/v1/competitor/pulse`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query }),

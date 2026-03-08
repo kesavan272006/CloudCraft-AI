@@ -20,6 +20,7 @@ import { Main } from '@/components/layout/main';
 import { TopNav } from '@/components/layout/top-nav';
 import { ProfileDropdown } from '@/components/profile-dropdown';
 import { ThemeSwitch } from '@/components/theme-switch';
+import { API_BASE_URL } from '@/lib/api-config';
 
 export const Route = createFileRoute('/_authenticated/vernacular/')({
     component: VernacularPage,
@@ -78,7 +79,7 @@ function VernacularPage() {
     const fetchHistory = async () => {
         setHistoryLoading(true);
         try {
-            const res = await fetch('http://127.0.0.1:8000/api/v1/vernacular/history');
+            const res = await fetch(`${API_BASE_URL}/api/v1/vernacular/history`);
             const data = await res.json();
             setCampaignHistory(data.history || []);
         } catch { setCampaignHistory([]); } finally { setHistoryLoading(false); }
@@ -88,7 +89,7 @@ function VernacularPage() {
         if (!scheduleTime || !result) return;
         setIsScheduling(true);
         try {
-            const res = await fetch('http://127.0.0.1:8000/api/v1/vernacular/schedule', {
+            const res = await fetch(`${API_BASE_URL}/api/v1/vernacular/schedule`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -144,7 +145,7 @@ function VernacularPage() {
             }, 900);
 
             const payload = { content, state: selectedState, has_image_context: !!imagePreview };
-            const response = await fetch('http://127.0.0.1:8000/api/v1/vernacular/transmute', {
+            const response = await fetch(`${API_BASE_URL}/api/v1/vernacular/transmute`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
             });
             clearInterval(fakeStream);

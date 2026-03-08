@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { API_BASE_URL } from '@/lib/api-config'
 
 interface AudienceSegment {
     segment_name: string
@@ -95,7 +96,7 @@ interface CampaignState {
     injectIntelligence: (payload: any) => void
 }
 
-const API_BASE = 'http://localhost:8000/api/v1/campaigns'
+const API_BASE = `${API_BASE_URL}/api/v1/campaigns`
 let logIdCounter = 0
 
 const PIPELINE_STEPS: PipelineStep[] = ['RECON', 'COMPREHEND', 'SYNTHESIS', 'MEMORY']

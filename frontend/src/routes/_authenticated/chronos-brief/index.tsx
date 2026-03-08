@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Card } from "@/components/ui/card"
@@ -23,6 +23,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
+import { API_BASE_URL } from '@/lib/api-config'
 
 const topNav = [
   { title: 'Overview', href: '/dashboard', isActive: false },
@@ -98,7 +99,8 @@ function PageBackground() {
 function ChronosBriefPageContent() {
   const [activeState, setActiveState] = useState<MissionState>('dashboard')
   const [missionsList, setMissionsList] = useState<any[]>([])
-  const [loadingMissions, setLoadingMissions] = useState(true)
+  const [loadingMissions, setLoadingMissions] = useState(false)
+  const hasFetchedRef = useRef(false)
 
   // Creation State
   const [goal, setGoal] = useState('')
@@ -196,7 +198,8 @@ function ChronosBriefPageContent() {
   ]
 
   useEffect(() => {
-    if (activeState === 'dashboard') {
+    if (activeState === 'dashboard' && !hasFetchedRef.current) {
+      hasFetchedRef.current = true
       fetchMissions()
     }
   }, [activeState])
@@ -214,7 +217,7 @@ function ChronosBriefPageContent() {
   const fetchMissions = async () => {
     setLoadingMissions(true)
     try {
-      const resp = await fetch('http://localhost:8000/api/v1/chronos/missions')
+      const resp = await fetch(`${API_BASE_URL}/api/v1/chronos/missions`)
       if (resp.ok) {
         const data = await resp.json()
         setMissionsList(data || [])
@@ -227,7 +230,7 @@ function ChronosBriefPageContent() {
 
   const loadMission = async (mId: string) => {
     try {
-      const resp = await fetch(`http://localhost:8000/api/v1/chronos/mission/${mId}`)
+      const resp = await fetch(`${API_BASE_URL}/api/v1/chronos/mission/${mId}`)
       if (!resp.ok) throw new Error("Failed to fetch mission details")
       const data = await resp.json()
       setMission(data)
@@ -246,7 +249,7 @@ function ChronosBriefPageContent() {
     setLoading(true)
 
     try {
-      const resp = await fetch('http://localhost:8000/api/v1/chronos/mission', {
+      const resp = await fetch(`${API_BASE_URL}/api/v1/chronos/mission`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1006,7 +1009,7 @@ function ChronosBriefPageContent() {
                     <p className="text-[9px] font-black uppercase tracking-[0.5em] text-muted-foreground/30">Living Blueprint Architecture</p>
                   </div>
                 </div>
-                <Button variant="ghost" className="rounded-full gap-2 text-[10px] font-black uppercase tracking-widest opacity-40 hover:opacity-100 transition-all">
+                <Button variant="ghost" onClick={() => fetchMissions()} className="rounded-full gap-2 text-[10px] font-black uppercase tracking-widest opacity-40 hover:opacity-100 transition-all">
                   <RefreshCcw className="h-3 w-3" /> Manual Override
                 </Button>
               </div>

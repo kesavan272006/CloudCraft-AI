@@ -17,6 +17,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
+import { API_BASE_URL } from '@/lib/api-config';
 
 interface AutonomousAutoPilotProps {
     initialContent: string;
@@ -58,7 +59,7 @@ export const AutonomousAutoPilot: React.FC<AutonomousAutoPilotProps> = ({ initia
         setPivot(null);
         setOptimizedContent(null);
 
-        const url = `http://127.0.0.1:8000/api/v1/forge/autopilot/stream?content=${encodeURIComponent(initialContent)}`;
+        const url = `${API_BASE_URL}/api/v1/forge/autopilot/stream?content=${encodeURIComponent(initialContent)}`;
 
         (async () => {
             try {

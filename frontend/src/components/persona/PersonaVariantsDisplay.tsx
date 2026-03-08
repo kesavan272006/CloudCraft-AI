@@ -5,6 +5,7 @@ import { PersonaVariant } from "@/types/persona"
 import { Copy, Check, Users, Briefcase, Baby, Globe, Rocket, CalendarDays } from "lucide-react"
 import { useState } from "react"
 import { ScheduleMissionDialog } from "./ScheduleMissionDialog"
+import { API_BASE_URL } from '@/lib/api-config'
 
 interface PersonaVariantsDisplayProps {
     variants: PersonaVariant[]
@@ -34,7 +35,7 @@ export function PersonaVariantsDisplay({ variants, onSchedule }: PersonaVariants
     const handleExecuteMission = async (data: { scheduled_at: string, webhook_url: string }) => {
         if (!selectedForSchedule) return
 
-        const response = await fetch("http://127.0.0.1:8000/api/v1/nexus/execute", {
+        const response = await fetch(`${API_BASE_URL}/api/v1/nexus/execute`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

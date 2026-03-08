@@ -18,6 +18,7 @@ import {
 import ReactMarkdown from 'react-markdown';
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { API_BASE_URL } from '@/lib/api-config';
 
 interface LiveSwarmCanvasProps {
     prompt: string;
@@ -71,7 +72,7 @@ export const LiveSwarmCanvas: React.FC<LiveSwarmCanvasProps> = ({ prompt, onComp
         const controller = new AbortController();
         abortRef.current = controller;
 
-        const url = `http://127.0.0.1:8000/api/v1/forge/stream?prompt=${encodeURIComponent(prompt)}`;
+        const url = `${API_BASE_URL}/api/v1/forge/stream?prompt=${encodeURIComponent(prompt)}`;
 
         (async () => {
             try {

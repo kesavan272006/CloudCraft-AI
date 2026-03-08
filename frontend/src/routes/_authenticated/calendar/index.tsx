@@ -52,6 +52,7 @@ import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
+import { API_BASE_URL } from '@/lib/api-config'
 
 export const Route = createFileRoute('/_authenticated/calendar/')({
   component: CampaignCalendarPage,
@@ -95,7 +96,7 @@ function CampaignCalendarPage() {
   const fetchPosts = async () => {
     setLoading(true)
     try {
-      const response = await fetch('http://localhost:8000/api/v1/calendar/')
+      const response = await fetch(`${API_BASE_URL}/api/v1/calendar/`)
       if (response.ok) {
         const data = await response.json()
         setPosts(data.posts)
@@ -120,7 +121,7 @@ function CampaignCalendarPage() {
 
     setIsScheduling(true)
     try {
-      const response = await fetch('http://localhost:8000/api/v1/calendar/schedule', {
+      const response = await fetch(`${API_BASE_URL}/api/v1/calendar/schedule`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -150,7 +151,7 @@ function CampaignCalendarPage() {
     if (!confirm('Are you sure you want to remove this post from the calendar?')) return
 
     try {
-      const response = await fetch(`http://localhost:8000/api/v1/calendar/${postId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/calendar/${postId}`, {
         method: 'DELETE'
       })
       if (response.ok) {

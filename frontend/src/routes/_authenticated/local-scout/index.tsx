@@ -16,6 +16,7 @@ import {
   Activity, Hash, Plus,
   RefreshCw, Globe, Shield
 } from 'lucide-react'
+import { API_BASE_URL } from '@/lib/api-config'
 
 // ── Types ─────────────────────────────────────────────────────────────
 interface ViralHook { title: string; description: string; confidence?: number }
@@ -430,7 +431,7 @@ export default function LocalScoutPage() {
       setRunElapsed(Math.floor((Date.now() - runStartRef.current) / 1000))
     }, 1000)
 
-    const url = `http://localhost:8000/api/v1/scout/stream?city=${encodeURIComponent(city)}&lat=${location.lat}&lng=${location.lng}`
+    const url = `${API_BASE_URL}/api/v1/scout/stream?city=${encodeURIComponent(city)}&lat=${location.lat}&lng=${location.lng}`
     const es = new EventSource(url)
 
     es.onmessage = (e) => {

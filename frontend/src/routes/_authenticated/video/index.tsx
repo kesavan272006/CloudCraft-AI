@@ -8,6 +8,7 @@ import { Video, Sparkles, Loader2, AlertCircle, Play, Download, Image as ImageIc
 import { createFileRoute } from '@tanstack/react-router';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from 'sonner';
+import { API_BASE_URL } from '@/lib/api-config';
 
 export default function VideoStudioPage() {
   const [prompt, setPrompt] = useState('');
@@ -27,7 +28,7 @@ export default function VideoStudioPage() {
     setResult(null);
 
     try {
-      const response = await fetch('http://localhost:8000/api/v1/video/generate', {
+      const response = await fetch(`${API_BASE_URL}/api/v1/video/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 

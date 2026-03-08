@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Loader2, CheckCircle2, AlertCircle, Terminal, Orbit } from "lucide-react"
+import { API_BASE_URL } from '@/lib/api-config'
 
 interface Mission {
     id: string
@@ -18,7 +19,7 @@ export function NexusMissionStatus() {
 
     const fetchMissions = async () => {
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/v1/calendar/")
+            const response = await fetch(`${API_BASE_URL}/api/v1/calendar/`)
             const data = await response.json()
             setMissions(data.posts || [])
         } catch (error) {

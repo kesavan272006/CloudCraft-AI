@@ -8,6 +8,7 @@ import {
     CheckCircle2, Sparkles, RefreshCw
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { API_BASE_URL } from '@/lib/api-config';
 
 interface DigitalFocusGroupProps {
     content: string;
@@ -63,7 +64,7 @@ export const DigitalFocusGroup: React.FC<DigitalFocusGroupProps> = ({ content, s
         const controller = new AbortController();
         abortRef.current = controller;
 
-        const url = `http://127.0.0.1:8000/api/v1/forge/focus-group/stream?content=${encodeURIComponent(content)}`;
+        const url = `${API_BASE_URL}/api/v1/forge/focus-group/stream?content=${encodeURIComponent(content)}`;
 
         (async () => {
             try {

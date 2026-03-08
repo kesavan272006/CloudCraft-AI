@@ -14,6 +14,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { TrendingUp, BarChart3, Loader2 } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { API_BASE_URL } from '@/lib/api-config'
 
 const PRIMARY_COLOR = '#6366f1' // Indigo-500
 const CHART_COLORS = ['#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe']
@@ -25,7 +26,7 @@ export function AnalyticsTab() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await fetch('http://localhost:8000/api/v1/dashboard/analytics')
+                const res = await fetch(`${API_BASE_URL}/api/v1/dashboard/analytics`)
                 if (res.ok) {
                     const json = await res.json()
                     setData(json)
